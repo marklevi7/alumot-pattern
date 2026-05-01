@@ -3,6 +3,13 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v31 — Accordion number badges: cascading spin
+- Each `.num` badge now spins 360° clockwise around its own centre.
+- Per-position `animation-delay` (0s, 0.7s, 1.4s, …, 4.2s) over a
+  4.9s duration creates a perpetual wave of rotation rolling down
+  the seven AI Employees.
+- `prefers-reduced-motion: reduce` disables the animation entirely.
+
 ## v30 — Manifesto: IBM Plex Mono + larger size
 - Switched the manifesto typeface from Space Mono to **IBM Plex
   Mono** — corporate-tech feel, fits the enterprise sales context

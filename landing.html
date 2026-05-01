@@ -414,6 +414,23 @@
       border-radius: 4px;
       font-variant-numeric: tabular-nums;
       letter-spacing: 0;
+      /* Each badge spins clockwise around its own centre. The 4.9s
+         duration / 0.7s stagger (= 4.9 / 7) makes a perfect rolling
+         wave across the seven items. */
+      animation: accordion-num-spin 4.9s linear infinite;
+      transform-origin: 50% 50%;
+      will-change: transform;
+    }
+    .accordion details:nth-of-type(1) .num { animation-delay: 0s;   }
+    .accordion details:nth-of-type(2) .num { animation-delay: 0.7s; }
+    .accordion details:nth-of-type(3) .num { animation-delay: 1.4s; }
+    .accordion details:nth-of-type(4) .num { animation-delay: 2.1s; }
+    .accordion details:nth-of-type(5) .num { animation-delay: 2.8s; }
+    .accordion details:nth-of-type(6) .num { animation-delay: 3.5s; }
+    .accordion details:nth-of-type(7) .num { animation-delay: 4.2s; }
+    @keyframes accordion-num-spin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
     }
 
     .accordion .title {
@@ -595,6 +612,7 @@
     @media (prefers-reduced-motion: reduce) {
       .reveal { opacity: 1; transform: none; transition: none; }
       .cta, .cta::after, .accordion .chev { transition: none; }
+      .accordion .num { animation: none; transform: none; }
     }
 
     /* ─── MOBILE ────────────────────────────────────────────────── */
