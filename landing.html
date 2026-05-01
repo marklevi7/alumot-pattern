@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap">
   <style>
     :root {
       --bg-0: #050507;
@@ -365,13 +365,13 @@
       background: var(--bg-0);
     }
     .manifesto-text {
-      font-family: 'Space Mono', ui-monospace, SFMono-Regular, 'Menlo',
+      font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, 'Menlo',
                    'Cascadia Mono', Consolas, monospace;
-      font-size: clamp(16px, 2.4vw, 22px);   /* mono reads bigger; nudge down a touch */
+      font-size: clamp(20px, 2.9vw, 26px);   /* legibility bump */
       line-height: 1.55;
       letter-spacing: 0;
       color: var(--ink);
-      max-width: 56ch;
+      max-width: 50ch;                       /* tighter measure for the larger size */
       font-weight: 400;
       /* Reserve the final layout dimensions so the scramble animation
          (which only swaps characters, never lengths) doesn't cause

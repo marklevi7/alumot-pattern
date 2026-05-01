@@ -3,6 +3,16 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v30 — Manifesto: IBM Plex Mono + larger size
+- Switched the manifesto typeface from Space Mono to **IBM Plex
+  Mono** — corporate-tech feel, fits the enterprise sales context
+  better than Space Mono's retro vibe.
+- Bumped font-size from `clamp(16px, 2.4vw, 22px)` to
+  `clamp(20px, 2.9vw, 26px)` for legibility.
+- Tightened `max-width` from 56ch → 50ch to balance the larger
+  type.
+- Scramble JS untouched — works on any monospace.
+
 ## v29 — Manifesto: Space Mono + scramble-reveal animation
 - Switched the manifesto block to **Space Mono** (Google Fonts).
   Distinctive tech-flavoured monospace; pairs well with the dot field
