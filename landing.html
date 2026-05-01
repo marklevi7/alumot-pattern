@@ -288,26 +288,24 @@
       background: var(--bg-2);
     }
 
+    /* Both columns share the same title styling — same font size,
+       weight, color. Reusing the accordion title clamp so the size
+       comes from an existing scale rather than a new one. */
     .score .col h4 {
-      font-size: 11px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--ink-faint);
+      font-size: clamp(18px, 2.2vw, 22px);
+      letter-spacing: -0.015em;
+      text-transform: none;
+      color: var(--ink);
       margin: 0 0 24px;
       font-weight: 500;
+      line-height: 1.25;
     }
 
-    .score .col.win h4 {
-      color: var(--ink);
-    }
-
+    /* Both icons identical — same size, same color (--ink). */
     .score .col-icon {
       width: 60px;
       height: 60px;
       margin: 0 0 18px;
-      color: var(--ink-faint);
-    }
-    .score .col.win .col-icon {
       color: var(--ink);
     }
     .score .col-icon svg {
@@ -819,7 +817,7 @@
           </div>
           <h4>Junior employee</h4>
           <div class="score-row">
-            <p class="label">Loaded monthly cost</p>
+            <p class="label">Monthly cost</p>
             <p class="value">$4,000 – $6,500</p>
           </div>
           <div class="score-row">
@@ -852,7 +850,7 @@
           </div>
           <h4>AI Employee</h4>
           <div class="score-row">
-            <p class="label">Loaded monthly cost</p>
+            <p class="label">Monthly cost</p>
             <p class="value">$150 – $800</p>
           </div>
           <div class="score-row">

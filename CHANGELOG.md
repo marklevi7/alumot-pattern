@@ -3,6 +3,16 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v23 — Scoreboard cleanup
+- "LOADED MONTHLY COST" → "Monthly cost" in both columns.
+- Junior vs AI column headings are now identical: same color (--ink),
+  same size, same weight, no uppercase. Reused the accordion-title
+  clamp `clamp(18px, 2.2vw, 22px)` so the size matches an existing
+  scale on the page rather than introducing a new one.
+- Both icons (junior + AI) now share `color: var(--ink)` — identical
+  brightness; the previous "winning column = brighter" treatment is
+  gone.
+
 ## v22 — Snowball moved into the WHY NOW block
 - Removed the standalone snowball section above the hero.
 - Snowball now sits inside the WHY NOW section, absolutely positioned
