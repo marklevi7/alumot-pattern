@@ -120,6 +120,31 @@
       line-height: 1.5;
     }
 
+    /* ─── WORDMARK ─────────────────────────────────────────────── */
+    .wordmark {
+      position: absolute;
+      top: 28px;
+      left: 24px;
+      z-index: 2;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      mix-blend-mode: difference;
+      color: #ffffff;
+      line-height: 1;
+      pointer-events: none;
+      user-select: none;
+    }
+    .wordmark .dot {
+      display: inline-block;
+      margin: 0 0.5em;
+      opacity: 0.6;
+    }
+    @media (max-width: 720px) {
+      .wordmark { top: 22px; left: 20px; font-size: 11px; letter-spacing: 0.16em; }
+    }
+
     /* ─── BUTTONS ──────────────────────────────────────────────── */
     .cta {
       display: inline-flex;
@@ -419,11 +444,15 @@
 
     /* ─── FINAL CTA ────────────────────────────────────────────── */
     .final {
-      padding: 144px 24px 96px;
+      padding: 220px 24px 180px;
+      min-height: 95vh;
       text-align: left;
       position: relative;
       overflow: hidden;
       isolation: isolate;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
     .final h2 {
       font-size: clamp(36px, 7vw, 80px);
@@ -439,18 +468,6 @@
       max-width: 50ch;
       margin: 0 0 40px;
     }
-
-    /* ─── VERSION STAMP ────────────────────────────────────────── */
-    .version {
-      padding: 32px 24px 48px;
-      color: var(--ink-faint);
-      font-size: 11px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      text-align: left;
-      border-top: 1px solid var(--line);
-    }
-    .version .wrap { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
 
     /* ─── REVEAL ANIMATIONS ────────────────────────────────────── */
     .reveal {
@@ -497,7 +514,7 @@
       }
 
       .banner { padding: 72px 24px; }
-      .final { padding: 96px 24px 72px; }
+      .final { padding: 160px 24px 140px; min-height: 95vh; }
     }
 
     /* Small focus ring for accessibility */
@@ -513,6 +530,7 @@
   <!-- ─── HERO ─────────────────────────────────────────────────── -->
   <section class="hero">
     <div id="hero_bg" class="dither-bg" data-preset="hero"></div>
+    <div class="wordmark">Mark Levi<span class="dot">·</span>Consulting</div>
     <div class="wrap">
       <h1 class="reveal">Stop paying humans for work machines do better.</h1>
       <p class="sub reveal">Every month you sign off on salaries for work that doesn't need a human anymore. Lead follow-ups. Content. Filing. Compliance. Reports. Calendar wrangling. Invoice reconciliation. Contract renewals. This work doesn't need talent. It needs volume. AI does volume for a fraction of the cost.</p>
@@ -804,14 +822,6 @@
     </div>
   </section>
 
-  <!-- ─── VERSION STAMP ────────────────────────────────────────── -->
-  <div class="version">
-    <div class="wrap">
-      <span>Mark Levi Consulting</span>
-      <span>v2.3 — May 1, 2026</span>
-    </div>
-  </div>
-
 </main>
 
 <script type="module">
@@ -833,12 +843,15 @@
     rippleSpeed: 0.30,       // how fast tap/auto ripples spread
     rippleThickness: 0.10,   // ring width of each ripple
 
-    // Per-section overrides. density: 0 = sparse / hero default,
-    // ~0.5 = clearly visible, 1.0 = saturated.
+    // Per-section overrides.
+    //   density       : 0 = sparse, 0.5 = clearly visible, 1.0 = saturated
+    //   autoRippleMs  : interval for random ripples (0 to disable)
+    //   flowY         : upward drift speed of the pattern (0 = static)
+    //   gradientY     : extra density at the bottom (0 = uniform, 1 = strong gradient)
     presets: {
-      hero:   { density: 0.0,  autoRippleMs: 5000 },
-      banner: { density: 0.45, autoRippleMs: 3500 },
-      final:  { density: 0.45, autoRippleMs: 3500 },
+      hero:   { density: 0.0,  autoRippleMs: 5000, flowY: 0.00, gradientY: 0.00 },
+      banner: { density: 0.45, autoRippleMs: 3500, flowY: 0.00, gradientY: 0.00 },
+      final:  { density: 0.45, autoRippleMs: 3500, flowY: 0.04, gradientY: 0.55 },
     },
   };
   // ────────────────────────────────────────────────────────────────
@@ -860,6 +873,8 @@ uniform float uDensity;       // 0 = sparse, 1 = saturated
 uniform float uFbmSpeed;
 uniform float uRippleSpeed;
 uniform float uRippleThickness;
+uniform float uFlowY;         // upward drift speed of the noise field
+uniform float uGradientY;     // extra density toward the bottom (0..1)
 
 const int SHAPE_SQUARE   = 0;
 const int SHAPE_CIRCLE   = 1;
@@ -949,11 +964,19 @@ void main() {
   vec2 cellCoord = cellId * cellPx;
   vec2 uv = cellCoord / uResolution * vec2(aspect, 1.0);
 
-  float feed = fbm2(uv, uTime * uFbmSpeed);
+  // Upward flow: shift the sampled noise downward over time so the
+  // visible pattern appears to drift up the screen.
+  vec2 flowUv = uv - vec2(0.0, uTime * uFlowY);
+  float feed = fbm2(flowUv, uTime * uFbmSpeed);
+
+  // Bottom-heavy density: ny=0 at bottom, ny=1 at top. Boost density
+  // near the bottom by uGradientY (0 = uniform, 1 = strong).
+  float ny = gl_FragCoord.y / max(uResolution.y, 1.0);
+  float dens = clamp(uDensity + uGradientY * (1.0 - ny) * 0.55, 0.0, 1.0);
+
   // density (0..1) shifts the dither offset:
-  // 0   → -0.65 (original sparse)
-  // 1   → -0.10 (saturated)
-  feed = feed * 0.5 - mix(0.65, 0.10, clamp(uDensity, 0.0, 1.0));
+  //   0 → -0.65 (sparse), 1 → -0.10 (saturated)
+  feed = feed * 0.5 - mix(0.65, 0.10, dens);
 
   const float dampT = 1.0;
   const float dampR = 10.0;
@@ -1015,6 +1038,8 @@ void main() {
       uFbmSpeed:        { value: cfg.fbmSpeed },
       uRippleSpeed:     { value: cfg.rippleSpeed },
       uRippleThickness: { value: cfg.rippleThickness },
+      uFlowY:           { value: preset.flowY     ?? 0 },
+      uGradientY:       { value: preset.gradientY ?? 0 },
     };
 
     const scene = new THREE.Scene();
