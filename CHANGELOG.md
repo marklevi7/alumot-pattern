@@ -3,6 +3,12 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v9 — Hard rollback to v5 + minimal test page
+- The v8 rollback didn't fix the white screen on iOS. Did a clean
+  `git checkout v5 -- landing.html` to restore the exact v5 state.
+- Added `test.html`, a minimal dark page with one button. If THIS
+  page also shows white, it's a CDN/cache issue, not the code.
+
 ## v8 — Rollback the running-outline button (broke iOS rendering)
 - The `@property --cta-angle` + `conic-gradient` + `isolation: isolate`
   + `z-index: -1` combo caused iOS Safari to render the entire page
