@@ -3,6 +3,13 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v11 — Matched line icons on the Junior / AI scoreboard
+- Added two hand-drawn SVG line icons above each column heading.
+  Both share the same stroke width (1.6), the same shoulder curve,
+  and head height. Junior = circle head; AI = rounded-square head
+  with antenna and two eye dots.
+- Icon color follows the column: dim for Junior, bright for AI.
+
 ## v10 — Slight button rounding (5px) + bigger dots
 - `.cta` border-radius: 0 → 5px (subtle round, matches the v6 spec).
 - DITHER_CONFIG.pixelSize is now in CSS pixels (4 by default).
