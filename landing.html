@@ -13,10 +13,10 @@
       --bg-1: #0b0b10;
       --bg-2: #11121a;
       --ink: #f3f3f5;
-      --ink-dim: #c0c0cc;     /* was #9a9aa3 — bumped ~25% for sun-readability */
-      --ink-faint: #6c6c78;   /* was #565660 — bumped ~25% for sun-readability */
-      --line: rgba(255, 255, 255, 0.08);
-      --line-strong: rgba(255, 255, 255, 0.18);
+      --ink-dim: #ececf2;     /* +25% on v12's #c0c0cc — high readability in sun */
+      --ink-faint: #a0a0ad;   /* +25% on v12's #6c6c78 */
+      --line: rgba(255, 255, 255, 0.12);
+      --line-strong: rgba(255, 255, 255, 0.22);
       --accent: #ffffff;
     }
 
@@ -98,18 +98,17 @@
 
     .hero h1 {
       font-size: clamp(40px, 9vw, 112px);
-      line-height: 0.95;
+      line-height: 1.05;       /* extra room so the per-line bg doesn't collide */
       letter-spacing: -0.035em;
       font-weight: 600;
       margin: 0 0 32px;
       max-width: 18ch;
-      mix-blend-mode: difference;
       color: #ffffff;
     }
 
     .hero h1 em {
       font-style: normal;
-      color: #aaaaaa;   /* was #888888 — bumped ~25% */
+      color: #d4d4d4;
     }
 
     .hero .sub {
@@ -117,14 +116,20 @@
       color: var(--ink-dim);
       max-width: 56ch;
       margin: 0 0 40px;
-      line-height: 1.7;        /* extra space so the per-line bg doesn't crowd */
+      line-height: 1.7;
     }
-    /* Solid black behind the text on every line so the dot pattern
-       can't bleed through and reduce legibility. */
-    .hero .sub > span {
+
+    /* Per-line black backdrop so dot pattern can't bleed through text.
+       Used on every text element that sits over a .dither-bg. */
+    .boxed {
       background: #000000;
       -webkit-box-decoration-break: clone;
               box-decoration-break: clone;
+      padding: 0.05em 0.28em;
+      box-shadow: 0.28em 0 0 #000000, -0.28em 0 0 #000000;
+    }
+    /* Heavier padding on body-copy spans for breathing room. */
+    .boxed--body {
       padding: 0.18em 0.4em;
       box-shadow: 0.4em 0 0 #000000, -0.4em 0 0 #000000;
     }
@@ -178,21 +183,22 @@
       background-image: linear-gradient(
         110deg,
         transparent 0%,
-        transparent 40%,
-        rgba(0, 0, 0, 0.18) 50%,
-        transparent 60%,
+        transparent 30%,
+        rgba(0, 0, 0, 0.55) 50%,
+        transparent 70%,
         transparent 100%
       );
-      background-size: 220% 100%;
+      background-size: 250% 100%;
       background-repeat: no-repeat;
-      background-position: -110% 0;
+      background-position: -130% 0;
       animation: cta-shine 5s ease-in-out infinite;
     }
 
     @keyframes cta-shine {
-      0%   { background-position: -110% 0; }
-      14%  { background-position:  210% 0; }   /* sweep takes ~0.7s */
-      100% { background-position:  210% 0; }   /* then waits off-screen */
+      0%   { background-position: -130% 0; transform: scale(1); }
+      18%  { background-position:  230% 0; transform: scale(1.025); }
+      24%  { transform: scale(1); }
+      100% { background-position:  230% 0; transform: scale(1); }
     }
 
     .cta::after {
@@ -294,9 +300,9 @@
     }
 
     .score .col-icon {
-      width: 44px;
-      height: 44px;
-      margin: 0 0 16px;
+      width: 60px;
+      height: 60px;
+      margin: 0 0 18px;
       color: var(--ink-faint);
     }
     .score .col.win .col-icon {
@@ -308,7 +314,7 @@
       height: 100%;
     }
     @media (max-width: 720px) {
-      .score .col-icon { width: 36px; height: 36px; margin-bottom: 12px; }
+      .score .col-icon { width: 48px; height: 48px; margin-bottom: 14px; }
     }
 
     .score-row {
@@ -482,13 +488,17 @@
     .banner h2 {
       margin: 0;
       max-width: 20ch;
-      mix-blend-mode: difference;
       color: #ffffff;
+      line-height: 1.15;
     }
     .banner p {
       color: var(--ink-dim);
       max-width: 50ch;
       margin: 0 0 8px;
+      line-height: 1.7;
+    }
+    .banner .eyebrow {
+      line-height: 2;
     }
 
     /* ─── FINAL CTA ────────────────────────────────────────────── */
@@ -505,10 +515,9 @@
     }
     .final h2 {
       font-size: clamp(36px, 7vw, 80px);
-      line-height: 1;
+      line-height: 1.1;
       max-width: 18ch;
       margin: 0 0 24px;
-      mix-blend-mode: difference;
       color: #ffffff;
     }
     .final p {
@@ -516,6 +525,7 @@
       font-size: clamp(16px, 2vw, 20px);
       max-width: 50ch;
       margin: 0 0 40px;
+      line-height: 1.7;
     }
 
     /* ─── REVEAL ANIMATIONS ────────────────────────────────────── */
@@ -581,8 +591,8 @@
     <div id="hero_bg" class="dither-bg" data-preset="hero"></div>
     <div class="wordmark">Mark Levi<span class="dot">·</span>Consulting</div>
     <div class="wrap">
-      <h1 class="reveal">Stop paying humans for work machines do better.</h1>
-      <p class="sub reveal"><span>Every month you sign off on salaries for work that doesn't need a human anymore. Lead follow-ups. Content. Filing. Compliance. Reports. Calendar wrangling. Invoice reconciliation. Contract renewals. This work doesn't need talent. It needs volume. AI does volume for a fraction of the cost.</span></p>
+      <h1 class="reveal"><span class="boxed">Stop paying humans for work machines do better.</span></h1>
+      <p class="sub reveal"><span class="boxed boxed--body">Every month you sign off on salaries for work that doesn't need a human anymore. Lead follow-ups. Content. Filing. Compliance. Reports. Calendar wrangling. Invoice reconciliation. Contract renewals. This work doesn't need talent. It needs volume. AI does volume for a fraction of the cost.</span></p>
       <div class="reveal">
         <a class="cta" href="https://calendly.com/marklevi/1hour" target="_blank" rel="noopener">Book a call</a>
       </div>
@@ -598,7 +608,7 @@
       <div class="score reveal">
         <div class="col">
           <div class="col-icon" aria-hidden="true">
-            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="32" cy="22" r="9"/>
               <path d="M14 54 C14 42 23 36 32 36 C41 36 50 42 50 54"/>
             </svg>
@@ -627,7 +637,7 @@
         </div>
         <div class="col win">
           <div class="col-icon" aria-hidden="true">
-            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
               <line x1="32" y1="9" x2="32" y2="13"/>
               <circle cx="32" cy="8.5" r="0.8" fill="currentColor" stroke="none"/>
               <rect x="23" y="13" width="18" height="18" rx="3"/>
@@ -773,9 +783,9 @@
   <section class="banner">
     <div class="dither-bg" data-preset="banner"></div>
     <div class="wrap">
-      <p class="eyebrow reveal">Your move</p>
-      <h2 class="reveal">Which one replaces the most expensive workflow in your company?</h2>
-      <p class="reveal">30-minute call. No deck. No pitch. Just the math and your highest-cost workflow.</p>
+      <p class="eyebrow reveal"><span class="boxed">Your move</span></p>
+      <h2 class="reveal"><span class="boxed">Which one replaces the most expensive workflow in your company?</span></h2>
+      <p class="reveal"><span class="boxed boxed--body">30-minute call. No deck. No pitch. Just the math and your highest-cost workflow.</span></p>
       <div class="reveal">
         <a class="cta" href="https://calendly.com/marklevi/1hour" target="_blank" rel="noopener">Book a call</a>
       </div>
@@ -879,8 +889,8 @@
   <section class="final">
     <div class="dither-bg" data-preset="final"></div>
     <div class="wrap">
-      <h2 class="reveal">Ready to stop paying for work machines do better?</h2>
-      <p class="reveal">30 minutes. No deck. No pitch. Just the math and your highest-cost workflow.</p>
+      <h2 class="reveal"><span class="boxed">Ready to stop paying for work machines do better?</span></h2>
+      <p class="reveal"><span class="boxed boxed--body">30 minutes. No deck. No pitch. Just the math and your highest-cost workflow.</span></p>
       <div class="reveal">
         <a class="cta" href="https://calendly.com/marklevi/1hour" target="_blank" rel="noopener">Book a call</a>
       </div>

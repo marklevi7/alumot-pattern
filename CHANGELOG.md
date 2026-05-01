@@ -3,6 +3,22 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v13 — Brighter grays (round 2) + visible icons + stronger shine + black backdrops everywhere
+- Bumped every gray ANOTHER ~25% on top of v12:
+    --ink-dim:   #c0c0cc → #ececf2
+    --ink-faint: #6c6c78 → #a0a0ad
+    .hero h1 em: #aaaaaa → #d4d4d4
+- Scoreboard icons: size 44→60, stroke 1.6→2.4 (much more visible).
+- CTA shine: dark band opacity 0.18→0.55, gradient widened, plus a
+  small scale pulse during the sweep so the animation reads even at
+  a glance. Sweep duration ~0.9s, then waits ~4.1s.
+- Replaced `mix-blend-mode: difference` on every headline with a
+  per-line solid-black backdrop. New `.boxed` utility class wraps
+  text in spans inside hero h1, hero subtitle, banner eyebrow,
+  banner h2, banner p, final h2, final p — every text element that
+  sits over a `.dither-bg`. Now the dot pattern is fully blocked
+  behind text instead of bleeding through.
+
 ## v12 — Brighter grays, hero subtitle blackout, CTA shine
 - Bumped every gray text/icon shade by ~25% so the page is readable
   in direct sun on a phone:
