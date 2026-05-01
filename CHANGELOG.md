@@ -3,6 +3,17 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v19 — Animated tier icons
+- Light: the single bot bobs up and down in place (1.2s loop).
+- Mid: the two bots arc-jump and swap places — left arcs over the
+  top, right arcs under the bottom, then they swap back (3s loop).
+- Heavy: each of the three bots pulses opacity in turn (top → left →
+  right) and the two connection lines run a dashed flow, suggesting
+  active data exchange across a department.
+- All three SVGs share the same 64×64 viewBox and 56px render size.
+  No element ever leaves its canvas.
+- SMIL animations in pure SVG — no extra JS, no CSS changes.
+
 ## v18 — Removed "WHAT IT IS" eyebrow above the "What an AI Employee actually is" section.
 
 ## v17 — Removed "THE MATH" eyebrow above the scoreboard.
