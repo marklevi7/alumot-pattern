@@ -145,16 +145,27 @@
       .wordmark { top: 22px; left: 20px; font-size: 11px; letter-spacing: 0.16em; }
     }
 
-    /* ─── BUTTONS ──────────────────────────────────────────────── */
+    /* ─── BUTTONS (with running outline) ────────────────────────── */
+    @property --cta-angle {
+      syntax: '<angle>';
+      initial-value: 0deg;
+      inherits: false;
+    }
+    @keyframes cta-runner {
+      to { --cta-angle: 360deg; }
+    }
+
     .cta {
+      position: relative;
+      isolation: isolate;
       display: inline-flex;
       align-items: center;
       gap: 10px;
       padding: 16px 28px;
       background: var(--ink);
       color: var(--bg-0);
-      border: 1px solid var(--ink);
-      border-radius: 0;
+      border: none;
+      border-radius: 5px;
       font: inherit;
       font-size: 15px;
       font-weight: 600;
@@ -164,6 +175,28 @@
       transition: transform 120ms ease, background 120ms ease, color 120ms ease;
     }
 
+    /* Running outline — conic gradient with a single bright arc that
+       sweeps around the perimeter every 3s. Sits behind the button via
+       z-index: -1 inside the .cta's isolation context, peeking out by
+       3px on every side as the visible glow. */
+    .cta::before {
+      content: '';
+      position: absolute;
+      inset: -3px;
+      z-index: -1;
+      border-radius: 8px;
+      background: conic-gradient(
+        from var(--cta-angle, 0deg),
+        rgba(255, 255, 255, 0)   0deg,
+        #ffffff                 50deg,
+        rgba(255, 255, 255, 0) 110deg,
+        rgba(255, 255, 255, 0) 360deg
+      );
+      animation: cta-runner 3s linear infinite;
+      filter: blur(2px);
+      opacity: 0.95;
+    }
+
     .cta::after {
       content: '→';
       display: inline-block;
@@ -171,8 +204,13 @@
     }
 
     .cta:hover {
-      background: transparent;
+      background: var(--bg-0);
       color: var(--ink);
+    }
+
+    .cta:hover::before {
+      filter: blur(4px);
+      opacity: 1;
     }
 
     .cta:hover::after {
@@ -188,6 +226,7 @@
       background: var(--ink);
       color: var(--bg-0);
     }
+
 
     /* ─── SECTIONS ─────────────────────────────────────────────── */
     section { padding: 96px 0; position: relative; }
