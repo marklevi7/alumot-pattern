@@ -3,6 +3,14 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v10 — Slight button rounding (5px) + bigger dots
+- `.cta` border-radius: 0 → 5px (subtle round, matches the v6 spec).
+- DITHER_CONFIG.pixelSize is now in CSS pixels (4 by default).
+  JS multiplies by device pixel ratio internally so dots are the
+  same visual size on retina iPhones and non-retina screens. Bumped
+  from a raw value of 6 (≈2 CSS px on retina, looked tiny) to a
+  CSS-pixel value of 4 (≈12 device px on retina, clearly visible).
+
 ## v9 — Hard rollback to v5 + minimal test page
 - The v8 rollback didn't fix the white screen on iOS. Did a clean
   `git checkout v5 -- landing.html` to restore the exact v5 state.

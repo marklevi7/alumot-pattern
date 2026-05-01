@@ -154,7 +154,7 @@
       background: var(--ink);
       color: var(--bg-0);
       border: 1px solid var(--ink);
-      border-radius: 0;
+      border-radius: 5px;
       font: inherit;
       font-size: 15px;
       font-weight: 600;
@@ -838,7 +838,7 @@
     shape:       'circle',   // 'circle' | 'square' | 'triangle' | 'diamond'
     inkColor:    '#ffffff',  // dot color
     bgColor:     '#050507',  // backdrop behind the dots
-    pixelSize:   6,          // dot size (smaller = finer grain)
+    pixelSize:   4,          // dot size in CSS pixels (multiplied by DPR internally so the visual size is consistent across devices)
     fbmSpeed:    0.05,       // how fast the cloud-noise pattern drifts
     rippleSpeed: 0.30,       // how fast tap/auto ripples spread
     rippleThickness: 0.10,   // ring width of each ripple
@@ -1033,7 +1033,9 @@ void main() {
       uClickPos:        { value: Array.from({ length: MAX }, () => new THREE.Vector2(-1, -1)) },
       uClickTimes:      { value: new Float32Array(MAX) },
       uShapeType:       { value: SHAPES[cfg.shape] ?? 1 },
-      uPixelSize:       { value: cfg.pixelSize },
+      // Multiply by DPR so cfg.pixelSize is interpreted in CSS pixels —
+      // dots stay the same visual size whether the screen is retina or not.
+      uPixelSize:       { value: cfg.pixelSize * (renderer.getPixelRatio() || 1) },
       uDensity:         { value: preset.density },
       uFbmSpeed:        { value: cfg.fbmSpeed },
       uRippleSpeed:     { value: cfg.rippleSpeed },
