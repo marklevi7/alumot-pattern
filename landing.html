@@ -73,23 +73,26 @@
       isolation: isolate;
     }
 
-    #hero_bg {
+    /* Shared dither-bg layer — used by hero, banner, and final CTA. */
+    .dither-bg {
       position: absolute;
       inset: 0;
       z-index: 0;
       width: 100%;
       height: 100%;
     }
-    #hero_bg canvas {
+    .dither-bg canvas {
       display: block;
       width: 100% !important;
       height: 100% !important;
     }
 
-    /* No z-index here — keeping .wrap free of a stacking context so
-       mix-blend-mode: difference on the headline can blend with the
+    /* No z-index on .wrap — keep .wrap free of a stacking context so
+       mix-blend-mode: difference on headlines can blend with the
        canvas underneath. DOM order alone keeps content above the bg. */
-    .hero .wrap {
+    .hero .wrap,
+    .banner .wrap,
+    .final .wrap {
       position: relative;
     }
 
@@ -392,8 +395,10 @@
       padding: 96px 24px;
       border-top: 1px solid var(--line);
       border-bottom: 1px solid var(--line);
-      background: var(--bg-1);
       text-align: left;
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
     }
     .banner .wrap {
       display: flex;
@@ -403,6 +408,8 @@
     .banner h2 {
       margin: 0;
       max-width: 20ch;
+      mix-blend-mode: difference;
+      color: #ffffff;
     }
     .banner p {
       color: var(--ink-dim);
@@ -414,12 +421,17 @@
     .final {
       padding: 144px 24px 96px;
       text-align: left;
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
     }
     .final h2 {
       font-size: clamp(36px, 7vw, 80px);
       line-height: 1;
       max-width: 18ch;
       margin: 0 0 24px;
+      mix-blend-mode: difference;
+      color: #ffffff;
     }
     .final p {
       color: var(--ink-dim);
@@ -500,7 +512,7 @@
 
   <!-- ─── HERO ─────────────────────────────────────────────────── -->
   <section class="hero">
-    <div id="hero_bg" data-shape="circle" data-pixel-size="6" data-ink="#ffffff" style="background-color:#050507;"></div>
+    <div id="hero_bg" class="dither-bg" data-preset="hero"></div>
     <div class="wrap">
       <h1 class="reveal">Stop paying humans for work machines do better.</h1>
       <p class="sub reveal">Every month you sign off on salaries for work that doesn't need a human anymore. Lead follow-ups. Content. Filing. Compliance. Reports. Calendar wrangling. Invoice reconciliation. Contract renewals. This work doesn't need talent. It needs volume. AI does volume for a fraction of the cost.</p>
@@ -676,6 +688,7 @@
 
   <!-- ─── MID CTA BANNER ───────────────────────────────────────── -->
   <section class="banner">
+    <div class="dither-bg" data-preset="banner"></div>
     <div class="wrap">
       <p class="eyebrow reveal">Your move</p>
       <h2 class="reveal">Which one replaces the most expensive workflow in your company?</h2>
@@ -781,6 +794,7 @@
 
   <!-- ─── FINAL CTA ────────────────────────────────────────────── -->
   <section class="final">
+    <div class="dither-bg" data-preset="final"></div>
     <div class="wrap">
       <h2 class="reveal">Ready to stop paying for work machines do better?</h2>
       <p class="reveal">30 minutes. No deck. No pitch. Just the math and your highest-cost workflow.</p>
@@ -801,33 +815,40 @@
 </main>
 
 <script type="module">
-  // Bayer-dither circles hero — adapted from Seva Dolgopolov's Codrops demo.
-  // Direct ESM import (no importmap) so this works reliably on iOS Safari.
+  // ════════════════════════════════════════════════════════════════
+  //  DITHER PATTERN — adapted from Seva Dolgopolov's Codrops demo.
+  //  Drives the moving dot field in the hero, mid-banner, and final
+  //  CTA. To tweak, edit DITHER_CONFIG below.
+  // ════════════════════════════════════════════════════════════════
   import * as THREE from 'https://esm.sh/three@0.160.0';
 
-  try {
-    const container = document.getElementById('hero_bg');
-    if (!container) throw new Error('no #hero_bg container');
+  // ─── TWEAK HERE ─────────────────────────────────────────────────
+  const DITHER_CONFIG = {
+    // Shared across all three instances. Change one — change all three.
+    shape:       'circle',   // 'circle' | 'square' | 'triangle' | 'diamond'
+    inkColor:    '#ffffff',  // dot color
+    bgColor:     '#050507',  // backdrop behind the dots
+    pixelSize:   6,          // dot size (smaller = finer grain)
+    fbmSpeed:    0.05,       // how fast the cloud-noise pattern drifts
+    rippleSpeed: 0.30,       // how fast tap/auto ripples spread
+    rippleThickness: 0.10,   // ring width of each ripple
 
-    const SHAPES = { square: 0, circle: 1, triangle: 2, diamond: 3 };
-    const shapeName = container.dataset.shape || 'circle';
-    const pixelSize = parseFloat(container.dataset.pixelSize) || 6;
-    const inkColor  = container.dataset.ink || '#ffffff';
+    // Per-section overrides. density: 0 = sparse / hero default,
+    // ~0.5 = clearly visible, 1.0 = saturated.
+    presets: {
+      hero:   { density: 0.0,  autoRippleMs: 5000 },
+      banner: { density: 0.45, autoRippleMs: 3500 },
+      final:  { density: 0.45, autoRippleMs: 3500 },
+    },
+  };
+  // ────────────────────────────────────────────────────────────────
 
-    const canvas = document.createElement('canvas');
-    const gl = canvas.getContext('webgl2', { antialias: true, alpha: true });
-    if (!gl) throw new Error('WebGL2 not supported');
+  const SHAPES = { square: 0, circle: 1, triangle: 2, diamond: 3 };
 
-    const renderer = new THREE.WebGLRenderer({ canvas, context: gl, antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-    container.appendChild(canvas);
+  const VERT = `
+void main() { gl_Position = vec4(position, 1.0); }`;
 
-      const VERT = `
-void main() {
-  gl_Position = vec4(position, 1.0);
-}`;
-
-      const FRAG = `
+  const FRAG = `
 precision highp float;
 
 uniform vec3  uColor;
@@ -835,6 +856,10 @@ uniform vec2  uResolution;
 uniform float uTime;
 uniform float uPixelSize;
 uniform int   uShapeType;
+uniform float uDensity;       // 0 = sparse, 1 = saturated
+uniform float uFbmSpeed;
+uniform float uRippleSpeed;
+uniform float uRippleThickness;
 
 const int SHAPE_SQUARE   = 0;
 const int SHAPE_CIRCLE   = 1;
@@ -924,13 +949,14 @@ void main() {
   vec2 cellCoord = cellId * cellPx;
   vec2 uv = cellCoord / uResolution * vec2(aspect, 1.0);
 
-  float feed = fbm2(uv, uTime * 0.05);
-  feed = feed * 0.5 - 0.65;
+  float feed = fbm2(uv, uTime * uFbmSpeed);
+  // density (0..1) shifts the dither offset:
+  // 0   → -0.65 (original sparse)
+  // 1   → -0.10 (saturated)
+  feed = feed * 0.5 - mix(0.65, 0.10, clamp(uDensity, 0.0, 1.0));
 
-  const float speed     = 0.30;
-  const float thickness = 0.10;
-  const float dampT     = 1.0;
-  const float dampR     = 10.0;
+  const float dampT = 1.0;
+  const float dampR = 10.0;
 
   for (int i = 0; i < MAX_CLICKS; ++i) {
     vec2 pos = uClickPos[i];
@@ -938,8 +964,8 @@ void main() {
     vec2 cuv = (((pos - uResolution * 0.5 - cellPx * 0.5) / uResolution)) * vec2(aspect, 1.0);
     float t = max(uTime - uClickTimes[i], 0.0);
     float r = distance(uv, cuv);
-    float waveR = speed * t;
-    float ring  = exp(-pow((r - waveR) / thickness, 2.0));
+    float waveR = uRippleSpeed * t;
+    float ring  = exp(-pow((r - waveR) / uRippleThickness, 2.0));
     float atten = exp(-dampT * t) * exp(-dampR * r);
     feed = max(feed, ring * atten);
   }
@@ -957,43 +983,63 @@ void main() {
   fragColor = vec4(uColor, M);
 }`;
 
-      const MAX = 10;
-      const uniforms = {
-        uResolution: { value: new THREE.Vector2() },
-        uTime:       { value: 0 },
-        uColor:      { value: new THREE.Color(inkColor) },
-        uClickPos:   { value: Array.from({ length: MAX }, () => new THREE.Vector2(-1, -1)) },
-        uClickTimes: { value: new Float32Array(MAX) },
-        uShapeType:  { value: SHAPES[shapeName] ?? 1 },
-        uPixelSize:  { value: pixelSize },
-      };
+  const MAX = 10;
+  const clock = new THREE.Clock();
+  const instances = [];
 
-      const scene = new THREE.Scene();
-      const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-      const material = new THREE.ShaderMaterial({
-        vertexShader: VERT,
-        fragmentShader: FRAG,
-        uniforms,
-        glslVersion: THREE.GLSL3,
-        transparent: true,
-      });
-      scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material));
+  function initInstance(container, presetName) {
+    const cfg = DITHER_CONFIG;
+    const preset = cfg.presets[presetName] || cfg.presets.hero;
+
+    container.style.backgroundColor = cfg.bgColor;
+
+    const canvas = document.createElement('canvas');
+    const gl = canvas.getContext('webgl2', { antialias: true, alpha: true });
+    if (!gl) {
+      console.warn('[dither] WebGL2 not supported on this device — leaving static bg.');
+      return null;
+    }
+    const renderer = new THREE.WebGLRenderer({ canvas, context: gl, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    container.appendChild(canvas);
+
+    const uniforms = {
+      uResolution:      { value: new THREE.Vector2() },
+      uTime:            { value: 0 },
+      uColor:           { value: new THREE.Color(cfg.inkColor) },
+      uClickPos:        { value: Array.from({ length: MAX }, () => new THREE.Vector2(-1, -1)) },
+      uClickTimes:      { value: new Float32Array(MAX) },
+      uShapeType:       { value: SHAPES[cfg.shape] ?? 1 },
+      uPixelSize:       { value: cfg.pixelSize },
+      uDensity:         { value: preset.density },
+      uFbmSpeed:        { value: cfg.fbmSpeed },
+      uRippleSpeed:     { value: cfg.rippleSpeed },
+      uRippleThickness: { value: cfg.rippleThickness },
+    };
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    const material = new THREE.ShaderMaterial({
+      vertexShader: VERT,
+      fragmentShader: FRAG,
+      uniforms,
+      glslVersion: THREE.GLSL3,
+      transparent: true,
+    });
+    scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material));
 
     function resize() {
       const rect = container.getBoundingClientRect();
       const w = Math.max(1, Math.round(rect.width  || container.clientWidth  || window.innerWidth));
-      const h = Math.max(1, Math.round(rect.height || container.clientHeight || window.innerHeight));
+      const h = Math.max(1, Math.round(rect.height || container.clientHeight || 1));
       renderer.setSize(w, h, false);
       const dpr = renderer.getPixelRatio();
       uniforms.uResolution.value.set(w * dpr, h * dpr);
     }
     window.addEventListener('resize', resize);
-    if ('ResizeObserver' in window) {
-      new ResizeObserver(resize).observe(container);
-    }
+    if ('ResizeObserver' in window) new ResizeObserver(resize).observe(container);
     resize();
 
-    // ───── Ripple helpers ────────────────────────────────────────
     let clickIdx = 0;
     function fireRipple(canvasX, canvasY) {
       uniforms.uClickPos.value[clickIdx].set(canvasX, canvasY);
@@ -1001,9 +1047,8 @@ void main() {
       clickIdx = (clickIdx + 1) % MAX;
     }
 
-    // Tap/click anywhere on the hero → ripple at that spot.
-    const hero = container.parentElement;
-    hero.addEventListener('pointerdown', (e) => {
+    const host = container.parentElement;
+    host.addEventListener('pointerdown', (e) => {
       const rect = canvas.getBoundingClientRect();
       if (!rect.width || !rect.height) return;
       const x = (e.clientX - rect.left) * (canvas.width / rect.width);
@@ -1011,16 +1056,14 @@ void main() {
       fireRipple(x, y);
     });
 
-    // Auto-ripple every 5s at a random position so motion is always visible.
     function autoRipple() {
       if (!canvas.width || !canvas.height) return;
-      const x = Math.random() * canvas.width;
-      const y = Math.random() * canvas.height;
-      fireRipple(x, y);
+      fireRipple(Math.random() * canvas.width, Math.random() * canvas.height);
     }
-    setInterval(autoRipple, 5000);
+    if (preset.autoRippleMs > 0) setInterval(autoRipple, preset.autoRippleMs);
+    setTimeout(autoRipple, 400);
+    setTimeout(autoRipple, 1200);
 
-    // Pause render loop when hero is off-screen (saves battery on mobile).
     let visible = true;
     if ('IntersectionObserver' in window) {
       new IntersectionObserver((entries) => {
@@ -1028,22 +1071,34 @@ void main() {
       }, { threshold: 0 }).observe(container);
     }
 
-    const clock = new THREE.Clock();
-    function tick() {
-      if (visible) {
-        uniforms.uTime.value = clock.getElapsedTime();
-        renderer.render(scene, camera);
-      }
-      requestAnimationFrame(tick);
-    }
-    tick();
-
-    // Trigger an opening ripple shortly after load so motion is immediate.
-    setTimeout(autoRipple, 400);
-    setTimeout(autoRipple, 1200);
-  } catch (err) {
-    console.error('[hero shader]', err);
+    return {
+      preset: presetName,
+      uniforms,
+      isVisible: () => visible,
+      render: () => renderer.render(scene, camera),
+    };
   }
+
+  // Initialise every .dither-bg in the page.
+  document.querySelectorAll('.dither-bg').forEach((el) => {
+    try {
+      const inst = initInstance(el, el.dataset.preset || 'hero');
+      if (inst) instances.push(inst);
+    } catch (err) {
+      console.error('[dither]', el.dataset.preset, err);
+    }
+  });
+
+  // Single shared render loop drives all instances in lock-step
+  // (so they all animate to the same time clock).
+  (function tick() {
+    const t = clock.getElapsedTime();
+    instances.forEach((i) => {
+      i.uniforms.uTime.value = t;
+      if (i.isVisible()) i.render();
+    });
+    requestAnimationFrame(tick);
+  })();
 </script>
 
 <script>
