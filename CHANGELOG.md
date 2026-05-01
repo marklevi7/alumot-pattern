@@ -3,6 +3,14 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v16 — Left-edge alignment + no more button "breathing"
+- `.boxed` and `.boxed--body` no longer extend the bg leftward via
+  box-shadow. Padding is now right-only so the bg's left edge sits
+  exactly at the same X as the title and the button. Text bg, title
+  text, and button left edge all line up across hero / banner / final.
+- Removed the `transform: scale()` pulse from the CTA shine. The
+  shine still sweeps every 2.5s but the button no longer changes size.
+
 ## v15 — Removed "Your move" eyebrow from the mid banner.
 
 ## v14 — Title de-box, build-tier icons, faster shine, structural cleanup

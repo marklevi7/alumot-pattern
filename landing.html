@@ -120,18 +120,18 @@
     }
 
     /* Per-line black backdrop so dot pattern can't bleed through text.
-       Used on every text element that sits over a .dither-bg. */
+       No box-shadow extension — the bg's left edge equals the span's
+       starting position which equals the column's content-left. That
+       way the text bg lines up exactly with the title and the button
+       on the left side of every block. */
     .boxed {
       background: #000000;
       -webkit-box-decoration-break: clone;
               box-decoration-break: clone;
-      padding: 0.05em 0.28em;
-      box-shadow: 0.28em 0 0 #000000, -0.28em 0 0 #000000;
+      padding: 0.05em 0.28em 0.05em 0;
     }
-    /* Heavier padding on body-copy spans for breathing room. */
     .boxed--body {
-      padding: 0.18em 0.4em;
-      box-shadow: 0.4em 0 0 #000000, -0.4em 0 0 #000000;
+      padding: 0.18em 0.4em 0.18em 0;
     }
 
     /* ─── WORDMARK ─────────────────────────────────────────────── */
@@ -194,12 +194,12 @@
       animation: cta-shine 2.5s ease-in-out infinite;
     }
 
-    /* Slower sweep (~1.5s) and twice as often (cycle 2.5s instead of 5s). */
+    /* Slower sweep (~1.5s) and twice as often (cycle 2.5s).
+       No scale pulse — button stays the same size. */
     @keyframes cta-shine {
-      0%   { background-position: -130% 0; transform: scale(1); }
-      60%  { background-position:  230% 0; transform: scale(1.025); }
-      66%  { transform: scale(1); }
-      100% { background-position:  230% 0; transform: scale(1); }
+      0%   { background-position: -130% 0; }
+      60%  { background-position:  230% 0; }
+      100% { background-position:  230% 0; }
     }
 
     .cta::after {
