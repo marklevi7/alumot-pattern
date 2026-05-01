@@ -3,6 +3,17 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v20 — Tier icons round 2
+- Light: jump now follows physics — fast lift-off, brief apex hang,
+  accelerating fall, small landing squash, recovery, idle. Implemented
+  via SMIL `calcMode="spline"` + per-segment `keySplines`.
+- Mid: each bot's head rect is now `fill="#000"` so the front bot
+  cleanly covers the back one mid-swap (no more line-through-line).
+- Heavy: redesigned to four bots in a square arrangement with the
+  flowing-dash lines forming the perimeter AND an X across the
+  middle (6 lines total). Bot heads filled black so the lines tuck
+  cleanly behind them.
+
 ## v19 — Animated tier icons
 - Light: the single bot bobs up and down in place (1.2s loop).
 - Mid: the two bots arc-jump and swap places — left arcs over the
