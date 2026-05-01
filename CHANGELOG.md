@@ -3,6 +3,8 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v15 — Removed "Your move" eyebrow from the mid banner.
+
 ## v14 — Title de-box, build-tier icons, faster shine, structural cleanup
 - Removed the `.boxed` per-line backdrop from every headline
   (hero h1, banner h2, final h2). Body copy keeps its boxed bg.
