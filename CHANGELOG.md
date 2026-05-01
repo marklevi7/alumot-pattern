@@ -3,6 +3,17 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v28 — Unified left alignment across every section
+- Removed the 24px horizontal padding from `.hero`, `.manifesto`,
+  `.banner`, and `.final`. Generic sections (scoreboard, what-it-is,
+  accordion, build-tiers, phases, why-now, why-us) already had no
+  horizontal padding.
+- Result: every section's content now starts at exactly **24px**
+  from the viewport edge — driven by `.wrap`'s padding alone. No
+  more "double padding" mismatch where named-class sections sat
+  48px in while generic sections sat 24px in.
+- Same adjustment applied to the mobile media block.
+
 ## v27 — Hero subtitle: "real" → "existing"
 - Swapped "real" for "existing" in the hero subtitle. New line:
   **"Custom-built AI Employees deployed inside your existing systems."**
