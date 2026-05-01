@@ -3,6 +3,16 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v22 — Snowball moved into the WHY NOW block
+- Removed the standalone snowball section above the hero.
+- Snowball now sits inside the WHY NOW section, absolutely positioned
+  behind the text (z-index 1) and slightly below the text vertically
+  (top 62%, centered horizontally).
+- WHY NOW section gets `min-height: 95vh` so there's room for the
+  ball without crowding the copy.
+- All `.pl*` selectors rescoped under `.snowball-loader` so the ball
+  is fully contained within the section it lives in.
+
 ## v21 — Snowball preview block (above the hero)
 - New experimental section above the hero with a pure-CSS rolling-ball
   loader, reskinned to a black + minimal-digital aesthetic (no snow

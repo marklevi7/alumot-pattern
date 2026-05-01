@@ -610,65 +610,75 @@
     }
 
     /* ════════════════════════════════════════════════════════════
-       SNOWBALL PREVIEW (experimental — sits above the hero).
-       Pure-CSS rolling-ball loader, reskinned to a black + minimal
-       digital aesthetic. Source: jkantner / CodePen wvXbboe.
-       All selectors live under .snowball-block to avoid bleeding
-       into the rest of the page.
+       SNOWBALL LOADER (experimental — sits inside the WHY NOW
+       section, behind the text and slightly below it).
+       Pure-CSS rolling-ball loader, reskinned black + minimal
+       digital. Source: jkantner / CodePen wvXbboe.
+       All .pl* selectors are scoped under .snowball-loader so they
+       can't bleed into the rest of the page.
     ════════════════════════════════════════════════════════════ */
-    .snowball-block {
-      background: #050507;
-      font-size: clamp(13px, 4vw, 16px);   /* drives the em-based loader */
-      min-height: 50vh;
-      display: grid;
-      place-items: center;
-      padding: 80px 24px;
+    .why-now {
       position: relative;
       overflow: hidden;
+      min-height: 95vh;          /* taller block to make room for the ball */
+    }
+    .why-now .wrap {
+      position: relative;
+      z-index: 2;                /* text above the ball */
+    }
+    .snowball-loader {
+      position: absolute;
+      left: 50%;
+      top: 62%;                  /* slightly below center, behind tail of text */
+      transform: translate(-50%, -50%);
+      font-size: clamp(11px, 3vw, 14px); /* drives the em-based loader size */
+      z-index: 1;                /* behind the text */
+      pointer-events: none;
+      opacity: 0.92;
     }
 
-    .snowball-block .pl,
-    .snowball-block .pl__ball,
-    .snowball-block .pl__ball-inner-shadow,
-    .snowball-block .pl__ball-side-shadows,
-    .snowball-block .pl__ball-texture,
-    .snowball-block .pl__inner-ring,
-    .snowball-block .pl__outer-ring,
-    .snowball-block .pl__track-cover {
+    .snowball-loader .pl,
+    .snowball-loader .pl__ball,
+    .snowball-loader .pl__ball-inner-shadow,
+    .snowball-loader .pl__ball-side-shadows,
+    .snowball-loader .pl__ball-texture,
+    .snowball-loader .pl__inner-ring,
+    .snowball-loader .pl__outer-ring,
+    .snowball-loader .pl__track-cover {
       border-radius: 50%;
     }
-    .snowball-block .pl {
+    .snowball-loader .pl {
       position: relative;
       width: 16em;
       height: 16em;
     }
-    .snowball-block .pl__ball,
-    .snowball-block .pl__ball-inner-shadow,
-    .snowball-block .pl__ball-outer-shadow,
-    .snowball-block .pl__ball-side-shadows,
-    .snowball-block .pl__ball-texture,
-    .snowball-block .pl__ball-texture::before,
-    .snowball-block .pl__inner-ring,
-    .snowball-block .pl__outer-ring,
-    .snowball-block .pl__track-cover {
+    .snowball-loader .pl__ball,
+    .snowball-loader .pl__ball-inner-shadow,
+    .snowball-loader .pl__ball-outer-shadow,
+    .snowball-loader .pl__ball-side-shadows,
+    .snowball-loader .pl__ball-texture,
+    .snowball-loader .pl__ball-texture::before,
+    .snowball-loader .pl__inner-ring,
+    .snowball-loader .pl__outer-ring,
+    .snowball-loader .pl__track-cover {
       position: absolute;
     }
-    .snowball-block .pl__ball,
-    .snowball-block .pl__ball-inner-shadow,
-    .snowball-block .pl__ball-outer-shadow,
-    .snowball-block .pl__ball-texture::before,
-    .snowball-block .pl__track-cover {
+    .snowball-loader .pl__ball,
+    .snowball-loader .pl__ball-inner-shadow,
+    .snowball-loader .pl__ball-outer-shadow,
+    .snowball-loader .pl__ball-texture::before,
+    .snowball-loader .pl__track-cover {
       animation: ball 3s linear infinite;
     }
-    .snowball-block .pl__ball {
+    .snowball-loader .pl__ball {
       top: calc(50% - 1.25em);
       left: calc(50% - 1.25em);
       transform: rotate(0) translateY(-6.5em);
       width: 2.5em;
       height: 2.5em;
-      background: #f3f3f5;       /* white digital ball */
+      background: #f3f3f5;
     }
-    .snowball-block .pl__ball-inner-shadow {
+    .snowball-loader .pl__ball-inner-shadow {
       animation-name: ballInnerShadow;
       box-shadow:
         0 0.1em 0.2em hsla(0, 0%, 0%, 0.6),
@@ -677,7 +687,7 @@
       width: 100%;
       height: 100%;
     }
-    .snowball-block .pl__ball-outer-shadow {
+    .snowball-loader .pl__ball-outer-shadow {
       animation-name: ballOuterShadow;
       background-image: linear-gradient(hsla(0, 0%, 0%, 0.6), hsla(0, 0%, 0%, 0));
       border-radius: 0 0 50% 50% / 0 0 100% 100%;
@@ -690,7 +700,7 @@
       transform-origin: 50% 0;
       z-index: -2;
     }
-    .snowball-block .pl__ball-side-shadows {
+    .snowball-loader .pl__ball-side-shadows {
       background-color: hsla(0, 0%, 0%, 0.5);
       filter: blur(2px);
       width: 100%;
@@ -698,15 +708,13 @@
       transform: scale(0.75, 1.1);
       z-index: -1;
     }
-    .snowball-block .pl__ball-texture {
+    .snowball-loader .pl__ball-texture {
       overflow: hidden;
       width: 100%;
       height: 100%;
       transform: translate3d(0, 0, 0);
     }
-    /* Replaces the snow.jpg texture with a CSS-only digital scanline
-       pattern so the ball reads as "rolling" without any external image. */
-    .snowball-block .pl__ball-texture::before {
+    .snowball-loader .pl__ball-texture::before {
       animation-name: ballTexture;
       animation-duration: 0.25s;
       background:
@@ -724,7 +732,7 @@
       width: 200%;
       height: 100%;
     }
-    .snowball-block .pl__inner-ring {
+    .snowball-loader .pl__inner-ring {
       box-shadow:
         0 -0.25em 0.5em hsla(0, 0%, 100%, 0.18),
         0 0.5em 0.75em hsla(0, 0%, 100%, 0.10) inset,
@@ -735,7 +743,7 @@
       width: calc(100% - 4.75em);
       height: calc(100% - 4.75em);
     }
-    .snowball-block .pl__outer-ring {
+    .snowball-loader .pl__outer-ring {
       box-shadow:
         0 -0.45em 0.375em hsla(0, 0%, 0%, 0.65),
         0 0.5em 0.75em hsla(0, 0%, 0%, 0.65) inset,
@@ -746,10 +754,10 @@
       width: calc(100% - 1.5em);
       height: calc(100% - 1.5em);
     }
-    .snowball-block .pl__track-cover {
+    .snowball-loader .pl__track-cover {
       animation-name: trackCover;
-      /* Cover matches the section bg so the leading half of the ball's
-         path is masked, faking a track that the ball rolls in. */
+      /* Cover colour matches the page bg so the leading half of the
+         ball's path is hidden, faking a track behind the ball. */
       background-image: conic-gradient(#050507 210deg, hsla(0, 0%, 0%, 0) 270deg);
       top: 0;
       left: 0;
@@ -782,26 +790,6 @@
 </head>
 <body>
 <main>
-
-  <!-- ─── SNOWBALL PREVIEW ────────────────────────────────────────
-       Experimental loader sitting above the hero. Black/digital/minimal
-       reskin of jkantner's CodePen pen wvXbboe. Self-contained CSS in
-       its own scope (.snowball-block + .pl__*). Remove this whole
-       section to drop it.
-  ─────────────────────────────────────────────────────────────── -->
-  <section class="snowball-block">
-    <div class="pl">
-      <div class="pl__outer-ring"></div>
-      <div class="pl__inner-ring"></div>
-      <div class="pl__track-cover"></div>
-      <div class="pl__ball">
-        <div class="pl__ball-texture"></div>
-        <div class="pl__ball-outer-shadow"></div>
-        <div class="pl__ball-inner-shadow"></div>
-        <div class="pl__ball-side-shadows"></div>
-      </div>
-    </div>
-  </section>
 
   <!-- ─── HERO ─────────────────────────────────────────────────── -->
   <section class="hero">
@@ -1171,12 +1159,26 @@
   </section>
 
   <!-- ─── WHY NOW ──────────────────────────────────────────────── -->
-  <section>
+  <section class="why-now">
     <div class="wrap">
       <p class="eyebrow reveal">Why now</p>
       <h2 class="reveal">Every month you wait, the math gets worse.</h2>
       <p class="lead reveal">Your competitors are deploying AI Employees right now. Companies that move first this year will operate at a structurally lower cost than the ones that wait. By 2027, the gap is permanent.</p>
       <p class="lead reveal" style="margin-top: 24px; color: var(--ink);">The question isn't whether to do this. It's which AI Employee you deploy first.</p>
+    </div>
+    <!-- Snowball loader sits behind the text and slightly below it. -->
+    <div class="snowball-loader" aria-hidden="true">
+      <div class="pl">
+        <div class="pl__outer-ring"></div>
+        <div class="pl__inner-ring"></div>
+        <div class="pl__track-cover"></div>
+        <div class="pl__ball">
+          <div class="pl__ball-texture"></div>
+          <div class="pl__ball-outer-shadow"></div>
+          <div class="pl__ball-inner-shadow"></div>
+          <div class="pl__ball-side-shadows"></div>
+        </div>
+      </div>
     </div>
   </section>
 
