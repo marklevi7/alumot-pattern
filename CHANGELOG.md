@@ -3,7 +3,16 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
-## v20 — Tier icons round 2
+## v21 — Snowball preview block (above the hero)
+- New experimental section above the hero with a pure-CSS rolling-ball
+  loader, reskinned to a black + minimal-digital aesthetic (no snow
+  texture image — replaced with a CSS scanline pattern).
+- All selectors are scoped under `.snowball-block` so they can't bleed
+  into the rest of the page. Drop the section to remove the loader.
+- Source: jkantner / CodePen wvXbboe (loader pattern only; styling
+  reworked from scratch for the dark / digital theme).
+
+## v20 — Tier icons round 2 (PINNED — last known-good baseline before v21)
 - Light: jump now follows physics — fast lift-off, brief apex hang,
   accelerating fall, small landing squash, recovery, idle. Implemented
   via SMIL `calcMode="spline"` + per-segment `keySplines`.

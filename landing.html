@@ -608,10 +608,200 @@
       outline: 2px solid var(--ink);
       outline-offset: 4px;
     }
+
+    /* ════════════════════════════════════════════════════════════
+       SNOWBALL PREVIEW (experimental — sits above the hero).
+       Pure-CSS rolling-ball loader, reskinned to a black + minimal
+       digital aesthetic. Source: jkantner / CodePen wvXbboe.
+       All selectors live under .snowball-block to avoid bleeding
+       into the rest of the page.
+    ════════════════════════════════════════════════════════════ */
+    .snowball-block {
+      background: #050507;
+      font-size: clamp(13px, 4vw, 16px);   /* drives the em-based loader */
+      min-height: 50vh;
+      display: grid;
+      place-items: center;
+      padding: 80px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .snowball-block .pl,
+    .snowball-block .pl__ball,
+    .snowball-block .pl__ball-inner-shadow,
+    .snowball-block .pl__ball-side-shadows,
+    .snowball-block .pl__ball-texture,
+    .snowball-block .pl__inner-ring,
+    .snowball-block .pl__outer-ring,
+    .snowball-block .pl__track-cover {
+      border-radius: 50%;
+    }
+    .snowball-block .pl {
+      position: relative;
+      width: 16em;
+      height: 16em;
+    }
+    .snowball-block .pl__ball,
+    .snowball-block .pl__ball-inner-shadow,
+    .snowball-block .pl__ball-outer-shadow,
+    .snowball-block .pl__ball-side-shadows,
+    .snowball-block .pl__ball-texture,
+    .snowball-block .pl__ball-texture::before,
+    .snowball-block .pl__inner-ring,
+    .snowball-block .pl__outer-ring,
+    .snowball-block .pl__track-cover {
+      position: absolute;
+    }
+    .snowball-block .pl__ball,
+    .snowball-block .pl__ball-inner-shadow,
+    .snowball-block .pl__ball-outer-shadow,
+    .snowball-block .pl__ball-texture::before,
+    .snowball-block .pl__track-cover {
+      animation: ball 3s linear infinite;
+    }
+    .snowball-block .pl__ball {
+      top: calc(50% - 1.25em);
+      left: calc(50% - 1.25em);
+      transform: rotate(0) translateY(-6.5em);
+      width: 2.5em;
+      height: 2.5em;
+      background: #f3f3f5;       /* white digital ball */
+    }
+    .snowball-block .pl__ball-inner-shadow {
+      animation-name: ballInnerShadow;
+      box-shadow:
+        0 0.1em 0.2em hsla(0, 0%, 0%, 0.6),
+        0 0 0.2em hsla(0, 0%, 0%, 0.4) inset,
+        0 -1em 0.5em hsla(0, 0%, 0%, 0.55) inset;
+      width: 100%;
+      height: 100%;
+    }
+    .snowball-block .pl__ball-outer-shadow {
+      animation-name: ballOuterShadow;
+      background-image: linear-gradient(hsla(0, 0%, 0%, 0.6), hsla(0, 0%, 0%, 0));
+      border-radius: 0 0 50% 50% / 0 0 100% 100%;
+      filter: blur(2px);
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 250%;
+      transform: rotate(20deg);
+      transform-origin: 50% 0;
+      z-index: -2;
+    }
+    .snowball-block .pl__ball-side-shadows {
+      background-color: hsla(0, 0%, 0%, 0.5);
+      filter: blur(2px);
+      width: 100%;
+      height: 100%;
+      transform: scale(0.75, 1.1);
+      z-index: -1;
+    }
+    .snowball-block .pl__ball-texture {
+      overflow: hidden;
+      width: 100%;
+      height: 100%;
+      transform: translate3d(0, 0, 0);
+    }
+    /* Replaces the snow.jpg texture with a CSS-only digital scanline
+       pattern so the ball reads as "rolling" without any external image. */
+    .snowball-block .pl__ball-texture::before {
+      animation-name: ballTexture;
+      animation-duration: 0.25s;
+      background:
+        repeating-linear-gradient(
+          90deg,
+          rgba(0, 0, 0, 0.18) 0,
+          rgba(0, 0, 0, 0.18) 1px,
+          transparent 1px,
+          transparent 4px
+        );
+      content: "";
+      display: block;
+      top: 0;
+      right: 0;
+      width: 200%;
+      height: 100%;
+    }
+    .snowball-block .pl__inner-ring {
+      box-shadow:
+        0 -0.25em 0.5em hsla(0, 0%, 100%, 0.18),
+        0 0.5em 0.75em hsla(0, 0%, 100%, 0.10) inset,
+        0 0.5em 0.375em hsla(0, 0%, 0%, 0.65),
+        0 -0.5em 0.75em hsla(0, 0%, 0%, 0.65) inset;
+      top: 2.375em;
+      left: 2.375em;
+      width: calc(100% - 4.75em);
+      height: calc(100% - 4.75em);
+    }
+    .snowball-block .pl__outer-ring {
+      box-shadow:
+        0 -0.45em 0.375em hsla(0, 0%, 0%, 0.65),
+        0 0.5em 0.75em hsla(0, 0%, 0%, 0.65) inset,
+        0 0.25em 0.5em hsla(0, 0%, 100%, 0.18),
+        0 -0.5em 0.75em hsla(0, 0%, 100%, 0.18) inset;
+      top: 0.75em;
+      left: 0.75em;
+      width: calc(100% - 1.5em);
+      height: calc(100% - 1.5em);
+    }
+    .snowball-block .pl__track-cover {
+      animation-name: trackCover;
+      /* Cover matches the section bg so the leading half of the ball's
+         path is masked, faking a track that the ball rolls in. */
+      background-image: conic-gradient(#050507 210deg, hsla(0, 0%, 0%, 0) 270deg);
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    @keyframes ball {
+      from { transform: rotate(0)      translateY(-6.5em); }
+      50%  { transform: rotate(180deg) translateY(-6em); }
+      to   { transform: rotate(360deg) translateY(-6.5em); }
+    }
+    @keyframes ballInnerShadow {
+      from { transform: rotate(0); }
+      to   { transform: rotate(-360deg); }
+    }
+    @keyframes ballOuterShadow {
+      from { transform: rotate(20deg); }
+      to   { transform: rotate(-340deg); }
+    }
+    @keyframes ballTexture {
+      from { transform: translateX(0); }
+      to   { transform: translateX(50%); }
+    }
+    @keyframes trackCover {
+      from { transform: rotate(0); }
+      to   { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
 <main>
+
+  <!-- ─── SNOWBALL PREVIEW ────────────────────────────────────────
+       Experimental loader sitting above the hero. Black/digital/minimal
+       reskin of jkantner's CodePen pen wvXbboe. Self-contained CSS in
+       its own scope (.snowball-block + .pl__*). Remove this whole
+       section to drop it.
+  ─────────────────────────────────────────────────────────────── -->
+  <section class="snowball-block">
+    <div class="pl">
+      <div class="pl__outer-ring"></div>
+      <div class="pl__inner-ring"></div>
+      <div class="pl__track-cover"></div>
+      <div class="pl__ball">
+        <div class="pl__ball-texture"></div>
+        <div class="pl__ball-outer-shadow"></div>
+        <div class="pl__ball-inner-shadow"></div>
+        <div class="pl__ball-side-shadows"></div>
+      </div>
+    </div>
+  </section>
 
   <!-- ─── HERO ─────────────────────────────────────────────────── -->
   <section class="hero">
