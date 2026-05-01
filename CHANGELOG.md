@@ -3,6 +3,17 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v26 — Hero subtitle refinement (enterprise tone)
+- Replaced the v25 subtitle ("AI Employees that replace human work,
+  end-to-end. 80% cheaper. Live in 30 days.") with a tighter,
+  enterprise-pitched line:
+  **"Custom-built AI Employees deployed inside your real systems."**
+- Rationale: actual builds run $10k–$100k+ delivered by teams of
+  senior operators. The previous "80% cheaper / 30 days" line
+  skewed consumer-pitch; "custom-built" + "real systems" signals
+  bespoke delivery and stack integration without softening the
+  hook. Manifesto block and rest of page unchanged.
+
 ## v25 — Hero subtitle swap + new manifesto block
 - Hero subtitle replaced with a punchy outcome line:
   "AI Employees that replace human work, end-to-end. 80% cheaper.
