@@ -3,7 +3,19 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
-## v6 — Running outline on every CTA
+## v8 — Rollback the running-outline button (broke iOS rendering)
+- The `@property --cta-angle` + `conic-gradient` + `isolation: isolate`
+  + `z-index: -1` combo caused iOS Safari to render the entire page
+  as a white screen. Reverted to the v5 button style: solid white
+  fill, simple 1px border. Kept the 5px corner radius from v6.
+- Will redo the running outline with a different technique that
+  doesn't rely on those layering rules.
+
+## v7 — Versioning + auto-deploy to GitHub Pages
+- Added CHANGELOG.md and tagged v1..v6 retroactively.
+- Added a Pages workflow (currently failing — investigating).
+
+## v6 — Running outline on every CTA (REVERTED in v8)
 - Animated conic-gradient glow sweeping around each "Book a call" button.
 - Corner radius set to 5px (not the heavy round of the source pen).
 - Hover: button fill flips to page bg, glow intensifies.
