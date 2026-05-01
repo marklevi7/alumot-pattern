@@ -3,6 +3,28 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v14 — Title de-box, build-tier icons, faster shine, structural cleanup
+- Removed the `.boxed` per-line backdrop from every headline
+  (hero h1, banner h2, final h2). Body copy keeps its boxed bg.
+  Reason: the backdrop was clipping descenders on big text.
+- Added three build-tier icons that visually escalate the bot count:
+  Light = 1 bot, Mid = 2 bots, Heavy = 3 connected bots.
+- Tier rows are now `[icon] [text]` instead of `[name col] [desc col]`.
+- `.accordion .num` is now a small white badge with the dark number
+  inside (instead of plain dim text).
+- Removed:
+    • "THE LINEUP" eyebrow over the seven AI Employees.
+    • The intro lead paragraph above the tier list.
+    • The "HOW IT WORKS" eyebrow — combined into the h2:
+      "How it works. Five phases."
+- Removed every gray section divider line (between sections + the
+  banner's own borders). Sections now blend.
+- CTA shine: cycle 5s → 2.5s, sweep 0.9s → 1.5s. Twice as often,
+  and the sweep itself is slower.
+- Final-CTA section now uses `min-height: 100svh` and bigger
+  bottom padding so the dot field truly is the last visual on
+  the page (kills the black gap at the bottom).
+
 ## v13 — Brighter grays (round 2) + visible icons + stronger shine + black backdrops everywhere
 - Bumped every gray ANOTHER ~25% on top of v12:
     --ink-dim:   #c0c0cc → #ececf2

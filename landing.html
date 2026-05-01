@@ -191,13 +191,14 @@
       background-size: 250% 100%;
       background-repeat: no-repeat;
       background-position: -130% 0;
-      animation: cta-shine 5s ease-in-out infinite;
+      animation: cta-shine 2.5s ease-in-out infinite;
     }
 
+    /* Slower sweep (~1.5s) and twice as often (cycle 2.5s instead of 5s). */
     @keyframes cta-shine {
       0%   { background-position: -130% 0; transform: scale(1); }
-      18%  { background-position:  230% 0; transform: scale(1.025); }
-      24%  { transform: scale(1); }
+      60%  { background-position:  230% 0; transform: scale(1.025); }
+      66%  { transform: scale(1); }
       100% { background-position:  230% 0; transform: scale(1); }
     }
 
@@ -228,7 +229,8 @@
 
     /* ─── SECTIONS ─────────────────────────────────────────────── */
     section { padding: 96px 0; position: relative; }
-    section + section { border-top: 1px solid var(--line); }
+    /* Section dividers removed so dot-pattern blocks blend into the
+       neighbouring sections seamlessly. */
 
     .eyebrow {
       font-size: 12px;
@@ -375,10 +377,18 @@
     .accordion summary:hover { opacity: 0.75; }
 
     .accordion .num {
-      font-size: 13px;
-      color: var(--ink-faint);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      background: var(--ink);
+      color: var(--bg-0);
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 4px;
       font-variant-numeric: tabular-nums;
-      letter-spacing: 0.04em;
+      letter-spacing: 0;
     }
 
     .accordion .title {
@@ -412,27 +422,40 @@
     .accordion .body p { color: var(--ink-dim); margin-bottom: 12px; }
     .accordion .body p strong { color: var(--ink); font-weight: 500; }
 
-    /* ─── BUILD TIERS (stacked list) ────────────────────────────── */
+    /* ─── BUILD TIERS (stacked list with icons) ─────────────────── */
     .tiers { margin-top: 48px; border-top: 1px solid var(--line); }
     .tier {
       padding: 32px 0;
       border-bottom: 1px solid var(--line);
       display: grid;
-      grid-template-columns: 200px 1fr;
-      gap: 32px;
-      align-items: baseline;
+      grid-template-columns: 64px 1fr;
+      gap: 24px;
+      align-items: start;
     }
+    .tier-icon {
+      width: 56px;
+      height: 56px;
+      color: var(--ink);
+    }
+    .tier-icon svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .tier-content { padding-top: 4px; }
     .tier .name {
       font-size: 13px;
       letter-spacing: 0.18em;
       text-transform: uppercase;
       color: var(--ink);
       font-weight: 500;
+      margin: 0 0 8px;
     }
     .tier .desc {
       color: var(--ink-dim);
       font-size: 17px;
       line-height: 1.5;
+      margin: 0;
     }
     .tier .desc em {
       color: var(--ink-faint);
@@ -473,8 +496,6 @@
     /* ─── MID CTA BANNER ───────────────────────────────────────── */
     .banner {
       padding: 96px 24px;
-      border-top: 1px solid var(--line);
-      border-bottom: 1px solid var(--line);
       text-align: left;
       position: relative;
       overflow: hidden;
@@ -503,8 +524,9 @@
 
     /* ─── FINAL CTA ────────────────────────────────────────────── */
     .final {
-      padding: 220px 24px 180px;
-      min-height: 95vh;
+      padding: 200px 24px 280px;
+      min-height: 100vh;
+      min-height: 100svh;       /* iOS small-viewport unit so no gap appears below */
       text-align: left;
       position: relative;
       overflow: hidden;
@@ -512,7 +534,12 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
+      margin-bottom: 0;
     }
+    /* Belt-and-suspenders: kill any default body trail below the
+       final section so the dot field really is the last visual. */
+    main { margin-bottom: 0; padding-bottom: 0; }
+    body { margin-bottom: 0; padding-bottom: 0; }
     .final h2 {
       font-size: clamp(36px, 7vw, 80px);
       line-height: 1.1;
@@ -573,7 +600,7 @@
       }
 
       .banner { padding: 72px 24px; }
-      .final { padding: 160px 24px 140px; min-height: 95vh; }
+      .final { padding: 140px 24px 220px; min-height: 100svh; }
     }
 
     /* Small focus ring for accessibility */
@@ -591,7 +618,7 @@
     <div id="hero_bg" class="dither-bg" data-preset="hero"></div>
     <div class="wordmark">Mark Levi<span class="dot">·</span>Consulting</div>
     <div class="wrap">
-      <h1 class="reveal"><span class="boxed">Stop paying humans for work machines do better.</span></h1>
+      <h1 class="reveal">Stop paying humans for work machines do better.</h1>
       <p class="sub reveal"><span class="boxed boxed--body">Every month you sign off on salaries for work that doesn't need a human anymore. Lead follow-ups. Content. Filing. Compliance. Reports. Calendar wrangling. Invoice reconciliation. Contract renewals. This work doesn't need talent. It needs volume. AI does volume for a fraction of the cost.</span></p>
       <div class="reveal">
         <a class="cta" href="https://calendly.com/marklevi/1hour" target="_blank" rel="noopener">Book a call</a>
@@ -688,7 +715,6 @@
   <!-- ─── 7 EMPLOYEES (accordion) ──────────────────────────────── -->
   <section>
     <div class="wrap">
-      <p class="eyebrow reveal">The lineup</p>
       <h2 class="reveal">Seven AI Employees. Ready to deploy.</h2>
 
       <div class="accordion reveal">
@@ -784,7 +810,7 @@
     <div class="dither-bg" data-preset="banner"></div>
     <div class="wrap">
       <p class="eyebrow reveal"><span class="boxed">Your move</span></p>
-      <h2 class="reveal"><span class="boxed">Which one replaces the most expensive workflow in your company?</span></h2>
+      <h2 class="reveal">Which one replaces the most expensive workflow in your company?</h2>
       <p class="reveal"><span class="boxed boxed--body">30-minute call. No deck. No pitch. Just the math and your highest-cost workflow.</span></p>
       <div class="reveal">
         <a class="cta" href="https://calendly.com/marklevi/1hour" target="_blank" rel="noopener">Book a call</a>
@@ -797,20 +823,69 @@
     <div class="wrap">
       <p class="eyebrow reveal">Build tiers</p>
       <h2 class="reveal">Custom-built around a specific workflow in your company.</h2>
-      <p class="lead reveal">Light build replaces a task. Mid build replaces a role. Heavy build replaces a whole department.</p>
 
       <div class="tiers reveal">
         <div class="tier">
-          <p class="name">Light build</p>
-          <p class="desc">One task, one system. <em>e.g. inbound lead qualifier on WhatsApp.</em></p>
+          <div class="tier-icon" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="32" y1="14" x2="32" y2="18"/>
+              <circle cx="32" cy="13" r="1" fill="currentColor" stroke="none"/>
+              <rect x="22" y="20" width="20" height="20" rx="3"/>
+              <circle cx="28" cy="29" r="1.6" fill="currentColor" stroke="none"/>
+              <circle cx="36" cy="29" r="1.6" fill="currentColor" stroke="none"/>
+            </svg>
+          </div>
+          <div class="tier-content">
+            <p class="name">Light build</p>
+            <p class="desc">One task, one system. <em>e.g. inbound lead qualifier on WhatsApp.</em></p>
+          </div>
         </div>
+
         <div class="tier">
-          <p class="name">Mid build</p>
-          <p class="desc">Multi-step workflow, 2–3 integrations, memory. <em>e.g. Sales/BizDev Agent, Content Factory.</em></p>
+          <div class="tier-icon" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="14" x2="18" y2="18"/>
+              <circle cx="18" cy="13" r="1" fill="currentColor" stroke="none"/>
+              <rect x="8" y="20" width="20" height="20" rx="3"/>
+              <circle cx="14" cy="29" r="1.4" fill="currentColor" stroke="none"/>
+              <circle cx="22" cy="29" r="1.4" fill="currentColor" stroke="none"/>
+
+              <line x1="46" y1="14" x2="46" y2="18"/>
+              <circle cx="46" cy="13" r="1" fill="currentColor" stroke="none"/>
+              <rect x="36" y="20" width="20" height="20" rx="3"/>
+              <circle cx="42" cy="29" r="1.4" fill="currentColor" stroke="none"/>
+              <circle cx="50" cy="29" r="1.4" fill="currentColor" stroke="none"/>
+            </svg>
+          </div>
+          <div class="tier-content">
+            <p class="name">Mid build</p>
+            <p class="desc">Multi-step workflow, 2–3 integrations, memory. <em>e.g. Sales/BizDev Agent, Content Factory.</em></p>
+          </div>
         </div>
+
         <div class="tier">
-          <p class="name">Heavy build</p>
-          <p class="desc">Replaces an entire function. Multi-agent, autonomous, runs across your stack with minimal human supervision. <em>e.g. a full marketing department: research, content, scheduling, distribution, reporting — built and run as one system, no headcount.</em></p>
+          <div class="tier-icon" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="22" y="6" width="20" height="20" rx="3"/>
+              <circle cx="28" cy="14" r="1.3" fill="currentColor" stroke="none"/>
+              <circle cx="36" cy="14" r="1.3" fill="currentColor" stroke="none"/>
+
+              <rect x="4" y="38" width="20" height="20" rx="3"/>
+              <circle cx="10" cy="46" r="1.3" fill="currentColor" stroke="none"/>
+              <circle cx="18" cy="46" r="1.3" fill="currentColor" stroke="none"/>
+
+              <rect x="40" y="38" width="20" height="20" rx="3"/>
+              <circle cx="46" cy="46" r="1.3" fill="currentColor" stroke="none"/>
+              <circle cx="54" cy="46" r="1.3" fill="currentColor" stroke="none"/>
+
+              <line x1="32" y1="26" x2="14" y2="38"/>
+              <line x1="32" y1="26" x2="50" y2="38"/>
+            </svg>
+          </div>
+          <div class="tier-content">
+            <p class="name">Heavy build</p>
+            <p class="desc">Replaces an entire function. Multi-agent, autonomous, runs across your stack with minimal human supervision. <em>e.g. a full marketing department: research, content, scheduling, distribution, reporting — built and run as one system, no headcount.</em></p>
+          </div>
         </div>
       </div>
 
@@ -821,8 +896,7 @@
   <!-- ─── PHASES ───────────────────────────────────────────────── -->
   <section>
     <div class="wrap">
-      <p class="eyebrow reveal">How it works</p>
-      <h2 class="reveal">Five phases.</h2>
+      <h2 class="reveal">How it works. Five phases.</h2>
 
       <div class="phases reveal">
         <div class="phase">
@@ -889,7 +963,7 @@
   <section class="final">
     <div class="dither-bg" data-preset="final"></div>
     <div class="wrap">
-      <h2 class="reveal"><span class="boxed">Ready to stop paying for work machines do better?</span></h2>
+      <h2 class="reveal">Ready to stop paying for work machines do better?</h2>
       <p class="reveal"><span class="boxed boxed--body">30 minutes. No deck. No pitch. Just the math and your highest-cost workflow.</span></p>
       <div class="reveal">
         <a class="cta" href="https://calendly.com/marklevi/1hour" target="_blank" rel="noopener">Book a call</a>
