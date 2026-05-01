@@ -3,6 +3,19 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v25 — Hero subtitle swap + new manifesto block
+- Hero subtitle replaced with a punchy outcome line:
+  "AI Employees that replace human work, end-to-end. 80% cheaper.
+  Live in 30 days."
+- New `.manifesto` section sits between the hero and the scoreboard.
+  Carries the original long copy ("Every month you sign off on
+  salaries...") at h3 size, plain dark bg, no dot pattern, no
+  eyebrow — pure editorial breath between the dot-heavy hero and
+  the data-heavy scoreboard.
+- Re-uses the existing `clamp(22px, 3vw, 28px)` h3 size, plus
+  `var(--bg-0)` and `var(--ink)` palette tokens. No new sizes
+  introduced.
+
 ## v24 — Snowball: below text + sharp pure B&W
 - Snowball moved from `top: 62%` (which overlapped the text) to
   `bottom: 7%` so it sits clearly below the copy with no overlap.

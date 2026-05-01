@@ -356,6 +356,23 @@
     }
     .score-summary span { color: var(--ink-dim); }
 
+    /* ─── MANIFESTO (between hero and scoreboard) ───────────────── */
+    .manifesto {
+      padding: 120px 24px;
+      background: var(--bg-0);
+    }
+    .manifesto-text {
+      font-size: clamp(22px, 3vw, 28px);   /* re-uses the existing h3 clamp */
+      line-height: 1.5;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      max-width: 38ch;
+      font-weight: 500;
+    }
+    @media (max-width: 720px) {
+      .manifesto { padding: 80px 24px; }
+    }
+
     /* ─── ACCORDION ────────────────────────────────────────────── */
     .accordion { margin-top: 48px; border-top: 1px solid var(--line); }
     .accordion details {
@@ -768,10 +785,17 @@
     <div class="wordmark">Mark Levi<span class="dot">·</span>Consulting</div>
     <div class="wrap">
       <h1 class="reveal">Stop paying humans for work machines do better.</h1>
-      <p class="sub reveal"><span class="boxed boxed--body">Every month you sign off on salaries for work that doesn't need a human anymore. Lead follow-ups. Content. Filing. Compliance. Reports. Calendar wrangling. Invoice reconciliation. Contract renewals. This work doesn't need talent. It needs volume. AI does volume for a fraction of the cost.</span></p>
+      <p class="sub reveal"><span class="boxed boxed--body">AI Employees that replace human work, end-to-end. 80% cheaper. Live in 30 days.</span></p>
       <div class="reveal">
         <a class="cta" href="https://calendly.com/marklevi/1hour" target="_blank" rel="noopener">Book a call</a>
       </div>
+    </div>
+  </section>
+
+  <!-- ─── MANIFESTO ────────────────────────────────────────────── -->
+  <section class="manifesto">
+    <div class="wrap">
+      <p class="manifesto-text reveal">Every month you sign off on salaries for work that doesn't need a human anymore. Lead follow-ups. Content. Filing. Compliance. Reports. Calendar wrangling. Invoice reconciliation. Contract renewals. This work doesn't need talent. It needs volume. AI does volume for a fraction of the cost.</p>
     </div>
   </section>
 
