@@ -627,12 +627,11 @@
     .snowball-loader {
       position: absolute;
       left: 50%;
-      top: 62%;                  /* slightly below center, behind tail of text */
-      transform: translate(-50%, -50%);
+      bottom: 7%;                /* sits clearly below the text */
+      transform: translateX(-50%);
       font-size: clamp(11px, 3vw, 14px); /* drives the em-based loader size */
-      z-index: 1;                /* behind the text */
+      z-index: 1;
       pointer-events: none;
-      opacity: 0.92;
     }
 
     .snowball-loader .pl,
@@ -674,37 +673,14 @@
       transform: rotate(0) translateY(-6.5em);
       width: 2.5em;
       height: 2.5em;
-      background: #f3f3f5;
+      background: #ffffff;        /* pure-white flat ball */
     }
-    .snowball-loader .pl__ball-inner-shadow {
-      animation-name: ballInnerShadow;
-      box-shadow:
-        0 0.1em 0.2em hsla(0, 0%, 0%, 0.6),
-        0 0 0.2em hsla(0, 0%, 0%, 0.4) inset,
-        0 -1em 0.5em hsla(0, 0%, 0%, 0.55) inset;
-      width: 100%;
-      height: 100%;
-    }
-    .snowball-loader .pl__ball-outer-shadow {
-      animation-name: ballOuterShadow;
-      background-image: linear-gradient(hsla(0, 0%, 0%, 0.6), hsla(0, 0%, 0%, 0));
-      border-radius: 0 0 50% 50% / 0 0 100% 100%;
-      filter: blur(2px);
-      top: 50%;
-      left: 0;
-      width: 100%;
-      height: 250%;
-      transform: rotate(20deg);
-      transform-origin: 50% 0;
-      z-index: -2;
-    }
+    /* High-contrast rework: hide every soft shadow so the only thing
+       on screen is pure black, pure white, and the rolling texture. */
+    .snowball-loader .pl__ball-inner-shadow,
+    .snowball-loader .pl__ball-outer-shadow,
     .snowball-loader .pl__ball-side-shadows {
-      background-color: hsla(0, 0%, 0%, 0.5);
-      filter: blur(2px);
-      width: 100%;
-      height: 100%;
-      transform: scale(0.75, 1.1);
-      z-index: -1;
+      display: none;
     }
     .snowball-loader .pl__ball-texture {
       overflow: hidden;
@@ -712,16 +688,18 @@
       height: 100%;
       transform: translate3d(0, 0, 0);
     }
+    /* Pure black scanlines on the white ball — gives the "rolling"
+       cue with maximum contrast. */
     .snowball-loader .pl__ball-texture::before {
       animation-name: ballTexture;
       animation-duration: 0.25s;
       background:
         repeating-linear-gradient(
           90deg,
-          rgba(0, 0, 0, 0.18) 0,
-          rgba(0, 0, 0, 0.18) 1px,
-          transparent 1px,
-          transparent 4px
+          #000 0,
+          #000 1.5px,
+          transparent 1.5px,
+          transparent 5px
         );
       content: "";
       display: block;
@@ -730,23 +708,18 @@
       width: 200%;
       height: 100%;
     }
+    /* Crisp 1.5px white outlines for both rings — no glows, no bevels. */
     .snowball-loader .pl__inner-ring {
-      box-shadow:
-        0 -0.25em 0.5em hsla(0, 0%, 100%, 0.18),
-        0 0.5em 0.75em hsla(0, 0%, 100%, 0.10) inset,
-        0 0.5em 0.375em hsla(0, 0%, 0%, 0.65),
-        0 -0.5em 0.75em hsla(0, 0%, 0%, 0.65) inset;
+      border: 1.5px solid #ffffff;
+      box-shadow: none;
       top: 2.375em;
       left: 2.375em;
       width: calc(100% - 4.75em);
       height: calc(100% - 4.75em);
     }
     .snowball-loader .pl__outer-ring {
-      box-shadow:
-        0 -0.45em 0.375em hsla(0, 0%, 0%, 0.65),
-        0 0.5em 0.75em hsla(0, 0%, 0%, 0.65) inset,
-        0 0.25em 0.5em hsla(0, 0%, 100%, 0.18),
-        0 -0.5em 0.75em hsla(0, 0%, 100%, 0.18) inset;
+      border: 1.5px solid #ffffff;
+      box-shadow: none;
       top: 0.75em;
       left: 0.75em;
       width: calc(100% - 1.5em);
@@ -754,8 +727,8 @@
     }
     .snowball-loader .pl__track-cover {
       animation-name: trackCover;
-      /* Cover colour matches the page bg so the leading half of the
-         ball's path is hidden, faking a track behind the ball. */
+      /* Solid page-bg conic mask — keeps the "ball appears from behind
+         the front of the track" illusion sharp. */
       background-image: conic-gradient(#050507 210deg, hsla(0, 0%, 0%, 0) 270deg);
       top: 0;
       left: 0;

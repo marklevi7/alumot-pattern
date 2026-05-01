@@ -3,6 +3,18 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v24 — Snowball: below text + sharp pure B&W
+- Snowball moved from `top: 62%` (which overlapped the text) to
+  `bottom: 7%` so it sits clearly below the copy with no overlap.
+- Killed every soft shadow on the loader (inner shadow, outer drop
+  shadow, side shadows are all `display: none`).
+- Both rings are now plain `1.5px solid #ffffff` outlines instead of
+  multi-layer box-shadow bevels.
+- Ball is pure `#ffffff`. Texture scanlines are pure `#000` (was
+  ~18% alpha) so the rolling effect reads as hard black-on-white.
+- Net effect: only pure black + pure white on screen, no greys, no
+  glows.
+
 ## v23 — Scoreboard cleanup
 - "LOADED MONTHLY COST" → "Monthly cost" in both columns.
 - Junior vs AI column headings are now identical: same color (--ink),
