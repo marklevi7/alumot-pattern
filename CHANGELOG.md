@@ -3,6 +3,14 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v27 — Hero subtitle: "real" → "existing"
+- Swapped "real" for "existing" in the hero subtitle. New line:
+  **"Custom-built AI Employees deployed inside your existing systems."**
+- Rationale: "existing systems" is the term CIOs and IT buyers
+  actually use; it also signals "no rip-and-replace" — a real
+  concern at $100k engagements. Trades a bit of punch for a more
+  enterprise-respectful tone that pairs well with the bold headline.
+
 ## v26 — Hero subtitle refinement (enterprise tone)
 - Replaced the v25 subtitle ("AI Employees that replace human work,
   end-to-end. 80% cheaper. Live in 30 days.") with a tighter,
