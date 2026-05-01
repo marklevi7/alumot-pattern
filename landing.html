@@ -86,9 +86,11 @@
       height: 100% !important;
     }
 
+    /* No z-index here — keeping .wrap free of a stacking context so
+       mix-blend-mode: difference on the headline can blend with the
+       canvas underneath. DOM order alone keeps content above the bg. */
     .hero .wrap {
       position: relative;
-      z-index: 1;
     }
 
     .hero h1 {
@@ -798,22 +800,15 @@
 
 </main>
 
-<script type="importmap">
-{
-  "imports": {
-    "three": "https://esm.sh/three@0.160.0"
-  }
-}
-</script>
-
 <script type="module">
   // Bayer-dither circles hero — adapted from Seva Dolgopolov's Codrops demo.
-  import * as THREE from 'three';
+  // Direct ESM import (no importmap) so this works reliably on iOS Safari.
+  import * as THREE from 'https://esm.sh/three@0.160.0';
 
-  const container = document.getElementById('hero_bg');
-  if (!container) {
-    // nothing to do
-  } else {
+  try {
+    const container = document.getElementById('hero_bg');
+    if (!container) throw new Error('no #hero_bg container');
+
     const SHAPES = { square: 0, circle: 1, triangle: 2, diamond: 3 };
     const shapeName = container.dataset.shape || 'circle';
     const pixelSize = parseFloat(container.dataset.pixelSize) || 6;
@@ -821,13 +816,11 @@
 
     const canvas = document.createElement('canvas');
     const gl = canvas.getContext('webgl2', { antialias: true, alpha: true });
+    if (!gl) throw new Error('WebGL2 not supported');
 
-    if (!gl) {
-      // WebGL2 not supported — leave the static dark hero in place.
-    } else {
-      const renderer = new THREE.WebGLRenderer({ canvas, context: gl, antialias: true, alpha: true });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-      container.appendChild(canvas);
+    const renderer = new THREE.WebGLRenderer({ canvas, context: gl, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    container.appendChild(canvas);
 
       const VERT = `
 void main() {
@@ -986,45 +979,70 @@ void main() {
       });
       scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material));
 
-      function resize() {
-        const w = container.clientWidth || window.innerWidth;
-        const h = container.clientHeight || window.innerHeight;
-        renderer.setSize(w, h, false);
-        uniforms.uResolution.value.set(w * renderer.getPixelRatio(), h * renderer.getPixelRatio());
-      }
-      window.addEventListener('resize', resize);
-      resize();
-
-      // Click ripples — listen on the whole hero so taps anywhere create waves.
-      let clickIdx = 0;
-      const hero = container.parentElement;
-      hero.addEventListener('pointerdown', (e) => {
-        const rect = canvas.getBoundingClientRect();
-        const x = (e.clientX - rect.left) * (canvas.width / rect.width);
-        const y = (rect.height - (e.clientY - rect.top)) * (canvas.height / rect.height);
-        uniforms.uClickPos.value[clickIdx].set(x, y);
-        uniforms.uClickTimes.value[clickIdx] = uniforms.uTime.value;
-        clickIdx = (clickIdx + 1) % MAX;
-      });
-
-      // Pause render loop when hero is off-screen (saves battery on mobile)
-      let visible = true;
-      if ('IntersectionObserver' in window) {
-        new IntersectionObserver((entries) => {
-          visible = entries[0].isIntersecting;
-        }, { threshold: 0 }).observe(container);
-      }
-
-      const clock = new THREE.Clock();
-      function tick() {
-        if (visible) {
-          uniforms.uTime.value = clock.getElapsedTime();
-          renderer.render(scene, camera);
-        }
-        requestAnimationFrame(tick);
-      }
-      tick();
+    function resize() {
+      const rect = container.getBoundingClientRect();
+      const w = Math.max(1, Math.round(rect.width  || container.clientWidth  || window.innerWidth));
+      const h = Math.max(1, Math.round(rect.height || container.clientHeight || window.innerHeight));
+      renderer.setSize(w, h, false);
+      const dpr = renderer.getPixelRatio();
+      uniforms.uResolution.value.set(w * dpr, h * dpr);
     }
+    window.addEventListener('resize', resize);
+    if ('ResizeObserver' in window) {
+      new ResizeObserver(resize).observe(container);
+    }
+    resize();
+
+    // ───── Ripple helpers ────────────────────────────────────────
+    let clickIdx = 0;
+    function fireRipple(canvasX, canvasY) {
+      uniforms.uClickPos.value[clickIdx].set(canvasX, canvasY);
+      uniforms.uClickTimes.value[clickIdx] = uniforms.uTime.value;
+      clickIdx = (clickIdx + 1) % MAX;
+    }
+
+    // Tap/click anywhere on the hero → ripple at that spot.
+    const hero = container.parentElement;
+    hero.addEventListener('pointerdown', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+      const y = (rect.height - (e.clientY - rect.top)) * (canvas.height / rect.height);
+      fireRipple(x, y);
+    });
+
+    // Auto-ripple every 5s at a random position so motion is always visible.
+    function autoRipple() {
+      if (!canvas.width || !canvas.height) return;
+      const x = Math.random() * canvas.width;
+      const y = Math.random() * canvas.height;
+      fireRipple(x, y);
+    }
+    setInterval(autoRipple, 5000);
+
+    // Pause render loop when hero is off-screen (saves battery on mobile).
+    let visible = true;
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver((entries) => {
+        visible = entries[0].isIntersecting;
+      }, { threshold: 0 }).observe(container);
+    }
+
+    const clock = new THREE.Clock();
+    function tick() {
+      if (visible) {
+        uniforms.uTime.value = clock.getElapsedTime();
+        renderer.render(scene, camera);
+      }
+      requestAnimationFrame(tick);
+    }
+    tick();
+
+    // Trigger an opening ripple shortly after load so motion is immediate.
+    setTimeout(autoRipple, 400);
+    setTimeout(autoRipple, 1200);
+  } catch (err) {
+    console.error('[hero shader]', err);
   }
 </script>
 
