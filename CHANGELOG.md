@@ -3,6 +3,19 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v29 — Manifesto: Space Mono + scramble-reveal animation
+- Switched the manifesto block to **Space Mono** (Google Fonts).
+  Distinctive tech-flavoured monospace; pairs well with the dot field
+  and gives the block its own typographic voice.
+- Added a JS scramble-reveal animation: when the manifesto scrolls
+  into view (≥30% visible), each letter cycles through ASCII noise
+  (`!@#$%&*<>[]/\|=+-?` plus hex chars) and locks in left-to-right
+  with light random scatter. Total run: 2.4s (under the 3s budget).
+- Spaces and punctuation never scramble — keeps line shape stable.
+  Monospace + 1:1 char swap = zero layout reflow during the run.
+- Animation runs **once** per page-load. No re-trigger on subsequent
+  scrolls.
+
 ## v28 — Unified left alignment across every section
 - Removed the 24px horizontal padding from `.hero`, `.manifesto`,
   `.banner`, and `.final`. Generic sections (scoreboard, what-it-is,

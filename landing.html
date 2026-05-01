@@ -7,6 +7,9 @@
   <meta name="description" content="AI Employees that replace human work end-to-end. 80–95% cost reduction. Live in 30 days.">
   <link rel="preconnect" href="https://rsms.me/">
   <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap">
   <style>
     :root {
       --bg-0: #050507;
@@ -362,12 +365,19 @@
       background: var(--bg-0);
     }
     .manifesto-text {
-      font-size: clamp(22px, 3vw, 28px);   /* re-uses the existing h3 clamp */
-      line-height: 1.5;
-      letter-spacing: -0.02em;
+      font-family: 'Space Mono', ui-monospace, SFMono-Regular, 'Menlo',
+                   'Cascadia Mono', Consolas, monospace;
+      font-size: clamp(16px, 2.4vw, 22px);   /* mono reads bigger; nudge down a touch */
+      line-height: 1.55;
+      letter-spacing: 0;
       color: var(--ink);
-      max-width: 38ch;
-      font-weight: 500;
+      max-width: 56ch;
+      font-weight: 400;
+      /* Reserve the final layout dimensions so the scramble animation
+         (which only swaps characters, never lengths) doesn't cause
+         any reflow as it plays. */
+      white-space: pre-wrap;
+      word-break: break-word;
     }
     @media (max-width: 720px) {
       .manifesto { padding: 80px 0; }
@@ -1523,6 +1533,73 @@ void main() {
       });
     }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
     els.forEach(function (el) { io.observe(el); });
+  })();
+</script>
+
+<script>
+  // Scramble-reveal for the manifesto. Letters (and digits) settle in
+  // staggered along the string so the text decrypts left-to-right with
+  // some randomness. Spaces and punctuation never get scrambled — keeps
+  // word boundaries readable while the noise resolves. Monospace font
+  // means swapping chars never reflows the layout.
+  (function () {
+    var el = document.querySelector('.manifesto-text');
+    if (!el) return;
+
+    var finalText = el.textContent;
+    var scrambleChars = '!@#$%^&*()<>[]{}/\\|=+-_~?abcdef0123456789';
+    var DURATION = 2400;        // total reveal duration (ms) — under 3s.
+    var SCRAMBLE_PER_CHAR = 0.5; // each char scrambles for half the run
+
+    // Per-character "lock-in" point in [0..1]. Later positions lock
+    // later, with random scatter for an organic feel.
+    var lockTimes = [];
+    for (var i = 0; i < finalText.length; i++) {
+      var positionRatio = i / Math.max(finalText.length - 1, 1);
+      lockTimes.push(positionRatio * (1 - SCRAMBLE_PER_CHAR) + Math.random() * 0.15);
+    }
+
+    function isLocked(ch) {
+      // Spaces, line breaks and a few common punctuation marks always
+      // render as themselves — they anchor the line shape.
+      return /\s|[.,!?'"—–\-]/.test(ch);
+    }
+
+    function run() {
+      var start = performance.now();
+
+      function frame(now) {
+        var t = (now - start) / DURATION;
+        if (t >= 1) {
+          el.textContent = finalText;
+          return;
+        }
+        var out = '';
+        for (var i = 0; i < finalText.length; i++) {
+          var ch = finalText[i];
+          if (isLocked(ch) || t >= lockTimes[i]) {
+            out += ch;
+          } else {
+            out += scrambleChars[(Math.random() * scrambleChars.length) | 0];
+          }
+        }
+        el.textContent = out;
+        requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    }
+
+    if (!('IntersectionObserver' in window)) { run(); return; }
+
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          run();
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.3 });
+    io.observe(el);
   })();
 </script>
 </body>
