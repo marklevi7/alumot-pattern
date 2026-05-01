@@ -3,6 +3,8 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v17 — Removed "THE MATH" eyebrow above the scoreboard.
+
 ## v16 — Left-edge alignment + no more button "breathing"
 - `.boxed` and `.boxed--body` no longer extend the bg leftward via
   box-shadow. Padding is now right-only so the bg's left edge sits
