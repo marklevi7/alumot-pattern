@@ -3,6 +3,20 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v12 — Brighter grays, hero subtitle blackout, CTA shine
+- Bumped every gray text/icon shade by ~25% so the page is readable
+  in direct sun on a phone:
+    --ink-dim:   #9a9aa3 → #c0c0cc
+    --ink-faint: #565660 → #6c6c78
+    .hero h1 em: #888888 → #aaaaaa
+- Hero subtitle now has a per-line solid-black background
+  (`box-decoration-break: clone` + horizontal `box-shadow`) so the
+  dot pattern can't bleed through the text.
+- Every `.cta` now has a single dark band that sweeps across once
+  every 5 seconds (~0.7s sweep, then waits 4.3s). Implemented via
+  `background-image` + `background-position` keyframes — no pseudo-
+  elements, no `@property`, no `isolation` (kept iOS-safe).
+
 ## v11 — Matched line icons on the Junior / AI scoreboard
 - Added two hand-drawn SVG line icons above each column heading.
   Both share the same stroke width (1.6), the same shoulder curve,

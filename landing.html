@@ -13,8 +13,8 @@
       --bg-1: #0b0b10;
       --bg-2: #11121a;
       --ink: #f3f3f5;
-      --ink-dim: #9a9aa3;
-      --ink-faint: #565660;
+      --ink-dim: #c0c0cc;     /* was #9a9aa3 — bumped ~25% for sun-readability */
+      --ink-faint: #6c6c78;   /* was #565660 — bumped ~25% for sun-readability */
       --line: rgba(255, 255, 255, 0.08);
       --line-strong: rgba(255, 255, 255, 0.18);
       --accent: #ffffff;
@@ -109,7 +109,7 @@
 
     .hero h1 em {
       font-style: normal;
-      color: #888888;
+      color: #aaaaaa;   /* was #888888 — bumped ~25% */
     }
 
     .hero .sub {
@@ -117,7 +117,16 @@
       color: var(--ink-dim);
       max-width: 56ch;
       margin: 0 0 40px;
-      line-height: 1.5;
+      line-height: 1.7;        /* extra space so the per-line bg doesn't crowd */
+    }
+    /* Solid black behind the text on every line so the dot pattern
+       can't bleed through and reduce legibility. */
+    .hero .sub > span {
+      background: #000000;
+      -webkit-box-decoration-break: clone;
+              box-decoration-break: clone;
+      padding: 0.18em 0.4em;
+      box-shadow: 0.4em 0 0 #000000, -0.4em 0 0 #000000;
     }
 
     /* ─── WORDMARK ─────────────────────────────────────────────── */
@@ -151,7 +160,6 @@
       align-items: center;
       gap: 10px;
       padding: 16px 28px;
-      background: var(--ink);
       color: var(--bg-0);
       border: 1px solid var(--ink);
       border-radius: 5px;
@@ -161,7 +169,30 @@
       letter-spacing: -0.005em;
       text-decoration: none;
       cursor: pointer;
-      transition: transform 120ms ease, background 120ms ease, color 120ms ease;
+      transition: transform 120ms ease, background-color 120ms ease, color 120ms ease;
+
+      /* Periodic shine — a single dark band sweeps across the
+         button once every 5s. Using background-image (not a pseudo)
+         so it stays on the safe side of iOS Safari layering. */
+      background-color: var(--ink);
+      background-image: linear-gradient(
+        110deg,
+        transparent 0%,
+        transparent 40%,
+        rgba(0, 0, 0, 0.18) 50%,
+        transparent 60%,
+        transparent 100%
+      );
+      background-size: 220% 100%;
+      background-repeat: no-repeat;
+      background-position: -110% 0;
+      animation: cta-shine 5s ease-in-out infinite;
+    }
+
+    @keyframes cta-shine {
+      0%   { background-position: -110% 0; }
+      14%  { background-position:  210% 0; }   /* sweep takes ~0.7s */
+      100% { background-position:  210% 0; }   /* then waits off-screen */
     }
 
     .cta::after {
@@ -171,7 +202,7 @@
     }
 
     .cta:hover {
-      background: transparent;
+      background-color: transparent;
       color: var(--ink);
     }
 
@@ -551,7 +582,7 @@
     <div class="wordmark">Mark Levi<span class="dot">·</span>Consulting</div>
     <div class="wrap">
       <h1 class="reveal">Stop paying humans for work machines do better.</h1>
-      <p class="sub reveal">Every month you sign off on salaries for work that doesn't need a human anymore. Lead follow-ups. Content. Filing. Compliance. Reports. Calendar wrangling. Invoice reconciliation. Contract renewals. This work doesn't need talent. It needs volume. AI does volume for a fraction of the cost.</p>
+      <p class="sub reveal"><span>Every month you sign off on salaries for work that doesn't need a human anymore. Lead follow-ups. Content. Filing. Compliance. Reports. Calendar wrangling. Invoice reconciliation. Contract renewals. This work doesn't need talent. It needs volume. AI does volume for a fraction of the cost.</span></p>
       <div class="reveal">
         <a class="cta" href="https://calendly.com/marklevi/1hour" target="_blank" rel="noopener">Book a call</a>
       </div>
