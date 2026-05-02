@@ -602,7 +602,7 @@
 
     /* ─── FINAL CTA ────────────────────────────────────────────── */
     .final {
-      padding: 200px 0 280px;
+      padding: 200px 0 360px;       /* extra bottom for the embedded footer */
       min-height: 100vh;
       min-height: 100svh;       /* iOS small-viewport unit so no gap appears below */
       text-align: left;
@@ -679,7 +679,9 @@
       }
 
       .banner { padding: 130px 0; }
-      .final { padding: 140px 0 220px; min-height: 100svh; }
+      .final { padding: 140px 0 300px; min-height: 100svh; }
+      .final-footer { bottom: 40px; }
+      .final-footer .wrap { gap: 22px; }
     }
 
     /* Small focus ring for accessibility */
@@ -689,25 +691,26 @@
     }
 
     /* ─── FOOTER ───────────────────────────────────────────────── */
-    .site-footer {
-      padding: 80px 0 56px;
-      border-top: 1px solid var(--line);
-      background: var(--bg-0);
-      position: relative;
+    /* Footer lives at the bottom of the .final block, sharing its
+       dot-pattern bg. Pinned to the section bottom so the main CTA
+       content above stays visually centred. */
+    .final-footer {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 48px;
       z-index: 2;
     }
-    /* Mobile (default): clean vertical stack with generous gaps so
-       the three legal links don't wrap awkwardly across two lines. */
-    .site-footer .wrap {
+    .final-footer .wrap {
       display: flex;
       flex-direction: column;
-      gap: 32px;
+      gap: 28px;
     }
     .footer-mark {
-      font-size: 12px;
+      font-size: 13px;
       letter-spacing: 0.18em;
       text-transform: uppercase;
-      color: var(--ink-dim);
+      color: var(--ink);
       margin: 0;
     }
     .footer-links {
@@ -716,40 +719,23 @@
       margin: 0;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 12px;
     }
     .footer-links a {
-      color: var(--ink-dim);
+      color: var(--ink);
       text-decoration: none;
       font-size: 15px;
     }
-    .footer-links a:hover { color: var(--ink); }
+    .footer-links a:hover { opacity: 0.8; }
     .footer-meta {
       margin: 0;
       font-size: 12px;
-      color: var(--ink-faint);
+      color: var(--ink);
       letter-spacing: 0.02em;
     }
-
-    /* Tablet / desktop: two-column. Wordmark + copyright on the left,
-       links stacked on the right. Reads as a tidy editorial footer. */
-    @media (min-width: 720px) {
-      .site-footer .wrap {
-        display: grid;
-        grid-template-columns: 1fr auto;
-        column-gap: 48px;
-        row-gap: 16px;
-        align-items: start;
-      }
-      .footer-mark { grid-column: 1; grid-row: 1; }
-      .footer-meta { grid-column: 1; grid-row: 2; }
-      .footer-links {
-        grid-column: 2;
-        grid-row: 1 / span 2;
-        text-align: right;
-        gap: 12px;
-      }
-    }
+    /* Each .boxed span carries its own black backdrop, so the line
+       text colour can be solid white — the contrast comes from the
+       cutout, not from a dim grey. */
 
     /* ════════════════════════════════════════════════════════════
        SNOWBALL LOADER (experimental — sits inside the WHY NOW
@@ -1328,7 +1314,7 @@
     </div>
   </section>
 
-  <!-- ─── FINAL CTA ────────────────────────────────────────────── -->
+  <!-- ─── FINAL CTA + FOOTER ───────────────────────────────────── -->
   <section class="final">
     <div class="dither-bg" data-preset="final"></div>
     <div class="wrap">
@@ -1338,20 +1324,18 @@
         <a class="cta" href="https://calendly.com/marklevi/1hour" target="_blank" rel="noopener">Book a call</a>
       </div>
     </div>
-  </section>
-
-  <!-- ─── FOOTER ───────────────────────────────────────────────── -->
-  <footer class="site-footer">
-    <div class="wrap">
-      <p class="footer-mark">Mark Levi Consulting</p>
-      <ul class="footer-links">
-        <li><a href="privacy.html">Privacy Policy</a></li>
-        <li><a href="terms.html">Terms &amp; Conditions</a></li>
-        <li><a href="accessibility.html">Accessibility Statement</a></li>
-      </ul>
-      <p class="footer-meta">© 2026 Mark Levi Consulting</p>
+    <div class="final-footer">
+      <div class="wrap">
+        <p class="footer-mark"><span class="boxed boxed--body">Mark Levi Consulting</span></p>
+        <ul class="footer-links">
+          <li><a href="privacy.html"><span class="boxed boxed--body">Privacy Policy</span></a></li>
+          <li><a href="terms.html"><span class="boxed boxed--body">Terms &amp; Conditions</span></a></li>
+          <li><a href="accessibility.html"><span class="boxed boxed--body">Accessibility Statement</span></a></li>
+        </ul>
+        <p class="footer-meta"><span class="boxed boxed--body">© 2026 Mark Levi Consulting</span></p>
+      </div>
     </div>
-  </footer>
+  </section>
 
 </main>
 

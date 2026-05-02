@@ -3,6 +3,18 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v58 — Footer absorbed into the final CTA block
+- Removed the standalone `<footer class="site-footer">`. The wordmark,
+  three legal links, and copyright now sit at the bottom of the
+  `.final` section, sharing its rising-dot animated background.
+- Each footer text element wraps in a `.boxed boxed--body` span so
+  it carves a black per-line cutout out of the dot field — same
+  treatment as the hero subtitle. No bleed-through.
+- `.final-footer` is absolutely pinned to `bottom: 48px` (40px on
+  mobile) so the main CTA stays centred above it.
+- `.final` bottom padding bumped 280→360px desktop / 220→300px
+  mobile so the section visibly extends to host the footer.
+
 ## v57 — Footer reorganised for mobile
 - Mobile (default): clean vertical stack — wordmark, three links
   each on their own line (gap 14px), copyright at the bottom.
