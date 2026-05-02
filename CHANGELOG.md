@@ -3,6 +3,16 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v42 — Photo dither: orientation fix + finer dots
+- The image was rendering upside-down. Three.js TextureLoader sets
+  `flipY = true` by default, which already orients the image
+  correctly when sampling with our bottom-origin `gl_FragCoord`.
+  Removed the manual `uv.y = 1.0 - uv.y` flip that was adding a
+  second flip on top of that.
+- Cell size dropped 5 → 3, making the photo's dots noticeably finer
+  and bringing them in line visually with the rest of the page's
+  dither blocks.
+
 ## v41 — Photo Bayer-dither block at top of page (experimental)
 - Added a new `<section class="photo-dither">` at the very top of
   the page (above the hero) that renders a remote image through a

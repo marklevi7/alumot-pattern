@@ -807,7 +807,7 @@
   <section class="photo-dither">
     <div id="photo_dither_canvas"
          data-image-url="https://upload.wikimedia.org/wikipedia/commons/3/39/Domestic_Goose.jpg"
-         data-pixel-size="5"
+         data-pixel-size="3"
          data-ink="#ffffff"></div>
   </section>
 
@@ -1595,9 +1595,11 @@ void main() {
     ? vec2(canvasAspect / imageAspect, 1.0)
     : vec2(1.0, imageAspect / canvasAspect);
 
+  // three.js TextureLoader sets texture.flipY = true by default, which
+  // already orients the image correctly when sampling with our bottom-
+  // origin gl_FragCoord. No manual y-flip needed.
   vec2 uv = cellCenter / uResolution;
   uv = (uv - 0.5) * scale + 0.5;
-  uv.y = 1.0 - uv.y;                    // flip y for texture coords
   uv = clamp(uv, 0.0, 1.0);
 
   vec3 col = texture(uImage, uv).rgb;
