@@ -3,6 +3,19 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v47 — AI-node loader: bigger centre, sonar, dot trails
+- Centre disc roughly **doubled in radius** (0.075 → 0.140) so it
+  dominates the composition instead of competing with the satellites.
+- Added **sonar rings** broadcasting out from the centre — three
+  expanding rings on staggered phases, fading as they grow. Gives
+  the centre real "presence" without resorting to a 3D model.
+- Satellite ring pushed out (0.30 → 0.40) to make room for the
+  fatter centre.
+- Connecting lines made brighter (0.18 → 0.30 baseline).
+- Travelling dots are now **3-dot comet trails** instead of single
+  dots — head bright, tail fading. Direction still alternates per
+  satellite so both inflow and outflow read.
+
 ## v46 — AI-employee node loader at the bottom of "What it is"
 - Same dither-strip treatment as the manifesto wave-floor, applied
   to the bottom of the WHAT IT IS section.

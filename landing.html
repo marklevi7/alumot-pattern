@@ -1745,41 +1745,60 @@ void main() {
   float minDim = min(uResolution.x, uResolution.y);
   vec2 px = (cellCenter - uResolution * 0.5) / minDim;
 
-  // Central processing node — bright disc with a slow breathing pulse.
+  // Central processing node — much bigger now, dominant presence.
+  // Solid bright core + a slow breathing pulse on top.
   float centerD = length(px);
-  float feed = smoothstep(0.075, 0.052, centerD)
-             * (0.85 + 0.15 * sin(uTime * 1.6));
+  float centerCore = smoothstep(0.140, 0.105, centerD)
+                   * (0.88 + 0.12 * sin(uTime * 1.6));
 
-  // Ring of 6 satellites + faint guide lines + travelling data dots.
-  float SAT_R = 0.30;
+  // Sonar: concentric rings constantly expanding from the centre,
+  // fading as they grow. Three rings on staggered phases so there's
+  // always one mid-flight. Reads as the agent broadcasting outward.
+  float sonar = 0.0;
+  for (int k = 0; k < 3; k++) {
+    float ringT  = fract(uTime * 0.40 + float(k) * 0.333);
+    float ringR  = mix(0.115, 0.36, ringT);
+    float ringD  = abs(centerD - ringR);
+    float fade   = 1.0 - ringT;
+    sonar = max(sonar, smoothstep(0.013, 0.004, ringD) * fade * 0.55);
+  }
+  float feed = max(centerCore, sonar);
+
+  // Ring of 6 satellites pushed out a bit (centre is bigger now),
+  // with brighter guide lines and trailing data dots.
+  float SAT_R = 0.40;
   for (int i = 0; i < N_SATS; i++) {
     float fi = float(i);
-    float ang = fi * 6.2831853 / float(N_SATS) - 1.5707963;  // first sat at top
+    float ang = fi * 6.2831853 / float(N_SATS) - 1.5707963;
     vec2  satPos = vec2(cos(ang), sin(ang)) * SAT_R;
 
     // Satellite node — pulses on its own rhythm.
     float satD = length(px - satPos);
-    float satPulse = 0.55 + 0.45 * sin(uTime * 1.3 + fi * 0.85);
-    feed = max(feed, smoothstep(0.038, 0.024, satD) * satPulse);
+    float satPulse = 0.6 + 0.4 * sin(uTime * 1.4 + fi * 0.85);
+    feed = max(feed, smoothstep(0.045, 0.028, satD) * satPulse);
 
-    // Faint always-on link.
-    vec2 toSat = -satPos;          // sat → centre vector
+    // Brighter always-on link line.
+    vec2 toSat = -satPos;
     float lineLen = length(toSat);
     vec2 lineDir = toSat / lineLen;
     vec2 fromSat = px - satPos;
     float t = clamp(dot(fromSat, lineDir) / lineLen, 0.0, 1.0);
     vec2 closest = satPos + lineDir * t * lineLen;
     float lineD = length(px - closest);
-    feed = max(feed, smoothstep(0.005, 0.002, lineD) * 0.18);
+    feed = max(feed, smoothstep(0.007, 0.003, lineD) * 0.30);
 
-    // Travelling data dot — alternating direction per satellite so
-    // the scene shows both inbound and outbound flow.
+    // Trailing data dots — 3 dots in a comet, head bright, tail dim.
+    // Alternating direction per satellite (inbound / outbound).
     float dir = mod(fi, 2.0) < 1.0 ? 1.0 : -1.0;
-    float pos = fract(uTime * 0.45 + fi * 0.13);
-    if (dir < 0.0) pos = 1.0 - pos;
-    vec2 dotPos = satPos + lineDir * pos * lineLen;
-    float dotD = length(px - dotPos);
-    feed = max(feed, smoothstep(0.026, 0.014, dotD));
+    for (int j = 0; j < 3; j++) {
+      float jf = float(j);
+      float pos = fract(uTime * 0.55 + fi * 0.13 - jf * 0.07);
+      if (dir < 0.0) pos = 1.0 - pos;
+      vec2 dotPos = satPos + lineDir * pos * lineLen;
+      float dotD  = length(px - dotPos);
+      float strength = 1.0 - jf * 0.30;
+      feed = max(feed, smoothstep(0.030, 0.016, dotD) * strength);
+    }
   }
 
   // Bayer threshold + small-circle mask, matching every other dither
