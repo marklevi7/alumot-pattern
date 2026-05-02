@@ -3,6 +3,14 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v57 — Footer reorganised for mobile
+- Mobile (default): clean vertical stack — wordmark, three links
+  each on their own line (gap 14px), copyright at the bottom.
+  Bigger top padding (64 → 80px) and section gap (14 → 32px) for
+  breathing room. Link size bumped 14 → 15px.
+- Tablet / desktop (≥720px): two-column grid — wordmark + copyright
+  on the left, the three links stacked right-aligned on the right.
+
 ## v56 — Footer: phone & email removed
 - Dropped the `.footer-contact` line (email + phone) from the
   landing page footer. Footer now shows wordmark, three legal links,
