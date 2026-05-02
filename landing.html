@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=VT323&display=swap">
   <style>
     :root {
       --bg-0: #050507;
@@ -358,24 +358,53 @@
     .manifesto {
       padding: 120px 0;
       background: var(--bg-0);
+      position: relative;
+      overflow: hidden;
+    }
+    /* Pixel-mono noise field that fills the entire block in dim grey,
+       with the readable manifesto text laid over it in bright ink. */
+    .manifesto-noise {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      font-family: 'VT323', ui-monospace, monospace;
+      font-size: 20px;
+      line-height: 1;
+      color: var(--ink-faint);
+      opacity: 0.55;
+      white-space: pre;
+      overflow: hidden;
+      user-select: none;
+      pointer-events: none;
+    }
+    .manifesto .wrap {
+      position: relative;
+      z-index: 1;
     }
     .manifesto-text {
-      font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, 'Menlo',
+      font-family: 'VT323', ui-monospace, SFMono-Regular, 'Menlo',
                    'Cascadia Mono', Consolas, monospace;
-      font-size: clamp(20px, 2.9vw, 26px);   /* legibility bump */
-      line-height: 1.55;
+      font-size: clamp(28px, 3.6vw, 36px);   /* VT323 reads small; bump up */
+      line-height: 1.4;
       letter-spacing: 0;
       color: var(--ink);
-      max-width: 50ch;                       /* tighter measure for the larger size */
+      max-width: 30ch;                        /* VT323 chars are wider */
       font-weight: 400;
-      /* Reserve the final layout dimensions so the scramble animation
-         (which only swaps characters, never lengths) doesn't cause
-         any reflow as it plays. */
+      /* Solid bg so the noise doesn't bleed through the text glyphs.
+         Per-line backdrop using box-decoration-break on an inner span
+         is what makes the body copy "carve out" of the noise field. */
       white-space: pre-wrap;
       word-break: break-word;
     }
+    .manifesto-text > .text-cutout {
+      background: var(--bg-0);
+      -webkit-box-decoration-break: clone;
+              box-decoration-break: clone;
+      padding: 0.05em 0.3em 0.05em 0;
+    }
     @media (max-width: 720px) {
       .manifesto { padding: 80px 0; }
+      .manifesto-noise { font-size: 18px; }
     }
 
     /* ─── ACCORDION ────────────────────────────────────────────── */
@@ -804,8 +833,9 @@
 
   <!-- ─── MANIFESTO ────────────────────────────────────────────── -->
   <section class="manifesto">
+    <div class="manifesto-noise" aria-hidden="true"></div>
     <div class="wrap">
-      <p class="manifesto-text reveal">Every month you sign off on salaries for work that doesn't need a human anymore. Lead follow-ups. Content. Filing. Compliance. Reports. Calendar wrangling. Invoice reconciliation. Contract renewals. This work doesn't need talent. It needs volume. AI does volume for a fraction of the cost.</p>
+      <p class="manifesto-text reveal"><span class="text-cutout">Every month you sign off on salaries for work that doesn't need a human anymore. Lead follow-ups. Content. Filing. Compliance. Reports. Calendar wrangling. Invoice reconciliation. Contract renewals. This work doesn't need talent. It needs volume. AI does volume for a fraction of the cost.</span></p>
     </div>
   </section>
 
@@ -1543,7 +1573,10 @@ void main() {
   // word boundaries readable while the noise resolves. Monospace font
   // means swapping chars never reflows the layout.
   (function () {
-    var el = document.querySelector('.manifesto-text');
+    // Scramble the inner cutout span (carries the bg) so the bg
+    // stays attached to the resolving glyphs as they settle.
+    var el = document.querySelector('.manifesto-text .text-cutout')
+          || document.querySelector('.manifesto-text');
     if (!el) return;
 
     var finalText = el.textContent;
@@ -1650,6 +1683,74 @@ void main() {
     // Stagger each group's first run by its offset so the pairs cascade
     // outside-in on the very first cycle, then loop independently.
     GROUPS.forEach(function (g) { setTimeout(function () { startGroup(g); }, g.offset); });
+  })();
+</script>
+
+<script>
+  // Pixel-mono noise grid that fills the manifesto block in dim grey.
+  // Recomputes on resize so the grid always covers the section, and
+  // refreshes a small slice every second for a "live data" feel
+  // without burning the CPU.
+  (function () {
+    var el = document.querySelector('.manifesto-noise');
+    if (!el) return;
+
+    var CHARSET = '01';   // binary; swap for '0123456789ABCDEF' or punctuation to taste
+    var lastCols = 0, lastRows = 0;
+    var grid = [];        // cached grid (array of strings, one per row)
+
+    function measureCharSize() {
+      var probe = document.createElement('span');
+      probe.style.cssText = 'position:absolute;visibility:hidden;font: inherit;';
+      probe.textContent = '0'.repeat(50);
+      el.appendChild(probe);
+      var w = probe.getBoundingClientRect().width / 50;
+      el.removeChild(probe);
+      // line-height: 1 → use font-size as line height
+      var fs = parseFloat(getComputedStyle(el).fontSize);
+      return { w: w || 12, h: fs || 20 };
+    }
+
+    function regenerate() {
+      var size = measureCharSize();
+      var cols = Math.ceil(el.clientWidth  / size.w) + 1;
+      var rows = Math.ceil(el.clientHeight / size.h) + 1;
+
+      if (cols === lastCols && rows === lastRows) return;
+      lastCols = cols; lastRows = rows;
+
+      grid = [];
+      for (var r = 0; r < rows; r++) {
+        var line = '';
+        for (var c = 0; c < cols; c++) {
+          line += CHARSET[(Math.random() * CHARSET.length) | 0];
+        }
+        grid.push(line);
+      }
+      render();
+    }
+
+    function render() { el.textContent = grid.join('\n'); }
+
+    function tickle() {
+      // Flip ~1.5% of cells per tick — subtle, like a slow data feed.
+      if (!grid.length) return;
+      var rows = grid.length, cols = grid[0].length;
+      var flips = Math.max(8, ((rows * cols) * 0.015) | 0);
+      for (var i = 0; i < flips; i++) {
+        var r = (Math.random() * rows) | 0;
+        var c = (Math.random() * cols) | 0;
+        var ch = CHARSET[(Math.random() * CHARSET.length) | 0];
+        grid[r] = grid[r].slice(0, c) + ch + grid[r].slice(c + 1);
+      }
+      render();
+    }
+
+    regenerate();
+    window.addEventListener('resize', regenerate);
+    if (!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) {
+      setInterval(tickle, 900);
+    }
   })();
 </script>
 </body>

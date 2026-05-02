@@ -3,6 +3,21 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v35 — Manifesto: pixel-mono noise field behind the text
+- Switched the manifesto typeface to **VT323** — pixel-style
+  monospace, retro-terminal vibe.
+- Added a full-block noise grid (`.manifesto-noise`) of binary
+  `01` characters in `--ink-faint` at 55% opacity. The grid is
+  recomputed on resize and a small percentage of cells flip
+  every ~0.9s for a subtle "live data" feel.
+- The manifesto text sits over the noise wrapped in a
+  `.text-cutout` span with a solid `--bg-0` per-line backdrop —
+  the bright copy carves itself out of the noise field.
+- Existing scramble-reveal still fires on viewport entry, now
+  scrambling the cutout span so the bg follows the resolving
+  glyphs.
+- Honors `prefers-reduced-motion`: noise stays static, no flips.
+
 ## v34 — Wordmark: dot separator removed
 - Wordmark now reads "Mark Levi Consulting" — single phrase, no
   middle-dot between "Levi" and "Consulting". Removed the
