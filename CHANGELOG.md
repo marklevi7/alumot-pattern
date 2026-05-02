@@ -3,6 +3,14 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v59 — Final block dot density toned down
+- The previous `gradientY: 0.55` + `density: 0.45` made the bottom
+  of the .final section so densely dotted that the embedded footer
+  read as chaos behind dense white speckle.
+- Lowered the .final preset to `density: 0.20`, `gradientY: 0.10`.
+  The rising-dot effect is preserved but much softer, and the
+  footer area now reads cleanly.
+
 ## v58 — Footer absorbed into the final CTA block
 - Removed the standalone `<footer class="site-footer">`. The wordmark,
   three legal links, and copyright now sit at the bottom of the
