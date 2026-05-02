@@ -3,6 +3,13 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v53 — Wordmark sized to match body text
+- `.wordmark` font-size 13 → 17 px (desktop) and 11 → 16 px (mobile).
+  Now reads at body-text scale instead of the small-label scale it
+  previously shared with eyebrows.
+- Everything else on the wordmark unchanged (still Inter, uppercase,
+  weight 600, 0.18em tracking, mix-blend-mode: difference).
+
 ## v52 — Seven AI Employees: choreographed entrance sequence
 On scroll into view, the accordion now plays a clean sequence:
 1. Badges pop in top → bottom over ~1 second (`accordion-num-pop`
