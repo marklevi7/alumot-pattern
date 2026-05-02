@@ -414,23 +414,39 @@
       border-radius: 4px;
       font-variant-numeric: tabular-nums;
       letter-spacing: 0;
-      /* Each badge spins clockwise around its own centre. The 4.9s
-         duration / 0.7s stagger (= 4.9 / 7) makes a perfect rolling
-         wave across the seven items. */
-      animation: accordion-num-spin 4.9s linear infinite;
+      /* The square spins clockwise. The .num-text inside counter-spins
+         at the same rate so the number stays upright while the square
+         rotates underneath it. Per-badge `--d` delay drives an outside-
+         in mirror pattern: ends (1 & 7) start first, cascades inward
+         to centre (4). Pairs the seven items by symmetry. */
+      animation: accordion-num-spin 4.5s linear infinite;
+      animation-delay: var(--d, 0s);
       transform-origin: 50% 50%;
       will-change: transform;
     }
-    .accordion details:nth-of-type(1) .num { animation-delay: 0s;   }
-    .accordion details:nth-of-type(2) .num { animation-delay: 0.7s; }
-    .accordion details:nth-of-type(3) .num { animation-delay: 1.4s; }
-    .accordion details:nth-of-type(4) .num { animation-delay: 2.1s; }
-    .accordion details:nth-of-type(5) .num { animation-delay: 2.8s; }
-    .accordion details:nth-of-type(6) .num { animation-delay: 3.5s; }
-    .accordion details:nth-of-type(7) .num { animation-delay: 4.2s; }
+    .accordion .num-text {
+      display: inline-block;
+      animation: accordion-num-spin-rev 4.5s linear infinite;
+      animation-delay: var(--d, 0s);     /* inherited from parent .num */
+      transform-origin: 50% 50%;
+    }
+
+    /* Outside-in mirror: 1+7, then 2+6, then 3+5, then 4. */
+    .accordion details:nth-of-type(1) .num,
+    .accordion details:nth-of-type(7) .num { --d: 0s; }
+    .accordion details:nth-of-type(2) .num,
+    .accordion details:nth-of-type(6) .num { --d: 0.5s; }
+    .accordion details:nth-of-type(3) .num,
+    .accordion details:nth-of-type(5) .num { --d: 1.0s; }
+    .accordion details:nth-of-type(4) .num { --d: 1.5s; }
+
     @keyframes accordion-num-spin {
       from { transform: rotate(0deg); }
       to   { transform: rotate(360deg); }
+    }
+    @keyframes accordion-num-spin-rev {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(-360deg); }
     }
 
     .accordion .title {
@@ -612,7 +628,8 @@
     @media (prefers-reduced-motion: reduce) {
       .reveal { opacity: 1; transform: none; transition: none; }
       .cta, .cta::after, .accordion .chev { transition: none; }
-      .accordion .num { animation: none; transform: none; }
+      .accordion .num,
+      .accordion .num-text { animation: none; transform: none; }
     }
 
     /* ─── MOBILE ────────────────────────────────────────────────── */
@@ -919,7 +936,7 @@
       <div class="accordion reveal">
         <details>
           <summary>
-            <span class="num">01</span>
+            <span class="num"><span class="num-text">01</span></span>
             <span class="title">Sales / BizDev Employee</span>
             <span class="chev">+</span>
           </summary>
@@ -931,7 +948,7 @@
 
         <details>
           <summary>
-            <span class="num">02</span>
+            <span class="num"><span class="num-text">02</span></span>
             <span class="title">Content Production Employee</span>
             <span class="chev">+</span>
           </summary>
@@ -943,7 +960,7 @@
 
         <details>
           <summary>
-            <span class="num">03</span>
+            <span class="num"><span class="num-text">03</span></span>
             <span class="title">Finance Team Assistant</span>
             <span class="chev">+</span>
           </summary>
@@ -955,7 +972,7 @@
 
         <details>
           <summary>
-            <span class="num">04</span>
+            <span class="num"><span class="num-text">04</span></span>
             <span class="title">Contract Renewal Agent</span>
             <span class="chev">+</span>
           </summary>
@@ -967,7 +984,7 @@
 
         <details>
           <summary>
-            <span class="num">05</span>
+            <span class="num"><span class="num-text">05</span></span>
             <span class="title">C-Suite Concierge</span>
             <span class="chev">+</span>
           </summary>
@@ -979,7 +996,7 @@
 
         <details>
           <summary>
-            <span class="num">06</span>
+            <span class="num"><span class="num-text">06</span></span>
             <span class="title">Onboarding Buddy Agent</span>
             <span class="chev">+</span>
           </summary>
@@ -991,7 +1008,7 @@
 
         <details>
           <summary>
-            <span class="num">07</span>
+            <span class="num"><span class="num-text">07</span></span>
             <span class="title">On-Demand Project Agent</span>
             <span class="chev">+</span>
           </summary>

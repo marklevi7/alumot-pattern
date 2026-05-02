@@ -3,6 +3,19 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v32 — Accordion badges: counter-rotated number + outside-in mirror grouping
+- Each badge spins clockwise; an inner `.num-text` span counter-spins
+  at the same rate so the **number stays upright** while the square
+  rotates underneath it.
+- New grouping: outside-in mirror.
+    - Items 1 and 7 start together at delay 0s
+    - Items 2 and 6 at 0.5s
+    - Items 3 and 5 at 1.0s
+    - Item 4 at 1.5s
+- The seven items are visually paired by symmetry — wave cascades
+  inward from the ends to the centre rather than marching down the
+  list. Duration tightened to 4.5s.
+
 ## v31 — Accordion number badges: cascading spin
 - Each `.num` badge now spins 360° clockwise around its own centre.
 - Per-position `animation-delay` (0s, 0.7s, 1.4s, …, 4.2s) over a
