@@ -3,7 +3,7 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
-## v54 — Wordmark left-edge aligned with hero content
+## v54 — Wordmark left-edge aligned with hero content  ★ PINNED — known-good baseline
 - Wrapped the wordmark in a `.wordmark-frame` that mirrors `.wrap`
   (`max-width: 1080px; margin: 0 auto; padding: 0 24px;`).
 - Result: the wordmark's left edge now sits on the same vertical
