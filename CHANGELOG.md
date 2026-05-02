@@ -3,6 +3,18 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v43 — Top of page: wave-dither strip
+- Replaced the goose-photo block with an animated **wave-dither strip**.
+  ~1/3 of the viewport tall, full width, black background.
+- Wave shape is a stack of three sines computed in the fragment
+  shader (no image, no fbm). `+uTime` in the sine phase drifts the
+  pattern from **right to left**.
+- Same dot recipe as the rest of the site — Bayer-8 threshold +
+  `maskCircle`, so the visible dot density matches the hero / banner
+  / final blocks exactly.
+- Tick paused when the strip scrolls off-screen
+  (`IntersectionObserver`) to spare battery.
+
 ## v42 — Photo dither: orientation fix + finer dots
 - The image was rendering upside-down. Three.js TextureLoader sets
   `flipY = true` by default, which already orients the image
