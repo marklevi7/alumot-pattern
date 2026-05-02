@@ -3,6 +3,19 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v49 — AI-node centre: opaque lit octahedron
+- Replaced the wireframe octahedron with a **solid, opaque, classically
+  lit** one. Same shape, but now ray-marched against an octahedron SDF
+  and shaded per face.
+- Lighting: ambient base + key (upper-front) diffuse + fill diffuse +
+  Phong specular highlight + a touch of rim. Three-point-ish, all
+  scalar (no colour) — gets fed straight into the dither so highlights
+  = dense dots, shadows = sparse dots, gives the classic chiaroscuro
+  3D look through Bayer.
+- Flat shading via face-octant trick: octahedron faces are axis-
+  aligned in object space, so `sign(p_obj) / √3` is the face normal.
+- Same 2-axis tumble as v48; satellites, lines, data trails unchanged.
+
 ## v48 — AI-node centre: rotating wireframe octahedron
 - Replaced the v47 solid centre disc + sonar rings with a procedural
   rotating **wireframe octahedron** drawn directly in the fragment
