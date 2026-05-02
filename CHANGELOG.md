@@ -3,7 +3,7 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
-## v35 — Manifesto: pixel-mono noise field behind the text
+## v35 — Manifesto: pixel-mono noise field behind the text  ★ PINNED — known-good baseline
 - Switched the manifesto typeface to **VT323** — pixel-style
   monospace, retro-terminal vibe.
 - Added a full-block noise grid (`.manifesto-noise`) of binary
