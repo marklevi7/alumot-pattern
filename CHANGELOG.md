@@ -3,7 +3,25 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
-## v35 — Manifesto: pixel-mono noise field behind the text  ★ PINNED — known-good baseline
+## v36 — Manifesto: integrated single-layer character grid
+- The manifesto block is now a **single layer** of monospace
+  characters. Most cells are dim-grey binary filler (`01`); the
+  cells that carry the actual manifesto text are wrapped in
+  `<span class="t">` and rendered bright white. Same font, same
+  size, same grid — only the colour distinguishes "noise" from
+  "text".
+- Text starts at row 4 from the top, padded a few characters in
+  from each side, and word-wraps cleanly (words never split mid-
+  word).
+- Character size bumped (`clamp(22px, 4vw, 34px)`) so the grid
+  reads as deliberate ASCII art rather than tiny noise.
+- Filler cells flip ~1.2% per tick every 0.9s for a subtle
+  data-feed feel; text cells are never touched.
+- Removed the previous two-layer setup (`.manifesto-noise` +
+  `.manifesto-text` overlay) and the scramble script. Honors
+  `prefers-reduced-motion` (no cell flips).
+
+## v35 — Manifesto: pixel-mono noise field behind the text  ★ PINNED — last known-good baseline before v36
 - Switched the manifesto typeface to **VT323** — pixel-style
   monospace, retro-terminal vibe.
 - Added a full-block noise grid (`.manifesto-noise`) of binary

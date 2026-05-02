@@ -356,55 +356,35 @@
 
     /* ─── MANIFESTO (between hero and scoreboard) ───────────────── */
     .manifesto {
-      padding: 120px 0;
       background: var(--bg-0);
       position: relative;
       overflow: hidden;
+      min-height: 75vh;
     }
-    /* Pixel-mono noise field that fills the entire block in dim grey,
-       with the readable manifesto text laid over it in bright ink. */
-    .manifesto-noise {
+    /* One layer. The whole block is a single grid of monospace
+       characters. Filler cells are dim grey (binary noise); the
+       cells that carry the manifesto text are bright white via
+       the inner `.t` spans the JS injects. Same font, same size,
+       same grid — only the colour distinguishes "text" from
+       "noise". */
+    .manifesto-grid {
       position: absolute;
       inset: 0;
-      z-index: 0;
       font-family: 'VT323', ui-monospace, monospace;
-      font-size: 20px;
-      line-height: 1;
-      color: var(--ink-faint);
-      opacity: 0.55;
+      font-size: clamp(22px, 4vw, 34px);
+      line-height: 1.05;
+      color: rgba(160, 160, 173, 0.5);   /* dim grey filler */
       white-space: pre;
       overflow: hidden;
       user-select: none;
       pointer-events: none;
     }
-    .manifesto .wrap {
-      position: relative;
-      z-index: 1;
-    }
-    .manifesto-text {
-      font-family: 'VT323', ui-monospace, SFMono-Regular, 'Menlo',
-                   'Cascadia Mono', Consolas, monospace;
-      font-size: clamp(28px, 3.6vw, 36px);   /* VT323 reads small; bump up */
-      line-height: 1.4;
-      letter-spacing: 0;
-      color: var(--ink);
-      max-width: 30ch;                        /* VT323 chars are wider */
-      font-weight: 400;
-      /* Solid bg so the noise doesn't bleed through the text glyphs.
-         Per-line backdrop using box-decoration-break on an inner span
-         is what makes the body copy "carve out" of the noise field. */
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-    .manifesto-text > .text-cutout {
-      background: var(--bg-0);
-      -webkit-box-decoration-break: clone;
-              box-decoration-break: clone;
-      padding: 0.05em 0.3em 0.05em 0;
+    .manifesto-grid .t {
+      color: #ffffff;                    /* the readable text */
     }
     @media (max-width: 720px) {
-      .manifesto { padding: 80px 0; }
-      .manifesto-noise { font-size: 18px; }
+      .manifesto { min-height: 70vh; }
+      .manifesto-grid { font-size: 20px; }
     }
 
     /* ─── ACCORDION ────────────────────────────────────────────── */
@@ -833,10 +813,7 @@
 
   <!-- ─── MANIFESTO ────────────────────────────────────────────── -->
   <section class="manifesto">
-    <div class="manifesto-noise" aria-hidden="true"></div>
-    <div class="wrap">
-      <p class="manifesto-text reveal"><span class="text-cutout">Every month you sign off on salaries for work that doesn't need a human anymore. Lead follow-ups. Content. Filing. Compliance. Reports. Calendar wrangling. Invoice reconciliation. Contract renewals. This work doesn't need talent. It needs volume. AI does volume for a fraction of the cost.</span></p>
-    </div>
+    <div class="manifesto-grid" aria-label="Every month you sign off on salaries for work that doesn't need a human anymore. Lead follow-ups, content, filing, compliance, reports, calendar wrangling, invoice reconciliation, contract renewals. This work doesn't need talent. It needs volume. AI does volume for a fraction of the cost."></div>
   </section>
 
   <!-- ─── SCOREBOARD ───────────────────────────────────────────── -->
@@ -1567,72 +1544,130 @@ void main() {
 </script>
 
 <script>
-  // Scramble-reveal for the manifesto. Letters (and digits) settle in
-  // staggered along the string so the text decrypts left-to-right with
-  // some randomness. Spaces and punctuation never get scrambled — keeps
-  // word boundaries readable while the noise resolves. Monospace font
-  // means swapping chars never reflows the layout.
+  // Manifesto integrated grid: a single character grid fills the entire
+  // .manifesto block. Most cells are random binary filler (dim grey).
+  // The cells that hold the manifesto text are wrapped in <span class="t">
+  // and rendered bright white. Same font, same size, same grid — text
+  // is part of the noise, just coloured differently.
+  //
+  // Word-wrap is character-aware: words never split mid-word, they push
+  // to the next row when they don't fit. Text starts at row 4 from the
+  // top, padded a few characters in from each side so it sits like a
+  // natural paragraph embedded in the noise.
   (function () {
-    // Scramble the inner cutout span (carries the bg) so the bg
-    // stays attached to the resolving glyphs as they settle.
-    var el = document.querySelector('.manifesto-text .text-cutout')
-          || document.querySelector('.manifesto-text');
+    var el = document.querySelector('.manifesto-grid');
     if (!el) return;
 
-    var finalText = el.textContent;
-    var scrambleChars = '!@#$%^&*()<>[]{}/\\|=+-_~?abcdef0123456789';
-    var DURATION = 2400;        // total reveal duration (ms) — under 3s.
-    var SCRAMBLE_PER_CHAR = 0.5; // each char scrambles for half the run
+    var FILLER = '01';
+    var MANIFESTO = "Every month you sign off on salaries for work that doesn't need a human anymore. Lead follow-ups. Content. Filing. Compliance. Reports. Calendar wrangling. Invoice reconciliation. Contract renewals. This work doesn't need talent. It needs volume. AI does volume for a fraction of the cost.";
+    var START_ROW = 4;
+    var EDGE_PAD = 3;
 
-    // Per-character "lock-in" point in [0..1]. Later positions lock
-    // later, with random scatter for an organic feel.
-    var lockTimes = [];
-    for (var i = 0; i < finalText.length; i++) {
-      var positionRatio = i / Math.max(finalText.length - 1, 1);
-      lockTimes.push(positionRatio * (1 - SCRAMBLE_PER_CHAR) + Math.random() * 0.15);
+    var grid = [];               // 2D array of { ch, t } cells
+    var lastCols = 0, lastRows = 0;
+
+    function measureChar() {
+      var probe = document.createElement('span');
+      probe.style.cssText = 'position:absolute;visibility:hidden;font:inherit;';
+      probe.textContent = '0'.repeat(60);
+      el.appendChild(probe);
+      var w = probe.getBoundingClientRect().width / 60;
+      el.removeChild(probe);
+      var fs = parseFloat(getComputedStyle(el).fontSize);
+      var lh = parseFloat(getComputedStyle(el).lineHeight);
+      return { w: w || 12, h: lh || fs || 24 };
     }
 
-    function isLocked(ch) {
-      // Spaces, line breaks and a few common punctuation marks always
-      // render as themselves — they anchor the line shape.
-      return /\s|[.,!?'"—–\-]/.test(ch);
-    }
+    function buildGrid() {
+      var size = measureChar();
+      var cols = Math.max(20, Math.floor(el.clientWidth  / size.w));
+      var rows = Math.max(8,  Math.ceil(el.clientHeight / size.h));
+      if (cols === lastCols && rows === lastRows && grid.length) return;
+      lastCols = cols; lastRows = rows;
 
-    function run() {
-      var start = performance.now();
-
-      function frame(now) {
-        var t = (now - start) / DURATION;
-        if (t >= 1) {
-          el.textContent = finalText;
-          return;
+      grid = [];
+      for (var r = 0; r < rows; r++) {
+        var row = [];
+        for (var c = 0; c < cols; c++) {
+          row.push({ ch: FILLER[(Math.random() * FILLER.length) | 0], t: false });
         }
-        var out = '';
-        for (var i = 0; i < finalText.length; i++) {
-          var ch = finalText[i];
-          if (isLocked(ch) || t >= lockTimes[i]) {
-            out += ch;
-          } else {
-            out += scrambleChars[(Math.random() * scrambleChars.length) | 0];
-          }
-        }
-        el.textContent = out;
-        requestAnimationFrame(frame);
+        grid.push(row);
       }
-      requestAnimationFrame(frame);
+
+      placeText(cols, rows);
+      render();
     }
 
-    if (!('IntersectionObserver' in window)) { run(); return; }
+    function placeText(cols, rows) {
+      var words = MANIFESTO.split(' ');
+      var row = START_ROW;
+      var col = EDGE_PAD;
+      var maxCol = cols - EDGE_PAD;
 
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          run();
-          io.unobserve(entry.target);
+      for (var i = 0; i < words.length; i++) {
+        var word = words[i];
+        // Wrap to next row if word doesn't fit.
+        if (col > EDGE_PAD && col + word.length > maxCol) {
+          row++;
+          col = EDGE_PAD;
+          if (row >= rows - 2) return;
         }
-      });
-    }, { threshold: 0.3 });
-    io.observe(el);
+        var len = Math.min(word.length, maxCol - col);
+        for (var j = 0; j < len; j++) {
+          grid[row][col++] = { ch: word[j], t: true };
+        }
+        // Single space between words; also part of the "text" so it
+        // visually reads as a clean gap inside the noise.
+        if (col < maxCol) {
+          grid[row][col++] = { ch: ' ', t: true };
+        }
+      }
+    }
+
+    function escapeHTML(c) {
+      if (c === '<') return '&lt;';
+      if (c === '>') return '&gt;';
+      if (c === '&') return '&amp;';
+      return c;
+    }
+
+    function render() {
+      var out = '';
+      for (var r = 0; r < grid.length; r++) {
+        var row = grid[r];
+        var inT = false;
+        for (var c = 0; c < row.length; c++) {
+          var cell = row[c];
+          if (cell.t && !inT)  { out += '<span class="t">'; inT = true; }
+          if (!cell.t && inT)  { out += '</span>';          inT = false; }
+          out += cell.ch === ' ' ? ' ' : escapeHTML(cell.ch);
+        }
+        if (inT) out += '</span>';
+        out += '\n';
+      }
+      el.innerHTML = out;
+    }
+
+    function tickle() {
+      // Flip ~1.2% of FILLER cells per tick — slow data-feed feel.
+      // Text cells are never touched.
+      if (!grid.length) return;
+      var R = grid.length, C = grid[0].length;
+      var flips = Math.max(8, ((R * C) * 0.012) | 0);
+      for (var i = 0; i < flips; i++) {
+        var r = (Math.random() * R) | 0;
+        var c = (Math.random() * C) | 0;
+        if (grid[r][c].t) continue;
+        grid[r][c].ch = FILLER[(Math.random() * FILLER.length) | 0];
+      }
+      render();
+    }
+
+    buildGrid();
+    window.addEventListener('resize', buildGrid);
+    if (!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) {
+      setInterval(tickle, 900);
+    }
   })();
 </script>
 
@@ -1686,72 +1721,5 @@ void main() {
   })();
 </script>
 
-<script>
-  // Pixel-mono noise grid that fills the manifesto block in dim grey.
-  // Recomputes on resize so the grid always covers the section, and
-  // refreshes a small slice every second for a "live data" feel
-  // without burning the CPU.
-  (function () {
-    var el = document.querySelector('.manifesto-noise');
-    if (!el) return;
-
-    var CHARSET = '01';   // binary; swap for '0123456789ABCDEF' or punctuation to taste
-    var lastCols = 0, lastRows = 0;
-    var grid = [];        // cached grid (array of strings, one per row)
-
-    function measureCharSize() {
-      var probe = document.createElement('span');
-      probe.style.cssText = 'position:absolute;visibility:hidden;font: inherit;';
-      probe.textContent = '0'.repeat(50);
-      el.appendChild(probe);
-      var w = probe.getBoundingClientRect().width / 50;
-      el.removeChild(probe);
-      // line-height: 1 → use font-size as line height
-      var fs = parseFloat(getComputedStyle(el).fontSize);
-      return { w: w || 12, h: fs || 20 };
-    }
-
-    function regenerate() {
-      var size = measureCharSize();
-      var cols = Math.ceil(el.clientWidth  / size.w) + 1;
-      var rows = Math.ceil(el.clientHeight / size.h) + 1;
-
-      if (cols === lastCols && rows === lastRows) return;
-      lastCols = cols; lastRows = rows;
-
-      grid = [];
-      for (var r = 0; r < rows; r++) {
-        var line = '';
-        for (var c = 0; c < cols; c++) {
-          line += CHARSET[(Math.random() * CHARSET.length) | 0];
-        }
-        grid.push(line);
-      }
-      render();
-    }
-
-    function render() { el.textContent = grid.join('\n'); }
-
-    function tickle() {
-      // Flip ~1.5% of cells per tick — subtle, like a slow data feed.
-      if (!grid.length) return;
-      var rows = grid.length, cols = grid[0].length;
-      var flips = Math.max(8, ((rows * cols) * 0.015) | 0);
-      for (var i = 0; i < flips; i++) {
-        var r = (Math.random() * rows) | 0;
-        var c = (Math.random() * cols) | 0;
-        var ch = CHARSET[(Math.random() * CHARSET.length) | 0];
-        grid[r] = grid[r].slice(0, c) + ch + grid[r].slice(c + 1);
-      }
-      render();
-    }
-
-    regenerate();
-    window.addEventListener('resize', regenerate);
-    if (!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) {
-      setInterval(tickle, 900);
-    }
-  })();
-</script>
 </body>
 </html>
