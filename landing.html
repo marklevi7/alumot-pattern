@@ -414,39 +414,10 @@
       border-radius: 4px;
       font-variant-numeric: tabular-nums;
       letter-spacing: 0;
-      /* The square spins clockwise. The .num-text inside counter-spins
-         at the same rate so the number stays upright while the square
-         rotates underneath it. Per-badge `--d` delay drives an outside-
-         in mirror pattern: ends (1 & 7) start first, cascades inward
-         to centre (4). Pairs the seven items by symmetry. */
-      animation: accordion-num-spin 4.5s linear infinite;
-      animation-delay: var(--d, 0s);
-      transform-origin: 50% 50%;
-      will-change: transform;
     }
     .accordion .num-text {
       display: inline-block;
-      animation: accordion-num-spin-rev 4.5s linear infinite;
-      animation-delay: var(--d, 0s);     /* inherited from parent .num */
-      transform-origin: 50% 50%;
-    }
-
-    /* Outside-in mirror: 1+7, then 2+6, then 3+5, then 4. */
-    .accordion details:nth-of-type(1) .num,
-    .accordion details:nth-of-type(7) .num { --d: 0s; }
-    .accordion details:nth-of-type(2) .num,
-    .accordion details:nth-of-type(6) .num { --d: 0.5s; }
-    .accordion details:nth-of-type(3) .num,
-    .accordion details:nth-of-type(5) .num { --d: 1.0s; }
-    .accordion details:nth-of-type(4) .num { --d: 1.5s; }
-
-    @keyframes accordion-num-spin {
-      from { transform: rotate(0deg); }
-      to   { transform: rotate(360deg); }
-    }
-    @keyframes accordion-num-spin-rev {
-      from { transform: rotate(0deg); }
-      to   { transform: rotate(-360deg); }
+      font-variant-numeric: tabular-nums;   /* keeps width stable mid-scramble */
     }
 
     .accordion .title {
@@ -628,8 +599,7 @@
     @media (prefers-reduced-motion: reduce) {
       .reveal { opacity: 1; transform: none; transition: none; }
       .cta, .cta::after, .accordion .chev { transition: none; }
-      .accordion .num,
-      .accordion .num-text { animation: none; transform: none; }
+      /* digit-scrambler JS already short-circuits on prefers-reduced-motion */
     }
 
     /* ─── MOBILE ────────────────────────────────────────────────── */
@@ -1635,6 +1605,56 @@ void main() {
       });
     }, { threshold: 0.3 });
     io.observe(el);
+  })();
+</script>
+
+<script>
+  // Digit scrambler for the accordion number badges. Each badge cycles
+  // its digit text through random 2-digit combinations for ~0.7s, then
+  // locks back to its true value. Uses the outside-in mirror cadence
+  // so the seven items pulse in pairs (1+7, 2+6, 3+5, 4 alone) on a
+  // perpetual 5s loop.
+  (function () {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    var nodes = document.querySelectorAll('.accordion .num-text');
+    if (!nodes.length) return;
+
+    // Outside-in mirror grouping → relative offset within each loop.
+    var GROUPS = [
+      { idx: [0, 6], offset: 0 },     // items 1 & 7
+      { idx: [1, 5], offset: 600 },   // items 2 & 6
+      { idx: [2, 4], offset: 1200 },  // items 3 & 5
+      { idx: [3],    offset: 1800 },  // item 4
+    ];
+    var SCRAMBLE_MS = 700;
+    var LOOP_MS = 5000;
+
+    // Capture each badge's "true" value so we can lock it back after the
+    // scramble pass finishes.
+    var truth = Array.prototype.map.call(nodes, function (n) { return n.textContent; });
+
+    function scramble(node, originalText) {
+      var start = performance.now();
+      function tick(now) {
+        var t = (now - start) / SCRAMBLE_MS;
+        if (t >= 1) { node.textContent = originalText; return; }
+        // Random 2-digit string with leading zeros preserved.
+        var n = (Math.random() * 100) | 0;
+        node.textContent = (n < 10 ? '0' : '') + n;
+        requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    }
+
+    function startGroup(group) {
+      group.idx.forEach(function (i) { scramble(nodes[i], truth[i]); });
+      setTimeout(function () { startGroup(group); }, LOOP_MS);
+    }
+
+    // Stagger each group's first run by its offset so the pairs cascade
+    // outside-in on the very first cycle, then loop independently.
+    GROUPS.forEach(function (g) { setTimeout(function () { startGroup(g); }, g.offset); });
   })();
 </script>
 </body>

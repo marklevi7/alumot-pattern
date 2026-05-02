@@ -3,6 +3,17 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v33 — Accordion badges: digit scrambler (creative iteration #1)
+- Replaced the rotating square with a **digit scrambler**: each badge
+  cycles its number text through random 2-digit values for ~0.7s,
+  then locks back to its true number.
+- Same outside-in mirror grouping as v32: 1+7 scramble together, then
+  2+6, then 3+5, then 4 alone, on a perpetual 5s loop.
+- Visual tie-in with the manifesto's scramble effect — establishes a
+  consistent "decryption" motif across the page.
+- JS-driven (CSS can't randomize text content). Skipped automatically
+  for users with `prefers-reduced-motion: reduce`.
+
 ## v32 — Accordion badges: counter-rotated number + outside-in mirror grouping
 - Each badge spins clockwise; an inner `.num-text` span counter-spins
   at the same rate so the **number stays upright** while the square
