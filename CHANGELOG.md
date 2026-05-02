@@ -3,6 +3,18 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v46 — AI-employee node loader at the bottom of "What it is"
+- Same dither-strip treatment as the manifesto wave-floor, applied
+  to the bottom of the WHAT IT IS section.
+- Inside the strip: a centred procedural loader — bright central
+  processing node + a ring of 6 satellites + faint connecting lines
+  + travelling data dots that alternate direction (some inbound to
+  the centre, some outbound) so the scene reads as an AI agent
+  pulling and pushing data across multiple sources.
+- Same Bayer-8 + maskCircle dot recipe as every other dither block.
+- Aspect-corrected so the ring stays a true circle on any viewport.
+- Render loop pauses when the strip scrolls off-screen.
+
 ## v45 — Wave: re-centred + ~1.35× faster
 - Wave's rest-Y moved back to the vertical centre of its strip
   (`0.83` → `0.50`).

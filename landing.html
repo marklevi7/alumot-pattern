@@ -60,7 +60,7 @@
       padding: 0 24px;
     }
 
-    /* The wave-dither canvas is now the "floor" of the manifesto block. */
+    /* The wave-dither canvas is the "floor" of the manifesto block. */
     #wave_dither_canvas {
       position: relative;
       width: 100%;
@@ -68,6 +68,26 @@
       display: block;
     }
     #wave_dither_canvas canvas {
+      display: block;
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    /* WHAT IT IS section gets the same "floor strip" treatment, with
+       a different abstract loader running inside it. */
+    .what-it-is {
+      padding-bottom: 0;
+      position: relative;
+      overflow: hidden;
+    }
+    #ai_node_canvas {
+      position: relative;
+      width: 100%;
+      height: 33vh;
+      display: block;
+      margin-top: 48px;            /* a bit of breathing room from the text */
+    }
+    #ai_node_canvas canvas {
       display: block;
       width: 100% !important;
       height: 100% !important;
@@ -895,13 +915,19 @@
   </section>
 
   <!-- ─── WHAT IT IS ───────────────────────────────────────────── -->
-  <section>
+  <section class="what-it-is">
     <div class="wrap">
       <h2 class="reveal">What an AI Employee actually is.</h2>
       <p class="lead reveal">Not a chatbot. Not a copilot. Software that does a job a human currently does, end-to-end, on its own, in the systems you already use. WhatsApp. Email. CRM. AWS. Jira. Government portals. SAP. NetSuite. Wherever the work happens.</p>
       <p class="lead reveal" style="margin-top: 24px;">It runs 24/7. It learns from every interaction. It asks for approval on what matters. It does the rest silently.</p>
       <p class="lead reveal" style="margin-top: 24px;">You don't manage it like an employee. You program it by talking to it. <em>"Push everything to tomorrow."</em> Done. <em>"Every Monday at 9am, send me a recap of last week's pipeline."</em> Done. Forever.</p>
     </div>
+    <!-- Same dither family as the manifesto wave; abstract loader
+         visualising an AI employee as a central node with data
+         flowing in and out along satellite links. -->
+    <div id="ai_node_canvas"
+         data-pixel-size="4"
+         data-ink="#ffffff"></div>
   </section>
 
   <!-- ─── 7 EMPLOYEES (accordion) ──────────────────────────────── -->
@@ -1638,6 +1664,163 @@ void main() {
     resize();
 
     // Pause render loop when the strip scrolls off-screen.
+    var visible = true;
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries) {
+        visible = entries[0].isIntersecting;
+      }, { threshold: 0 }).observe(container);
+    }
+
+    var clock = new THREE.Clock();
+    (function tick() {
+      if (visible) {
+        uniforms.uTime.value = clock.getElapsedTime();
+        renderer.render(scene, camera);
+      }
+      requestAnimationFrame(tick);
+    })();
+  })();
+</script>
+
+<script type="module">
+  // AI-employee node loader. Procedural scene: a central processing
+  // node, a ring of 6 satellites, faint connecting lines, and dots
+  // travelling along the lines (some inbound, some outbound) to
+  // suggest data flowing into / out of the central agent. Same Bayer-
+  // dither + maskCircle treatment as everywhere else.
+  import * as THREE from 'https://esm.sh/three@0.160.0';
+
+  (function () {
+    var container = document.getElementById('ai_node_canvas');
+    if (!container) return;
+
+    var pixelSize = parseFloat(container.dataset.pixelSize) || 4;
+    var inkColor  = container.dataset.ink || '#ffffff';
+
+    var canvas = document.createElement('canvas');
+    var gl = canvas.getContext('webgl2', { antialias: true, alpha: true });
+    if (!gl) {
+      console.warn('[ai-node] WebGL2 not supported');
+      return;
+    }
+    var renderer = new THREE.WebGLRenderer({ canvas: canvas, context: gl, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    container.appendChild(canvas);
+
+    var VERT = `
+void main() { gl_Position = vec4(position, 1.0); }`;
+
+    var FRAG = `
+precision highp float;
+
+uniform vec2  uResolution;
+uniform float uPixelSize;
+uniform vec3  uColor;
+uniform float uTime;
+
+out vec4 fragColor;
+
+float Bayer2(vec2 a) { a = floor(a); return fract(a.x / 2.0 + a.y * a.y * 0.75); }
+#define Bayer4(a) (Bayer2(0.5*(a))*0.25 + Bayer2(a))
+#define Bayer8(a) (Bayer4(0.5*(a))*0.25 + Bayer2(a))
+
+float maskCircle(vec2 p, float cov) {
+  float r = sqrt(cov) * 0.25;
+  float d = length(p - 0.5) - r;
+  float aa = 0.5 * fwidth(d);
+  return cov * (1.0 - smoothstep(-aa, aa, d * 2.0));
+}
+
+#define N_SATS 6
+
+void main() {
+  vec2 fragCoord  = gl_FragCoord.xy;
+  vec2 cellId     = floor(fragCoord / uPixelSize);
+  vec2 cellCenter = (cellId + 0.5) * uPixelSize;
+  vec2 pixelUV    = fract(fragCoord / uPixelSize);
+
+  // Aspect-corrected centred coords. Origin at the canvas centre,
+  // 1 unit = the shorter canvas dimension. Keeps the satellite ring
+  // a true circle on any aspect ratio.
+  float minDim = min(uResolution.x, uResolution.y);
+  vec2 px = (cellCenter - uResolution * 0.5) / minDim;
+
+  // Central processing node — bright disc with a slow breathing pulse.
+  float centerD = length(px);
+  float feed = smoothstep(0.075, 0.052, centerD)
+             * (0.85 + 0.15 * sin(uTime * 1.6));
+
+  // Ring of 6 satellites + faint guide lines + travelling data dots.
+  float SAT_R = 0.30;
+  for (int i = 0; i < N_SATS; i++) {
+    float fi = float(i);
+    float ang = fi * 6.2831853 / float(N_SATS) - 1.5707963;  // first sat at top
+    vec2  satPos = vec2(cos(ang), sin(ang)) * SAT_R;
+
+    // Satellite node — pulses on its own rhythm.
+    float satD = length(px - satPos);
+    float satPulse = 0.55 + 0.45 * sin(uTime * 1.3 + fi * 0.85);
+    feed = max(feed, smoothstep(0.038, 0.024, satD) * satPulse);
+
+    // Faint always-on link.
+    vec2 toSat = -satPos;          // sat → centre vector
+    float lineLen = length(toSat);
+    vec2 lineDir = toSat / lineLen;
+    vec2 fromSat = px - satPos;
+    float t = clamp(dot(fromSat, lineDir) / lineLen, 0.0, 1.0);
+    vec2 closest = satPos + lineDir * t * lineLen;
+    float lineD = length(px - closest);
+    feed = max(feed, smoothstep(0.005, 0.002, lineD) * 0.18);
+
+    // Travelling data dot — alternating direction per satellite so
+    // the scene shows both inbound and outbound flow.
+    float dir = mod(fi, 2.0) < 1.0 ? 1.0 : -1.0;
+    float pos = fract(uTime * 0.45 + fi * 0.13);
+    if (dir < 0.0) pos = 1.0 - pos;
+    vec2 dotPos = satPos + lineDir * pos * lineLen;
+    float dotD = length(px - dotPos);
+    feed = max(feed, smoothstep(0.026, 0.014, dotD));
+  }
+
+  // Bayer threshold + small-circle mask, matching every other dither
+  // block on the page.
+  float bayer = Bayer8(fragCoord / uPixelSize);
+  float on    = step(bayer, feed);
+  float M     = maskCircle(pixelUV, on);
+
+  fragColor = vec4(uColor, M);
+}`;
+
+    var uniforms = {
+      uResolution: { value: new THREE.Vector2() },
+      uPixelSize:  { value: pixelSize * (renderer.getPixelRatio() || 1) },
+      uColor:      { value: new THREE.Color(inkColor) },
+      uTime:       { value: 0 },
+    };
+
+    var scene = new THREE.Scene();
+    var camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    var material = new THREE.ShaderMaterial({
+      vertexShader: VERT,
+      fragmentShader: FRAG,
+      uniforms: uniforms,
+      glslVersion: THREE.GLSL3,
+      transparent: true,
+    });
+    scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material));
+
+    function resize() {
+      var rect = container.getBoundingClientRect();
+      var w = Math.max(1, Math.round(rect.width  || container.clientWidth  || window.innerWidth));
+      var h = Math.max(1, Math.round(rect.height || container.clientHeight || 1));
+      renderer.setSize(w, h, false);
+      var dpr = renderer.getPixelRatio();
+      uniforms.uResolution.value.set(w * dpr, h * dpr);
+    }
+    window.addEventListener('resize', resize);
+    if ('ResizeObserver' in window) new ResizeObserver(resize).observe(container);
+    resize();
+
     var visible = true;
     if ('IntersectionObserver' in window) {
       new IntersectionObserver(function (entries) {
