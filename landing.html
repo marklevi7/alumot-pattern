@@ -60,6 +60,27 @@
       padding: 0 24px;
     }
 
+    /* ─── PHOTO DITHER (experimental block at top) ─────────────── */
+    .photo-dither {
+      position: relative;
+      width: 100%;
+      min-height: 100vh;
+      min-height: 100svh;
+      background: #050507;
+      overflow: hidden;
+    }
+    #photo_dither_canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    #photo_dither_canvas canvas {
+      display: block;
+      width: 100% !important;
+      height: 100% !important;
+    }
+
     /* ─── HERO ─────────────────────────────────────────────────── */
     .hero {
       min-height: 100vh;
@@ -778,6 +799,17 @@
 </head>
 <body>
 <main>
+
+  <!-- ─── PHOTO DITHER (experimental, top of page) ─────────────────
+       Loads a public image and renders it through the same Bayer-
+       dither shader the rest of the site uses. Pure visual test —
+       remove the whole <section class="photo-dither"> block to drop. -->
+  <section class="photo-dither">
+    <div id="photo_dither_canvas"
+         data-image-url="https://upload.wikimedia.org/wikipedia/commons/3/39/Domestic_Goose.jpg"
+         data-pixel-size="5"
+         data-ink="#ffffff"></div>
+  </section>
 
   <!-- ─── HERO ─────────────────────────────────────────────────── -->
   <section class="hero">
@@ -1503,6 +1535,129 @@ void main() {
       if (i.isVisible()) i.render();
     });
     requestAnimationFrame(tick);
+  })();
+</script>
+
+<script type="module">
+  // Photo Bayer-dither: same Bayer8 threshold the rest of the site
+  // uses, but the "feed" comes from the luminance of an external image
+  // rather than the fbm noise field. Cover-fits the image to the
+  // canvas, renders once on load and again on resize. Static — no
+  // animation tick.
+  import * as THREE from 'https://esm.sh/three@0.160.0';
+
+  (function () {
+    var container = document.getElementById('photo_dither_canvas');
+    if (!container) return;
+
+    var imageUrl = container.dataset.imageUrl;
+    var pixelSize = parseFloat(container.dataset.pixelSize) || 5;
+    var inkColor  = container.dataset.ink || '#ffffff';
+
+    var canvas = document.createElement('canvas');
+    var gl = canvas.getContext('webgl2', { antialias: true, alpha: true });
+    if (!gl) {
+      console.warn('[photo-dither] WebGL2 not supported');
+      return;
+    }
+    var renderer = new THREE.WebGLRenderer({ canvas: canvas, context: gl, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    container.appendChild(canvas);
+
+    var VERT = `
+void main() { gl_Position = vec4(position, 1.0); }`;
+
+    var FRAG = `
+precision highp float;
+
+uniform vec2  uResolution;
+uniform float uPixelSize;
+uniform sampler2D uImage;
+uniform vec2  uImageSize;
+uniform vec3  uColor;
+
+out vec4 fragColor;
+
+float Bayer2(vec2 a) { a = floor(a); return fract(a.x / 2.0 + a.y * a.y * 0.75); }
+#define Bayer4(a) (Bayer2(0.5*(a))*0.25 + Bayer2(a))
+#define Bayer8(a) (Bayer4(0.5*(a))*0.25 + Bayer2(a))
+
+void main() {
+  vec2 fragCoord = gl_FragCoord.xy;
+  vec2 cellId    = floor(fragCoord / uPixelSize);
+  vec2 cellCenter = (cellId + 0.5) * uPixelSize;
+
+  // Cover-fit: scale the image so it fills the canvas, cropping the
+  // overflowing dimension.
+  float canvasAspect = uResolution.x / uResolution.y;
+  float imageAspect  = uImageSize.x  / uImageSize.y;
+  vec2  scale = imageAspect > canvasAspect
+    ? vec2(canvasAspect / imageAspect, 1.0)
+    : vec2(1.0, imageAspect / canvasAspect);
+
+  vec2 uv = cellCenter / uResolution;
+  uv = (uv - 0.5) * scale + 0.5;
+  uv.y = 1.0 - uv.y;                    // flip y for texture coords
+  uv = clamp(uv, 0.0, 1.0);
+
+  vec3 col = texture(uImage, uv).rgb;
+  float lum = dot(col, vec3(0.299, 0.587, 0.114));
+
+  // Bayer threshold — bright pixels become "on" dots, dark stay bg.
+  float bayer = Bayer8(fragCoord / uPixelSize);
+  float on = step(bayer, lum);
+
+  fragColor = vec4(uColor, on);
+}`;
+
+    var uniforms = {
+      uResolution: { value: new THREE.Vector2() },
+      uPixelSize:  { value: pixelSize * (renderer.getPixelRatio() || 1) },
+      uImage:      { value: null },
+      uImageSize:  { value: new THREE.Vector2(1, 1) },
+      uColor:      { value: new THREE.Color(inkColor) },
+    };
+
+    var scene = new THREE.Scene();
+    var camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    var material = new THREE.ShaderMaterial({
+      vertexShader: VERT,
+      fragmentShader: FRAG,
+      uniforms: uniforms,
+      glslVersion: THREE.GLSL3,
+      transparent: true,
+    });
+    scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material));
+
+    function resize() {
+      var rect = container.getBoundingClientRect();
+      var w = Math.max(1, Math.round(rect.width  || container.clientWidth  || window.innerWidth));
+      var h = Math.max(1, Math.round(rect.height || container.clientHeight || 1));
+      renderer.setSize(w, h, false);
+      var dpr = renderer.getPixelRatio();
+      uniforms.uResolution.value.set(w * dpr, h * dpr);
+      if (uniforms.uImage.value) renderer.render(scene, camera);
+    }
+    window.addEventListener('resize', resize);
+    if ('ResizeObserver' in window) new ResizeObserver(resize).observe(container);
+    resize();
+
+    // Load and bind the image as a texture, then render once.
+    var loader = new THREE.TextureLoader();
+    loader.setCrossOrigin('anonymous');
+    loader.load(
+      imageUrl,
+      function (texture) {
+        texture.minFilter = THREE.LinearFilter;
+        texture.magFilter = THREE.LinearFilter;
+        texture.generateMipmaps = false;
+        uniforms.uImage.value = texture;
+        uniforms.uImageSize.value.set(texture.image.width, texture.image.height);
+        renderer.render(scene, camera);
+      },
+      undefined,
+      function (err) { console.error('[photo-dither] image load failed', err); }
+    );
   })();
 </script>
 

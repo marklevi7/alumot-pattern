@@ -3,6 +3,21 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v41 — Photo Bayer-dither block at top of page (experimental)
+- Added a new `<section class="photo-dither">` at the very top of
+  the page (above the hero) that renders a remote image through a
+  Bayer-8 dither shader — same monochrome look as the rest of the
+  site, but driven by image luminance instead of fbm noise.
+- Image cover-fits the section, white dot output on the page-bg
+  black. Renders once on load + on resize, no animation tick.
+- Configurable via data attributes on `#photo_dither_canvas`:
+  `data-image-url`, `data-pixel-size`, `data-ink`. Currently set
+  to a placeholder Wikimedia goose image; swap the URL to test
+  any photo.
+- Self-contained: separate WebGL2 module, three.js loaded from
+  its existing CDN (cached). Removing the section's HTML drops
+  the block cleanly — no other changes needed.
+
 ## v40 — Manifesto rolled back to plain big-title text
 - Threw out the v36/v37 integrated-noise-grid manifesto entirely.
 - Replaced with a plain `.manifesto-text` paragraph in Inter, sized
