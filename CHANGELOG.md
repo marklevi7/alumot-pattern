@@ -3,6 +3,20 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v55 — Footer + 3 legal pages
+- New `<footer class="site-footer">` at the bottom of `landing.html`:
+  wordmark, three legal-page links, email, phone, copyright. Same
+  Inter type and `--bg-0`/`--ink-dim`/`--ink-faint` palette as the
+  rest of the site.
+- Three new standalone pages, each self-contained with the same
+  dark / Inter style:
+    `privacy.html`        — Privacy Policy
+    `terms.html`          — Terms & Conditions
+    `accessibility.html`  — Accessibility Statement
+  Each page has its own header (wordmark linking back to home), main
+  body, and the same footer for cross-navigation. Effective date set
+  to 1 January 2026.
+
 ## v54 — Wordmark left-edge aligned with hero content  ★ PINNED — known-good baseline
 - Wrapped the wordmark in a `.wordmark-frame` that mirrors `.wrap`
   (`max-width: 1080px; margin: 0 auto; padding: 0 24px;`).

@@ -688,6 +688,43 @@
       outline-offset: 4px;
     }
 
+    /* ─── FOOTER ───────────────────────────────────────────────── */
+    .site-footer {
+      padding: 64px 0 56px;
+      border-top: 1px solid var(--line);
+      background: var(--bg-0);
+      position: relative;
+      z-index: 2;
+    }
+    .site-footer .wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .footer-mark {
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-dim);
+      margin: 0 0 4px;
+    }
+    .footer-links {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+    .footer-links a, .footer-contact a {
+      color: var(--ink-dim);
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .footer-links a:hover, .footer-contact a:hover { color: var(--ink); }
+    .footer-contact { margin: 0; font-size: 14px; color: var(--ink-faint); }
+    .footer-meta { margin: 0; font-size: 12px; color: var(--ink-faint); }
+
     /* ════════════════════════════════════════════════════════════
        SNOWBALL LOADER (experimental — sits inside the WHY NOW
        section, behind the text and slightly below it).
@@ -1276,6 +1313,24 @@
       </div>
     </div>
   </section>
+
+  <!-- ─── FOOTER ───────────────────────────────────────────────── -->
+  <footer class="site-footer">
+    <div class="wrap">
+      <p class="footer-mark">Mark Levi Consulting</p>
+      <ul class="footer-links">
+        <li><a href="privacy.html">Privacy Policy</a></li>
+        <li><a href="terms.html">Terms &amp; Conditions</a></li>
+        <li><a href="accessibility.html">Accessibility Statement</a></li>
+      </ul>
+      <p class="footer-contact">
+        <a href="mailto:[email protected]">[email protected]</a>
+        &nbsp;·&nbsp;
+        <a href="tel:+972528834558">+972-528-834-558</a>
+      </p>
+      <p class="footer-meta">© 2026 Mark Levi Consulting</p>
+    </div>
+  </footer>
 
 </main>
 
