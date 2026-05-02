@@ -3,6 +3,18 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v37 — Manifesto: bigger grid + sentence-aware paragraphing
+- Bumped `.manifesto-grid` font-size from `clamp(22px, 4vw, 34px)`
+  to `clamp(30px, 5.5vw, 48px)`. Mobile bumped from 20→28px.
+  Section min-height bumped on mobile (70 → 80vh) to keep the grid
+  generous.
+- Restructured the body copy into 4 explicit paragraphs (full
+  thought, list, contrast, punchline). Word-wrap stays inside each
+  paragraph; one blank "noise-only" row sits between paragraphs.
+  Result: line breaks now land at meaningful sentence pauses
+  instead of mid-thought.
+- `START_ROW` lowered 4 → 3 so the larger text still fits.
+
 ## v36 — Manifesto: integrated single-layer character grid
 - The manifesto block is now a **single layer** of monospace
   characters. Most cells are dim-grey binary filler (`01`); the

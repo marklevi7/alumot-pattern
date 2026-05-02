@@ -371,7 +371,7 @@
       position: absolute;
       inset: 0;
       font-family: 'VT323', ui-monospace, monospace;
-      font-size: clamp(22px, 4vw, 34px);
+      font-size: clamp(30px, 5.5vw, 48px);
       line-height: 1.05;
       color: rgba(160, 160, 173, 0.5);   /* dim grey filler */
       white-space: pre;
@@ -383,8 +383,8 @@
       color: #ffffff;                    /* the readable text */
     }
     @media (max-width: 720px) {
-      .manifesto { min-height: 70vh; }
-      .manifesto-grid { font-size: 20px; }
+      .manifesto { min-height: 80vh; }
+      .manifesto-grid { font-size: 28px; }
     }
 
     /* ─── ACCORDION ────────────────────────────────────────────── */
@@ -813,7 +813,7 @@
 
   <!-- ─── MANIFESTO ────────────────────────────────────────────── -->
   <section class="manifesto">
-    <div class="manifesto-grid" aria-label="Every month you sign off on salaries for work that doesn't need a human anymore. Lead follow-ups, content, filing, compliance, reports, calendar wrangling, invoice reconciliation, contract renewals. This work doesn't need talent. It needs volume. AI does volume for a fraction of the cost."></div>
+    <div class="manifesto-grid" aria-label="Every month you sign off on salaries for work that doesn't need a human anymore. Lead follow-ups. Content. Filing. Compliance. Reports. Calendar wrangling. Invoice reconciliation. Contract renewals. This work doesn't need talent. It needs volume. AI does volume for a fraction of the cost."></div>
   </section>
 
   <!-- ─── SCOREBOARD ───────────────────────────────────────────── -->
@@ -1559,9 +1559,18 @@ void main() {
     if (!el) return;
 
     var FILLER = '01';
-    var MANIFESTO = "Every month you sign off on salaries for work that doesn't need a human anymore. Lead follow-ups. Content. Filing. Compliance. Reports. Calendar wrangling. Invoice reconciliation. Contract renewals. This work doesn't need talent. It needs volume. AI does volume for a fraction of the cost.";
-    var START_ROW = 4;
+    // Paragraphs are placed in order, with one blank "noise-only" line
+    // between them. Word-wrap stays within each paragraph so line
+    // breaks always land between paragraphs, not mid-sentence.
+    var PARAGRAPHS = [
+      "Every month you sign off on salaries for work that doesn't need a human anymore.",
+      "Lead follow-ups. Content. Filing. Compliance. Reports. Calendar wrangling. Invoice reconciliation. Contract renewals.",
+      "This work doesn't need talent. It needs volume.",
+      "AI does volume for a fraction of the cost."
+    ];
+    var START_ROW = 3;
     var EDGE_PAD = 3;
+    var PARA_GAP = 1;            // blank rows between paragraphs
 
     var grid = [];               // 2D array of { ch, t } cells
     var lastCols = 0, lastRows = 0;
@@ -1599,28 +1608,33 @@ void main() {
     }
 
     function placeText(cols, rows) {
-      var words = MANIFESTO.split(' ');
-      var row = START_ROW;
-      var col = EDGE_PAD;
       var maxCol = cols - EDGE_PAD;
+      var row = START_ROW;
 
-      for (var i = 0; i < words.length; i++) {
-        var word = words[i];
-        // Wrap to next row if word doesn't fit.
-        if (col > EDGE_PAD && col + word.length > maxCol) {
-          row++;
-          col = EDGE_PAD;
-          if (row >= rows - 2) return;
+      for (var p = 0; p < PARAGRAPHS.length; p++) {
+        var words = PARAGRAPHS[p].split(' ');
+        var col = EDGE_PAD;
+
+        for (var i = 0; i < words.length; i++) {
+          var word = words[i];
+          if (col > EDGE_PAD && col + word.length > maxCol) {
+            row++;
+            col = EDGE_PAD;
+            if (row >= rows - 1) return;
+          }
+          var len = Math.min(word.length, maxCol - col);
+          for (var j = 0; j < len; j++) {
+            grid[row][col++] = { ch: word[j], t: true };
+          }
+          // Single space between words on the same line.
+          if (col < maxCol) {
+            grid[row][col++] = { ch: ' ', t: true };
+          }
         }
-        var len = Math.min(word.length, maxCol - col);
-        for (var j = 0; j < len; j++) {
-          grid[row][col++] = { ch: word[j], t: true };
-        }
-        // Single space between words; also part of the "text" so it
-        // visually reads as a clean gap inside the noise.
-        if (col < maxCol) {
-          grid[row][col++] = { ch: ' ', t: true };
-        }
+
+        // Move down past this paragraph + blank gap (left as noise).
+        row += 1 + PARA_GAP;
+        if (row >= rows - 1) return;
       }
     }
 
