@@ -3,6 +3,18 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v48 — AI-node centre: rotating wireframe octahedron
+- Replaced the v47 solid centre disc + sonar rings with a procedural
+  rotating **wireframe octahedron** drawn directly in the fragment
+  shader.
+- Six vertices, two-axis rotation driven by `uTime`, mild perspective,
+  12 edges drawn via per-pixel distance to each line segment.
+- A tiny anchor dot sits at the exact centre so the eye still locks on
+  while the wireframe tumbles.
+- Goes through the same Bayer + maskCircle pipeline — visually
+  cohesive with everything else on the page.
+- Satellites, lines, and data trails unchanged from v47.
+
 ## v47 — AI-node loader: bigger centre, sonar, dot trails
 - Centre disc roughly **doubled in radius** (0.075 → 0.140) so it
   dominates the composition instead of competing with the satellites.
