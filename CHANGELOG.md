@@ -3,6 +3,11 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v50 — AI-node centre: octahedron +25% larger
+- Bumped `SHAPE_R` from `0.18` → `0.225` (~+25% radius). Octahedron
+  now reads more dominant against the satellite ring without changing
+  anything else in the scene.
+
 ## v49 — AI-node centre: opaque lit octahedron
 - Replaced the wireframe octahedron with a **solid, opaque, classically
   lit** one. Same shape, but now ray-marched against an octahedron SDF

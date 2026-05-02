@@ -1776,7 +1776,7 @@ void main() {
   mat3 rot    = rxMat * ryMat;
   mat3 invRot = transpose(rot);
 
-  float SHAPE_R = 0.18;            // visual radius in normalised coords
+  float SHAPE_R = 0.225;           // visual radius in normalised coords (+25% from v49)
   vec2 ndc = px / SHAPE_R;          // px=(0,0) at centre; ndc spans ~ [-1.5, 1.5] etc.
 
   float feed = 0.0;
