@@ -3,6 +3,23 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v39 — Mid banner: case-study moment + much taller block
+- Threw out the previous "Show us / book a call" framing entirely.
+  New approach: pull a real case-study number to the front so the
+  banner becomes a **proof moment**, not a generic CTA.
+    H2: "$2,500 → $500 a month."
+    Sub: "Content cost at a medical news outlet, with one AI
+         Employee. Live in production. Want the same math for your
+         highest-cost workflow?"
+  CFOs read dollars first. Putting one of the page's real proof
+  points (previously buried in the accordion) into the mid-banner
+  doubles its job — proof + conversion in one block.
+- Banner padding: desktop 120 → 180px, mobile 90 → 130px.
+- Reverted the in-progress `.manifesto-grid` CSS change (twinkle
+  effect was paused mid-implementation). Manifesto returns to its
+  v37 state — text + dim grey filler, no blackout. Twinkle work
+  to resume in a future version.
+
 ## v38 — Mid CTA banner: copy rewrite + taller block
 - Copy rewrite. The mid-banner now flips the framing: instead of
   asking the visitor a question, it tells them what to bring.
