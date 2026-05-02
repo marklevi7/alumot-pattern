@@ -3,6 +3,11 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v34 — Wordmark: dot separator removed
+- Wordmark now reads "Mark Levi Consulting" — single phrase, no
+  middle-dot between "Levi" and "Consulting". Removed the
+  `.wordmark .dot` CSS rule too since nothing else uses it.
+
 ## v33 — Accordion badges: digit scrambler (creative iteration #1)
 - Replaced the rotating square with a **digit scrambler**: each badge
   cycles its number text through random 2-digit values for ~0.7s,
