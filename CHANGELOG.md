@@ -3,6 +3,15 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v51 — Seven AI Employees: digit scrambler defers until in view
+- The badge digit-scrambler used to fire as soon as the page loaded,
+  so by the time you scrolled to the accordion, the staggered cascade
+  was already running mid-cycle.
+- Now wrapped in an `IntersectionObserver` that triggers the cascade
+  only when the accordion section first enters the viewport (≥5%
+  visible). The outside-in mirror cadence (1+7 → 2+6 → 3+5 → 4) plays
+  cleanly from the start the first time you see it.
+
 ## v50 — AI-node centre: octahedron +25% larger
 - Bumped `SHAPE_R` from `0.18` → `0.225` (~+25% radius). Octahedron
   now reads more dominant against the satellite ring without changing

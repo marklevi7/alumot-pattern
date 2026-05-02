@@ -1976,9 +1976,28 @@ void main() {
       setTimeout(function () { startGroup(group); }, LOOP_MS);
     }
 
-    // Stagger each group's first run by its offset so the pairs cascade
-    // outside-in on the very first cycle, then loop independently.
-    GROUPS.forEach(function (g) { setTimeout(function () { startGroup(g); }, g.offset); });
+    function startAll() {
+      // Stagger each group's first run by its offset so the pairs cascade
+      // outside-in on the very first cycle, then loop independently.
+      GROUPS.forEach(function (g) { setTimeout(function () { startGroup(g); }, g.offset); });
+    }
+
+    // Hold off until the accordion scrolls into view — first square
+    // entering the viewport kicks the cascade off.
+    var accordionEl = document.querySelector('.accordion');
+    if (!accordionEl || !('IntersectionObserver' in window)) {
+      startAll();
+      return;
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          startAll();
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.05 });
+    io.observe(accordionEl);
   })();
 </script>
 
