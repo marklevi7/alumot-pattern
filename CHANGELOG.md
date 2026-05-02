@@ -3,6 +3,13 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v45 — Wave: re-centred + ~1.35× faster
+- Wave's rest-Y moved back to the vertical centre of its strip
+  (`0.83` → `0.50`).
+- Time coefficients on the three sine harmonics bumped ~1.35× —
+  `1.4 → 1.9`, `0.9 → 1.2`, `2.1 → 2.8` — so the wave drifts noticeably
+  quicker right→left.
+
 ## v44 — Wave-dither moved into the manifesto block (as a "floor")
 - Removed the standalone `<section class="wave-dither">` from the
   top of the page.

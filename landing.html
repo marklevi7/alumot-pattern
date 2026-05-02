@@ -1585,13 +1585,13 @@ void main() {
   vec2 uv = cellCenter / uResolution;
 
   // Wave Y as a stack of sines. +uTime in the phase drifts the
-  // pattern from right to left.  Rest-Y is high in the canvas
-  // (uv.y = 0.83 ≈ 17% from the top) so the wave sits just below
-  // the manifesto text above this strip.
-  float waveY = 0.83
-    + sin(uv.x *  6.0 + uTime * 1.4) * 0.10
-    + sin(uv.x * 13.0 + uTime * 0.9) * 0.04
-    + sin(uv.x * 24.0 + uTime * 2.1) * 0.02;
+  // pattern from right to left. Rest-Y centred (0.50) so the wave
+  // sits in the vertical middle of its strip. Time coefficients
+  // bumped ~1.35× from v44 for a bit more energy.
+  float waveY = 0.50
+    + sin(uv.x *  6.0 + uTime * 1.9) * 0.10
+    + sin(uv.x * 13.0 + uTime * 1.2) * 0.04
+    + sin(uv.x * 24.0 + uTime * 2.8) * 0.02;
 
   // Brightness peaks where the pixel is close to the wave line.
   float thickness = 0.10;
