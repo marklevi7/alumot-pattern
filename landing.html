@@ -691,20 +691,23 @@
     }
 
     /* ─── FOOTER ───────────────────────────────────────────────── */
-    /* Footer lives at the bottom of the .final block, sharing its
-       dot-pattern bg. Pinned to the section bottom so the main CTA
-       content above stays visually centred. */
+    /* Footer is pinned to the bottom of the .final block on a solid
+       dark panel so the text reads cleanly. Animated dot pattern
+       above the panel still fills the rest of the .final section. */
     .final-footer {
       position: absolute;
       left: 0;
       right: 0;
-      bottom: 48px;
+      bottom: 0;
       z-index: 2;
+      padding: 36px 0 28px;
+      background: var(--bg-0);
+      border-top: 1px solid var(--line);
     }
     .final-footer .wrap {
       display: flex;
       flex-direction: column;
-      gap: 28px;
+      gap: 20px;
     }
     .footer-mark {
       font-size: 13px;
@@ -719,23 +722,37 @@
       margin: 0;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
     }
     .footer-links a {
-      color: var(--ink);
+      color: var(--ink-dim);
       text-decoration: none;
       font-size: 15px;
     }
-    .footer-links a:hover { opacity: 0.8; }
+    .footer-links a:hover { color: var(--ink); }
     .footer-meta {
       margin: 0;
       font-size: 12px;
-      color: var(--ink);
+      color: var(--ink-faint);
       letter-spacing: 0.02em;
     }
-    /* Each .boxed span carries its own black backdrop, so the line
-       text colour can be solid white — the contrast comes from the
-       cutout, not from a dim grey. */
+    @media (min-width: 720px) {
+      .final-footer .wrap {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        column-gap: 48px;
+        row-gap: 12px;
+        align-items: start;
+      }
+      .footer-mark { grid-column: 1; grid-row: 1; }
+      .footer-meta { grid-column: 1; grid-row: 2; }
+      .footer-links {
+        grid-column: 2;
+        grid-row: 1 / span 2;
+        text-align: right;
+        gap: 10px;
+      }
+    }
 
     /* ════════════════════════════════════════════════════════════
        SNOWBALL LOADER (experimental — sits inside the WHY NOW
@@ -1326,13 +1343,13 @@
     </div>
     <div class="final-footer">
       <div class="wrap">
-        <p class="footer-mark"><span class="boxed boxed--body">Mark Levi Consulting</span></p>
+        <p class="footer-mark">Mark Levi Consulting</p>
         <ul class="footer-links">
-          <li><a href="privacy.html"><span class="boxed boxed--body">Privacy Policy</span></a></li>
-          <li><a href="terms.html"><span class="boxed boxed--body">Terms &amp; Conditions</span></a></li>
-          <li><a href="accessibility.html"><span class="boxed boxed--body">Accessibility Statement</span></a></li>
+          <li><a href="privacy.html">Privacy Policy</a></li>
+          <li><a href="terms.html">Terms &amp; Conditions</a></li>
+          <li><a href="accessibility.html">Accessibility Statement</a></li>
         </ul>
-        <p class="footer-meta"><span class="boxed boxed--body">© 2026 Mark Levi Consulting</span></p>
+        <p class="footer-meta">© 2026 Mark Levi Consulting</p>
       </div>
     </div>
   </section>

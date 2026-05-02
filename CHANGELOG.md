@@ -3,6 +3,18 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v60 — Footer: solid dark panel
+- Footer is still pinned to the bottom of the .final block, but
+  now sits on a **solid `var(--bg-0)` panel** (with a 1px top
+  border) instead of trying to share the dot-pattern background.
+- Removed the per-line `.boxed` cutouts from footer text — no
+  longer needed since the panel itself is the backdrop. Plain
+  white text on solid dark.
+- Two-column grid restored on ≥720 px (wordmark + © left, links
+  right-aligned right). Single-column stack on mobile.
+- The animated dot pattern still fills the .final section above
+  the panel — final CTA still reads on the dot field.
+
 ## v59 — Final block dot density toned down
 - The previous `gradientY: 0.55` + `density: 0.45` made the bottom
   of the .final section so densely dotted that the embedded footer
