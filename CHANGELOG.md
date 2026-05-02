@@ -3,6 +3,18 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v44 — Wave-dither moved into the manifesto block (as a "floor")
+- Removed the standalone `<section class="wave-dither">` from the
+  top of the page.
+- Re-housed the wave canvas as the bottom of the **manifesto**
+  block — now reads as the visual "floor" under the manifesto copy.
+- Manifesto bottom padding zeroed out and `.manifesto-text` margin
+  set to `0`, so the text bottom sits directly above the strip.
+- Wave's rest-Y shifted from the centre of its canvas (`0.50`) to
+  near the top (`0.83`) and amplitudes reduced (`.10/.04/.02`) so
+  the visible wave sits just under the text — letters almost
+  touching the wave.
+
 ## v43 — Top of page: wave-dither strip
 - Replaced the goose-photo block with an animated **wave-dither strip**.
   ~1/3 of the viewport tall, full width, black background.
