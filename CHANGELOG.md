@@ -3,6 +3,13 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v56 — Footer: phone & email removed
+- Dropped the `.footer-contact` line (email + phone) from the
+  landing page footer. Footer now shows wordmark, three legal links,
+  and the copyright line only.
+- Email is still referenced inside the legal pages' Contact sections
+  (privacy.html, terms.html, accessibility.html).
+
 ## v55 — Footer + 3 legal pages
 - New `<footer class="site-footer">` at the bottom of `landing.html`:
   wordmark, three legal-page links, email, phone, copyright. Same
