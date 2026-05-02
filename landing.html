@@ -168,11 +168,22 @@
     }
 
     /* ─── WORDMARK ─────────────────────────────────────────────── */
-    .wordmark {
+    /* Frame mirrors .wrap so the wordmark's left edge sits on the
+       same vertical axis as the hero headline / sub / button on every
+       viewport (centred container on desktop, full-width on mobile). */
+    .wordmark-frame {
       position: absolute;
       top: 28px;
-      left: 24px;
+      left: 0;
+      right: 0;
       z-index: 2;
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 24px;
+      pointer-events: none;
+    }
+    .wordmark {
+      display: inline-block;
       font-size: 17px;             /* matches body text */
       font-weight: 600;
       letter-spacing: 0.18em;
@@ -180,11 +191,11 @@
       mix-blend-mode: difference;
       color: #ffffff;
       line-height: 1;
-      pointer-events: none;
       user-select: none;
     }
     @media (max-width: 720px) {
-      .wordmark { top: 22px; left: 20px; font-size: 16px; letter-spacing: 0.16em; }
+      .wordmark-frame { top: 22px; }
+      .wordmark { font-size: 16px; letter-spacing: 0.16em; }
     }
 
     /* ─── BUTTONS ──────────────────────────────────────────────── */
@@ -835,7 +846,9 @@
   <!-- ─── HERO ─────────────────────────────────────────────────── -->
   <section class="hero">
     <div id="hero_bg" class="dither-bg" data-preset="hero"></div>
-    <div class="wordmark">Mark Levi Consulting</div>
+    <div class="wordmark-frame" aria-hidden="true">
+      <div class="wordmark">Mark Levi Consulting</div>
+    </div>
     <div class="wrap">
       <h1 class="reveal">Stop paying humans for work machines do better.</h1>
       <p class="sub reveal"><span class="boxed boxed--body">Custom-built AI Employees deployed inside your existing systems.</span></p>

@@ -3,6 +3,15 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v54 — Wordmark left-edge aligned with hero content
+- Wrapped the wordmark in a `.wordmark-frame` that mirrors `.wrap`
+  (`max-width: 1080px; margin: 0 auto; padding: 0 24px;`).
+- Result: the wordmark's left edge now sits on the same vertical
+  axis as the hero headline, subtitle, and CTA on every viewport
+  — including wide desktop where `.wrap` centres at 1080 px.
+- Previously the wordmark was at a fixed `left: 24px` from the
+  viewport, so on wide screens it drifted left of the content.
+
 ## v53 — Wordmark sized to match body text
 - `.wordmark` font-size 13 → 17 px (desktop) and 11 → 16 px (mobile).
   Now reads at body-text scale instead of the small-label scale it
