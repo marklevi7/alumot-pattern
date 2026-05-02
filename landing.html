@@ -435,6 +435,23 @@
       border-radius: 4px;
       font-variant-numeric: tabular-nums;
       letter-spacing: 0;
+      opacity: 0;                 /* hidden until the section enters view */
+      transform: scale(0.5);
+      transform-origin: 50% 50%;
+    }
+    .accordion.in-view .num {
+      animation: accordion-num-pop 0.35s ease-out both;
+    }
+    .accordion.in-view details:nth-of-type(1) .num { animation-delay: 0.00s; }
+    .accordion.in-view details:nth-of-type(2) .num { animation-delay: 0.11s; }
+    .accordion.in-view details:nth-of-type(3) .num { animation-delay: 0.22s; }
+    .accordion.in-view details:nth-of-type(4) .num { animation-delay: 0.33s; }
+    .accordion.in-view details:nth-of-type(5) .num { animation-delay: 0.44s; }
+    .accordion.in-view details:nth-of-type(6) .num { animation-delay: 0.55s; }
+    .accordion.in-view details:nth-of-type(7) .num { animation-delay: 0.66s; }
+    @keyframes accordion-num-pop {
+      from { opacity: 0; transform: scale(0.5); }
+      to   { opacity: 1; transform: scale(1); }
     }
     .accordion .num-text {
       display: inline-block;
@@ -1971,28 +1988,39 @@ void main() {
       requestAnimationFrame(tick);
     }
 
-    function startGroup(group) {
-      group.idx.forEach(function (i) { scramble(nodes[i], truth[i]); });
-      setTimeout(function () { startGroup(group); }, LOOP_MS);
+    var BADGE_APPEAR_MS = 1000;   // squares pop in top→bottom in ~1s
+    var PAUSE_MS = 3000;          // pause between scramble cycles
+
+    function runCascade() {
+      // Outside-in mirror cascade — pairs scramble in sequence.
+      GROUPS.forEach(function (g) {
+        setTimeout(function () {
+          g.idx.forEach(function (i) { scramble(nodes[i], truth[i]); });
+        }, g.offset);
+      });
     }
 
-    function startAll() {
-      // Stagger each group's first run by its offset so the pairs cascade
-      // outside-in on the very first cycle, then loop independently.
-      GROUPS.forEach(function (g) { setTimeout(function () { startGroup(g); }, g.offset); });
+    function loopCycle() {
+      runCascade();
+      // Cascade tail = last group offset (1800) + scramble (700) = 2500ms.
+      setTimeout(loopCycle, 2500 + PAUSE_MS);
+    }
+
+    function startSequence(accordionEl) {
+      accordionEl.classList.add('in-view');             // CSS pop-in starts
+      setTimeout(loopCycle, BADGE_APPEAR_MS);            // scramble cycles after pop-in
     }
 
     // Hold off until the accordion scrolls into view — first square
-    // entering the viewport kicks the cascade off.
+    // entering the viewport kicks off the whole sequence.
     var accordionEl = document.querySelector('.accordion');
-    if (!accordionEl || !('IntersectionObserver' in window)) {
-      startAll();
-      return;
-    }
+    if (!accordionEl) return;
+    if (!('IntersectionObserver' in window)) { startSequence(accordionEl); return; }
+
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
         if (entry.isIntersecting) {
-          startAll();
+          startSequence(entry.target);
           io.unobserve(entry.target);
         }
       });

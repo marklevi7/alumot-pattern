@@ -3,6 +3,19 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v52 — Seven AI Employees: choreographed entrance sequence
+On scroll into view, the accordion now plays a clean sequence:
+1. Badges pop in top → bottom over ~1 second (`accordion-num-pop`
+   keyframes, staggered `0.00s`–`0.66s`).
+2. Then the scramble cascade runs once (outside-in mirror cadence,
+   ~2.5 s).
+3. Then a 3-second pause.
+4. Scramble cascade again. Pause 3 s. Loop indefinitely.
+
+JS dropped the per-group internal `LOOP_MS` recursion in favour of a
+single global `loopCycle` that runs one cascade, waits 2.5 s + 3 s, and
+recurses.
+
 ## v51 — Seven AI Employees: digit scrambler defers until in view
 - The badge digit-scrambler used to fire as soon as the page loaded,
   so by the time you scrolled to the accordion, the staggered cascade
