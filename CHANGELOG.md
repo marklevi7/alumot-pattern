@@ -3,6 +3,19 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v38 — Mid CTA banner: copy rewrite + taller block
+- Copy rewrite. The mid-banner now flips the framing: instead of
+  asking the visitor a question, it tells them what to bring.
+    H2: "Which one replaces the most expensive workflow in your
+         company?" → "Show us your most expensive workflow."
+    Sub: "30-minute call. No deck. No pitch. Just the math and your
+         highest-cost workflow."
+       → "30 minutes. We come back with a written scope, fixed price,
+         fixed timeline."
+  The new sub names four concrete deliverables (written / scope /
+  fixed price / fixed timeline) so the call commitment is unambiguous.
+- Banner padding bumped ~25%: desktop 96 → 120px, mobile 72 → 90px.
+
 ## v37 — Manifesto: bigger grid + sentence-aware paragraphing
 - Bumped `.manifesto-grid` font-size from `clamp(22px, 4vw, 34px)`
   to `clamp(30px, 5.5vw, 48px)`. Mobile bumped from 20→28px.
