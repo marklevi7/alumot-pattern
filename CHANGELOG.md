@@ -3,7 +3,19 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
-## v39 — Mid banner: case-study moment + much taller block
+## v40 — Manifesto rolled back to plain big-title text
+- Threw out the v36/v37 integrated-noise-grid manifesto entirely.
+- Replaced with a plain `.manifesto-text` paragraph in Inter, sized
+  `clamp(28px, 4vw, 40px)` — bigger than the v25 baseline so it
+  reads as a "big title" paragraph rather than body copy.
+- Removed the `.manifesto-grid` CSS, the integrated-grid JS at the
+  bottom of the file, and the now-unused `IBM Plex Mono` + `VT323`
+  Google Fonts query string. Only Inter remains.
+- Hero, scoreboard, accordion, build tiers, mid banner, phases,
+  why-now, why-us, final CTA, and the snowball loader are all
+  untouched.
+
+## v39 — Mid banner: case-study moment + much taller block  ★ PINNED — last full state with the noise-grid manifesto direction
 - Threw out the previous "Show us / book a call" framing entirely.
   New approach: pull a real case-study number to the front so the
   banner becomes a **proof moment**, not a generic CTA.

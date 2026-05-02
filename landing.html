@@ -7,9 +7,6 @@
   <meta name="description" content="AI Employees that replace human work end-to-end. 80–95% cost reduction. Live in 30 days.">
   <link rel="preconnect" href="https://rsms.me/">
   <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=VT323&display=swap">
   <style>
     :root {
       --bg-0: #050507;
@@ -356,35 +353,19 @@
 
     /* ─── MANIFESTO (between hero and scoreboard) ───────────────── */
     .manifesto {
+      padding: 120px 0;
       background: var(--bg-0);
-      position: relative;
-      overflow: hidden;
-      min-height: 75vh;
     }
-    /* One layer. The whole block is a single grid of monospace
-       characters. Filler cells are dim grey (binary noise); the
-       cells that carry the manifesto text are bright white via
-       the inner `.t` spans the JS injects. Same font, same size,
-       same grid — only the colour distinguishes "text" from
-       "noise". */
-    .manifesto-grid {
-      position: absolute;
-      inset: 0;
-      font-family: 'VT323', ui-monospace, monospace;
-      font-size: clamp(30px, 5.5vw, 48px);
-      line-height: 1.05;
-      color: rgba(160, 160, 173, 0.5);   /* dim grey filler */
-      white-space: pre;
-      overflow: hidden;
-      user-select: none;
-      pointer-events: none;
-    }
-    .manifesto-grid .t {
-      color: #ffffff;                    /* the readable text */
+    .manifesto-text {
+      font-size: clamp(28px, 4vw, 40px);   /* big title-style paragraph */
+      line-height: 1.35;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      max-width: 30ch;
+      font-weight: 500;
     }
     @media (max-width: 720px) {
-      .manifesto { min-height: 80vh; }
-      .manifesto-grid { font-size: 28px; }
+      .manifesto { padding: 80px 0; }
     }
 
     /* ─── ACCORDION ────────────────────────────────────────────── */
@@ -813,7 +794,9 @@
 
   <!-- ─── MANIFESTO ────────────────────────────────────────────── -->
   <section class="manifesto">
-    <div class="manifesto-grid" aria-label="Every month you sign off on salaries for work that doesn't need a human anymore. Lead follow-ups. Content. Filing. Compliance. Reports. Calendar wrangling. Invoice reconciliation. Contract renewals. This work doesn't need talent. It needs volume. AI does volume for a fraction of the cost."></div>
+    <div class="wrap">
+      <p class="manifesto-text reveal">Every month you sign off on salaries for work that doesn't need a human anymore. Lead follow-ups. Content. Filing. Compliance. Reports. Calendar wrangling. Invoice reconciliation. Contract renewals. This work doesn't need talent. It needs volume. AI does volume for a fraction of the cost.</p>
+    </div>
   </section>
 
   <!-- ─── SCOREBOARD ───────────────────────────────────────────── -->
@@ -1540,148 +1523,6 @@ void main() {
       });
     }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
     els.forEach(function (el) { io.observe(el); });
-  })();
-</script>
-
-<script>
-  // Manifesto integrated grid: a single character grid fills the entire
-  // .manifesto block. Most cells are random binary filler (dim grey).
-  // The cells that hold the manifesto text are wrapped in <span class="t">
-  // and rendered bright white. Same font, same size, same grid — text
-  // is part of the noise, just coloured differently.
-  //
-  // Word-wrap is character-aware: words never split mid-word, they push
-  // to the next row when they don't fit. Text starts at row 4 from the
-  // top, padded a few characters in from each side so it sits like a
-  // natural paragraph embedded in the noise.
-  (function () {
-    var el = document.querySelector('.manifesto-grid');
-    if (!el) return;
-
-    var FILLER = '01';
-    // Paragraphs are placed in order, with one blank "noise-only" line
-    // between them. Word-wrap stays within each paragraph so line
-    // breaks always land between paragraphs, not mid-sentence.
-    var PARAGRAPHS = [
-      "Every month you sign off on salaries for work that doesn't need a human anymore.",
-      "Lead follow-ups. Content. Filing. Compliance. Reports. Calendar wrangling. Invoice reconciliation. Contract renewals.",
-      "This work doesn't need talent. It needs volume.",
-      "AI does volume for a fraction of the cost."
-    ];
-    var START_ROW = 3;
-    var EDGE_PAD = 3;
-    var PARA_GAP = 1;            // blank rows between paragraphs
-
-    var grid = [];               // 2D array of { ch, t } cells
-    var lastCols = 0, lastRows = 0;
-
-    function measureChar() {
-      var probe = document.createElement('span');
-      probe.style.cssText = 'position:absolute;visibility:hidden;font:inherit;';
-      probe.textContent = '0'.repeat(60);
-      el.appendChild(probe);
-      var w = probe.getBoundingClientRect().width / 60;
-      el.removeChild(probe);
-      var fs = parseFloat(getComputedStyle(el).fontSize);
-      var lh = parseFloat(getComputedStyle(el).lineHeight);
-      return { w: w || 12, h: lh || fs || 24 };
-    }
-
-    function buildGrid() {
-      var size = measureChar();
-      var cols = Math.max(20, Math.floor(el.clientWidth  / size.w));
-      var rows = Math.max(8,  Math.ceil(el.clientHeight / size.h));
-      if (cols === lastCols && rows === lastRows && grid.length) return;
-      lastCols = cols; lastRows = rows;
-
-      grid = [];
-      for (var r = 0; r < rows; r++) {
-        var row = [];
-        for (var c = 0; c < cols; c++) {
-          row.push({ ch: FILLER[(Math.random() * FILLER.length) | 0], t: false });
-        }
-        grid.push(row);
-      }
-
-      placeText(cols, rows);
-      render();
-    }
-
-    function placeText(cols, rows) {
-      var maxCol = cols - EDGE_PAD;
-      var row = START_ROW;
-
-      for (var p = 0; p < PARAGRAPHS.length; p++) {
-        var words = PARAGRAPHS[p].split(' ');
-        var col = EDGE_PAD;
-
-        for (var i = 0; i < words.length; i++) {
-          var word = words[i];
-          if (col > EDGE_PAD && col + word.length > maxCol) {
-            row++;
-            col = EDGE_PAD;
-            if (row >= rows - 1) return;
-          }
-          var len = Math.min(word.length, maxCol - col);
-          for (var j = 0; j < len; j++) {
-            grid[row][col++] = { ch: word[j], t: true };
-          }
-          // Single space between words on the same line.
-          if (col < maxCol) {
-            grid[row][col++] = { ch: ' ', t: true };
-          }
-        }
-
-        // Move down past this paragraph + blank gap (left as noise).
-        row += 1 + PARA_GAP;
-        if (row >= rows - 1) return;
-      }
-    }
-
-    function escapeHTML(c) {
-      if (c === '<') return '&lt;';
-      if (c === '>') return '&gt;';
-      if (c === '&') return '&amp;';
-      return c;
-    }
-
-    function render() {
-      var out = '';
-      for (var r = 0; r < grid.length; r++) {
-        var row = grid[r];
-        var inT = false;
-        for (var c = 0; c < row.length; c++) {
-          var cell = row[c];
-          if (cell.t && !inT)  { out += '<span class="t">'; inT = true; }
-          if (!cell.t && inT)  { out += '</span>';          inT = false; }
-          out += cell.ch === ' ' ? ' ' : escapeHTML(cell.ch);
-        }
-        if (inT) out += '</span>';
-        out += '\n';
-      }
-      el.innerHTML = out;
-    }
-
-    function tickle() {
-      // Flip ~1.2% of FILLER cells per tick — slow data-feed feel.
-      // Text cells are never touched.
-      if (!grid.length) return;
-      var R = grid.length, C = grid[0].length;
-      var flips = Math.max(8, ((R * C) * 0.012) | 0);
-      for (var i = 0; i < flips; i++) {
-        var r = (Math.random() * R) | 0;
-        var c = (Math.random() * C) | 0;
-        if (grid[r][c].t) continue;
-        grid[r][c].ch = FILLER[(Math.random() * FILLER.length) | 0];
-      }
-      render();
-    }
-
-    buildGrid();
-    window.addEventListener('resize', buildGrid);
-    if (!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) {
-      setInterval(tickle, 900);
-    }
   })();
 </script>
 
