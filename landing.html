@@ -691,26 +691,24 @@
     }
 
     /* ─── FOOTER ───────────────────────────────────────────────── */
-    /* Footer is pinned to the bottom of the .final block on a solid
-       dark panel so the text reads cleanly. Animated dot pattern
-       above the panel still fills the rest of the .final section. */
+    /* No solid panel — the dot pattern flows through the footer area
+       unchanged. Each text node carries its own .boxed cutout so the
+       dots can't bleed through the glyphs. Compact, small, tight. */
     .final-footer {
       position: absolute;
       left: 0;
       right: 0;
       bottom: 0;
       z-index: 2;
-      padding: 36px 0 28px;
-      background: var(--bg-0);
-      border-top: 1px solid var(--line);
+      padding: 28px 0 24px;
     }
     .final-footer .wrap {
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 12px;
     }
     .footer-mark {
-      font-size: 13px;
+      font-size: 11px;
       letter-spacing: 0.18em;
       text-transform: uppercase;
       color: var(--ink);
@@ -722,26 +720,26 @@
       margin: 0;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 6px;
     }
     .footer-links a {
-      color: var(--ink-dim);
+      color: var(--ink);
       text-decoration: none;
-      font-size: 15px;
+      font-size: 13px;
     }
-    .footer-links a:hover { color: var(--ink); }
+    .footer-links a:hover { opacity: 0.78; }
     .footer-meta {
       margin: 0;
-      font-size: 12px;
-      color: var(--ink-faint);
+      font-size: 11px;
+      color: var(--ink);
       letter-spacing: 0.02em;
     }
     @media (min-width: 720px) {
       .final-footer .wrap {
         display: grid;
         grid-template-columns: 1fr auto;
-        column-gap: 48px;
-        row-gap: 12px;
+        column-gap: 32px;
+        row-gap: 8px;
         align-items: start;
       }
       .footer-mark { grid-column: 1; grid-row: 1; }
@@ -750,7 +748,7 @@
         grid-column: 2;
         grid-row: 1 / span 2;
         text-align: right;
-        gap: 10px;
+        gap: 6px;
       }
     }
 
@@ -1343,13 +1341,13 @@
     </div>
     <div class="final-footer">
       <div class="wrap">
-        <p class="footer-mark">Mark Levi Consulting</p>
+        <p class="footer-mark"><span class="boxed">Mark Levi Consulting</span></p>
         <ul class="footer-links">
-          <li><a href="privacy.html">Privacy Policy</a></li>
-          <li><a href="terms.html">Terms &amp; Conditions</a></li>
-          <li><a href="accessibility.html">Accessibility Statement</a></li>
+          <li><a href="privacy.html"><span class="boxed">Privacy Policy</span></a></li>
+          <li><a href="terms.html"><span class="boxed">Terms &amp; Conditions</span></a></li>
+          <li><a href="accessibility.html"><span class="boxed">Accessibility Statement</span></a></li>
         </ul>
-        <p class="footer-meta">© 2026 Mark Levi Consulting</p>
+        <p class="footer-meta"><span class="boxed">© 2026 Mark Levi Consulting</span></p>
       </div>
     </div>
   </section>

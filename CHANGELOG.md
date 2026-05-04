@@ -3,6 +3,20 @@
 Each user request is recorded as a version. Tags are pushed to the repo so any
 version can be restored by name (e.g. `git checkout v3`).
 
+## v61 — Footer: pattern flows through, tight + small
+- Killed the solid `var(--bg-0)` panel under the footer. The dot
+  pattern now flows through the whole footer area uninterrupted
+  ("big chunk with pattern").
+- Each footer text element wraps in a small `.boxed` span — black
+  cutout behind only the glyphs, dots stay visible elsewhere.
+- Tightened layout per request:
+    - wordmark 13 → 11px
+    - links    15 → 13px
+    - meta     12 → 11px
+    - vertical gaps 20 → 12 (.wrap), 10 → 6 (.footer-links)
+- Two-column desktop grid retained, but column gap tightened
+  48 → 32px and row gap 12 → 8px.
+
 ## v60 — Footer: solid dark panel
 - Footer is still pinned to the bottom of the .final block, but
   now sits on a **solid `var(--bg-0)` panel** (with a 1px top
