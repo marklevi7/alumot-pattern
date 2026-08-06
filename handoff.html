@@ -1,0 +1,1814 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Handoff — Animations &amp; Patterns · Mark Levi Consulting landing</title>
+<meta name="description" content="Every animation and pattern from the landing page, isolated and copy-pasteable.">
+<link rel="preconnect" href="https://rsms.me/">
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+<style>
+  :root {
+    --bg-0: #050507;
+    --bg-1: #0b0b10;
+    --bg-2: #11121a;
+    --ink: #f3f3f5;
+    --ink-dim: #ececf2;
+    --ink-faint: #a0a0ad;
+    --line: rgba(255, 255, 255, 0.12);
+    --line-strong: rgba(255, 255, 255, 0.22);
+    --accent: #ffffff;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg-0);
+    color: var(--ink);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    font-feature-settings: 'ss01', 'cv11';
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  @supports (font-variation-settings: normal) {
+    body { font-family: 'Inter var', -apple-system, BlinkMacSystemFont, sans-serif; }
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+
+  header.top {
+    padding: 72px 0 48px;
+    border-bottom: 1px solid var(--line);
+  }
+  header.top .kicker {
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin: 0 0 16px;
+  }
+  header.top h1 {
+    font-size: clamp(32px, 5.5vw, 56px);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    font-weight: 600;
+    margin: 0 0 20px;
+    max-width: 20ch;
+  }
+  header.top p.lead {
+    font-size: clamp(16px, 1.8vw, 19px);
+    color: var(--ink-dim);
+    max-width: 62ch;
+    margin: 0 0 32px;
+    line-height: 1.6;
+  }
+  header.top ul.toc {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    columns: 2;
+    column-gap: 40px;
+    font-size: 14px;
+  }
+  header.top ul.toc a {
+    color: var(--ink-dim);
+    text-decoration: none;
+    display: block;
+    padding: 3px 0;
+    border-bottom: 1px dashed transparent;
+  }
+  header.top ul.toc a:hover {
+    color: var(--ink);
+    border-bottom-color: var(--line);
+  }
+  @media (max-width: 720px) {
+    header.top ul.toc { columns: 1; }
+  }
+
+  section.pat {
+    padding: 72px 0;
+    border-bottom: 1px solid var(--line);
+    scroll-margin-top: 24px;
+  }
+  section.pat .num {
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin: 0 0 12px;
+    font-variant-numeric: tabular-nums;
+  }
+  section.pat h2 {
+    font-size: clamp(24px, 3.6vw, 36px);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    font-weight: 600;
+    margin: 0 0 16px;
+    max-width: 22ch;
+  }
+  section.pat p.what {
+    color: var(--ink-dim);
+    max-width: 62ch;
+    margin: 0 0 12px;
+  }
+  section.pat .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    margin: 12px 0 28px;
+    font-size: 12px;
+    color: var(--ink-faint);
+  }
+  section.pat .meta code {
+    background: var(--bg-1);
+    border: 1px solid var(--line);
+    padding: 3px 8px;
+    border-radius: 4px;
+    color: var(--ink-dim);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11.5px;
+  }
+
+  .demo {
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--bg-0);
+    overflow: hidden;
+    margin: 8px 0 20px;
+    position: relative;
+  }
+  .demo-label {
+    position: absolute;
+    top: 10px;
+    left: 12px;
+    z-index: 3;
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    background: rgba(5,5,7,0.7);
+    padding: 4px 8px;
+    border-radius: 3px;
+    pointer-events: none;
+  }
+
+  details.code {
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--bg-1);
+    margin-bottom: 12px;
+  }
+  details.code summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  details.code summary::-webkit-details-marker { display: none; }
+  details.code summary::after {
+    content: '+';
+    color: var(--ink-faint);
+    font-size: 18px;
+    line-height: 1;
+    font-weight: 400;
+  }
+  details.code[open] summary::after { content: '−'; }
+  details.code pre {
+    margin: 0;
+    padding: 0 16px 18px;
+    overflow: auto;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--ink-dim);
+    white-space: pre;
+  }
+  details.code pre code {
+    color: inherit;
+    background: none;
+    padding: 0;
+    font: inherit;
+  }
+  .note {
+    font-size: 13px;
+    color: var(--ink-faint);
+    padding: 10px 12px;
+    border-left: 2px solid var(--line);
+    margin: 8px 0 20px;
+    background: rgba(255,255,255,0.02);
+  }
+
+  footer.foot {
+    padding: 40px 0 60px;
+    color: var(--ink-faint);
+    font-size: 13px;
+  }
+  footer.foot a { color: var(--ink-dim); }
+
+  /* ─────────── DEMO 1..3: DITHER BACKGROUNDS ─────────── */
+  .dither-demo { height: 340px; position: relative; }
+  .dither-bg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .dither-bg canvas { display: block; width: 100% !important; height: 100% !important; }
+  .dither-caption {
+    position: absolute; left: 20px; bottom: 16px; z-index: 2;
+    font-size: 13px; color: var(--ink);
+    background: rgba(5,5,7,0.7);
+    padding: 6px 10px; border-radius: 4px;
+    pointer-events: none;
+  }
+
+  /* ─────────── DEMO 4: WAVE STRIP ─────────── */
+  #wave_dither_canvas {
+    position: relative; width: 100%; height: 220px; display: block;
+  }
+  #wave_dither_canvas canvas {
+    display: block; width: 100% !important; height: 100% !important;
+  }
+
+  /* ─────────── DEMO 5: AI NODE ─────────── */
+  #ai_node_canvas {
+    position: relative; width: 100%; height: 340px; display: block;
+  }
+  #ai_node_canvas canvas {
+    display: block; width: 100% !important; height: 100% !important;
+  }
+
+  /* ─────────── DEMO 6: SNOWBALL LOADER ─────────── */
+  .snowball-demo { min-height: 260px; display: grid; place-items: center; }
+  .snowball-loader {
+    font-size: 14px;
+    pointer-events: none;
+  }
+  .snowball-loader .pl,
+  .snowball-loader .pl__ball,
+  .snowball-loader .pl__ball-inner-shadow,
+  .snowball-loader .pl__ball-side-shadows,
+  .snowball-loader .pl__ball-texture,
+  .snowball-loader .pl__inner-ring,
+  .snowball-loader .pl__outer-ring,
+  .snowball-loader .pl__track-cover { border-radius: 50%; }
+  .snowball-loader .pl { position: relative; width: 16em; height: 16em; }
+  .snowball-loader .pl__ball,
+  .snowball-loader .pl__ball-inner-shadow,
+  .snowball-loader .pl__ball-outer-shadow,
+  .snowball-loader .pl__ball-side-shadows,
+  .snowball-loader .pl__ball-texture,
+  .snowball-loader .pl__ball-texture::before,
+  .snowball-loader .pl__inner-ring,
+  .snowball-loader .pl__outer-ring,
+  .snowball-loader .pl__track-cover { position: absolute; }
+  .snowball-loader .pl__ball,
+  .snowball-loader .pl__ball-inner-shadow,
+  .snowball-loader .pl__ball-outer-shadow,
+  .snowball-loader .pl__ball-texture::before,
+  .snowball-loader .pl__track-cover { animation: ball 3s linear infinite; }
+  .snowball-loader .pl__ball {
+    top: calc(50% - 1.25em); left: calc(50% - 1.25em);
+    transform: rotate(0) translateY(-6.5em);
+    width: 2.5em; height: 2.5em; background: #ffffff;
+  }
+  .snowball-loader .pl__ball-inner-shadow,
+  .snowball-loader .pl__ball-outer-shadow,
+  .snowball-loader .pl__ball-side-shadows { display: none; }
+  .snowball-loader .pl__ball-texture {
+    overflow: hidden; width: 100%; height: 100%;
+    transform: translate3d(0, 0, 0);
+  }
+  .snowball-loader .pl__ball-texture::before {
+    animation-name: ballTexture;
+    animation-duration: 0.25s;
+    background: repeating-linear-gradient(90deg, #000 0, #000 1.5px, transparent 1.5px, transparent 5px);
+    content: ""; display: block; top: 0; right: 0; width: 200%; height: 100%;
+  }
+  .snowball-loader .pl__inner-ring {
+    border: 1.5px solid #ffffff; box-shadow: none;
+    top: 2.375em; left: 2.375em;
+    width: calc(100% - 4.75em); height: calc(100% - 4.75em);
+  }
+  .snowball-loader .pl__outer-ring {
+    border: 1.5px solid #ffffff; box-shadow: none;
+    top: 0.75em; left: 0.75em;
+    width: calc(100% - 1.5em); height: calc(100% - 1.5em);
+  }
+  .snowball-loader .pl__track-cover {
+    animation-name: trackCover;
+    background-image: conic-gradient(#050507 210deg, hsla(0, 0%, 0%, 0) 270deg);
+    top: 0; left: 0; width: 100%; height: 100%;
+  }
+  @keyframes ball {
+    from { transform: rotate(0)      translateY(-6.5em); }
+    50%  { transform: rotate(180deg) translateY(-6em); }
+    to   { transform: rotate(360deg) translateY(-6.5em); }
+  }
+  @keyframes ballTexture {
+    from { transform: translateX(0); }
+    to   { transform: translateX(50%); }
+  }
+  @keyframes trackCover {
+    from { transform: rotate(0); }
+    to   { transform: rotate(360deg); }
+  }
+
+  /* ─────────── DEMO 7: TIER ICONS (SVG) ─────────── */
+  .tier-icons {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    padding: 40px 20px;
+  }
+  .tier-icon-card {
+    background: var(--bg-1);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 22px 18px;
+    text-align: center;
+  }
+  .tier-icon-card .icon {
+    width: 64px; height: 64px; margin: 0 auto 14px; color: var(--ink);
+  }
+  .tier-icon-card .icon svg { width: 100%; height: 100%; display: block; }
+  .tier-icon-card .lbl {
+    font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  @media (max-width: 640px) {
+    .tier-icons { grid-template-columns: 1fr; }
+  }
+
+  /* ─────────── DEMO 8: CTA SHINE ─────────── */
+  .cta-demo { padding: 40px 20px; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
+  .cta {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 16px 28px; color: var(--bg-0);
+    border: 1px solid var(--ink); border-radius: 5px;
+    font: inherit; font-size: 15px; font-weight: 600;
+    letter-spacing: -0.005em; text-decoration: none; cursor: pointer;
+    transition: transform 120ms ease, background-color 120ms ease, color 120ms ease;
+    background-color: var(--ink);
+    background-image: linear-gradient(110deg,
+      transparent 0%, transparent 30%,
+      rgba(0, 0, 0, 0.55) 50%,
+      transparent 70%, transparent 100%);
+    background-size: 250% 100%;
+    background-repeat: no-repeat;
+    background-position: -130% 0;
+    animation: cta-shine 2.5s ease-in-out infinite;
+  }
+  @keyframes cta-shine {
+    0%   { background-position: -130% 0; }
+    60%  { background-position:  230% 0; }
+    100% { background-position:  230% 0; }
+  }
+  .cta::after {
+    content: '→'; display: inline-block;
+    transition: transform 200ms ease;
+  }
+  .cta:hover { background-color: transparent; color: var(--ink); }
+  .cta:hover::after { transform: translateX(4px); }
+  .cta.ghost { background: transparent; color: var(--ink); }
+  .cta.ghost:hover { background: var(--ink); color: var(--bg-0); }
+
+  /* ─────────── DEMO 9: ACCORDION NUM POP + DIGIT SCRAMBLE ─────────── */
+  .accordion { border-top: 1px solid var(--line); }
+  .accordion details { border-bottom: 1px solid var(--line); }
+  .accordion summary {
+    list-style: none; cursor: pointer;
+    padding: 22px 0;
+    display: grid;
+    grid-template-columns: 56px 1fr 24px;
+    gap: 16px; align-items: baseline;
+    transition: opacity 150ms ease;
+  }
+  .accordion summary::-webkit-details-marker { display: none; }
+  .accordion summary:hover { opacity: 0.75; }
+  .accordion .num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 30px; height: 30px;
+    background: var(--ink); color: var(--bg-0);
+    font-size: 12px; font-weight: 600;
+    border-radius: 4px;
+    font-variant-numeric: tabular-nums; letter-spacing: 0;
+    opacity: 0; transform: scale(0.5); transform-origin: 50% 50%;
+  }
+  .accordion.in-view .num {
+    animation: accordion-num-pop 0.35s ease-out both;
+  }
+  .accordion.in-view details:nth-of-type(1) .num { animation-delay: 0.00s; }
+  .accordion.in-view details:nth-of-type(2) .num { animation-delay: 0.11s; }
+  .accordion.in-view details:nth-of-type(3) .num { animation-delay: 0.22s; }
+  .accordion.in-view details:nth-of-type(4) .num { animation-delay: 0.33s; }
+  .accordion.in-view details:nth-of-type(5) .num { animation-delay: 0.44s; }
+  .accordion.in-view details:nth-of-type(6) .num { animation-delay: 0.55s; }
+  .accordion.in-view details:nth-of-type(7) .num { animation-delay: 0.66s; }
+  @keyframes accordion-num-pop {
+    from { opacity: 0; transform: scale(0.5); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+  .accordion .num-text { display: inline-block; font-variant-numeric: tabular-nums; }
+  .accordion .title {
+    font-size: clamp(16px, 2vw, 20px);
+    font-weight: 500; letter-spacing: -0.015em; line-height: 1.25;
+  }
+  .accordion .chev {
+    font-size: 20px; color: var(--ink-faint); line-height: 1;
+    transition: transform 200ms ease, color 200ms ease;
+    justify-self: end;
+  }
+  .accordion details[open] .chev { transform: rotate(45deg); color: var(--ink); }
+  .accordion .body {
+    padding: 0 0 24px 72px;
+    max-width: 64ch; color: var(--ink-dim);
+    font-size: 15px; line-height: 1.6;
+  }
+  .replay {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 14px;
+    background: transparent; color: var(--ink);
+    border: 1px solid var(--line-strong);
+    border-radius: 4px;
+    font: inherit; font-size: 12px;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    cursor: pointer;
+    margin: 16px 0;
+  }
+  .replay:hover { background: var(--ink); color: var(--bg-0); }
+
+  /* ─────────── DEMO 10: REVEAL ON SCROLL ─────────── */
+  .reveal-demo {
+    padding: 40px 20px;
+  }
+  .reveal {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 700ms ease, transform 700ms ease;
+    will-change: opacity, transform;
+  }
+  .reveal.in { opacity: 1; transform: translateY(0); }
+  .reveal-demo .row {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 16px; margin-bottom: 16px;
+  }
+  .reveal-demo .box {
+    padding: 16px 18px;
+    background: var(--bg-1);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--ink-dim);
+  }
+  @media (max-width: 600px) {
+    .reveal-demo .row { grid-template-columns: 1fr; }
+  }
+
+  /* ─────────── DEMO 11: WORDMARK BLEND-MODE ─────────── */
+  .wordmark-demo {
+    position: relative;
+    height: 140px;
+    overflow: hidden;
+  }
+  .wordmark-demo .bg {
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg,
+      #050507 0%, #ffffff 40%, #ffffff 60%, #050507 100%);
+  }
+  .wordmark-frame-demo {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .wordmark {
+    display: inline-block;
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    mix-blend-mode: difference;
+    color: #ffffff;
+    line-height: 1;
+    user-select: none;
+  }
+
+  /* ─────────── DEMO 12: BOXED PER-LINE BACKDROP ─────────── */
+  .boxed-demo {
+    padding: 40px 20px;
+    position: relative;
+    background:
+      radial-gradient(circle at 25% 30%, rgba(255,255,255,0.35), transparent 12%),
+      radial-gradient(circle at 60% 55%, rgba(255,255,255,0.28), transparent 10%),
+      radial-gradient(circle at 80% 20%, rgba(255,255,255,0.30), transparent 10%),
+      radial-gradient(circle at 15% 75%, rgba(255,255,255,0.32), transparent 10%),
+      radial-gradient(circle at 45% 82%, rgba(255,255,255,0.26), transparent 10%),
+      radial-gradient(circle at 92% 68%, rgba(255,255,255,0.34), transparent 10%),
+      var(--bg-0);
+  }
+  .boxed {
+    background: #000000;
+    -webkit-box-decoration-break: clone;
+            box-decoration-break: clone;
+    padding: 0.05em 0.28em 0.05em 0;
+  }
+  .boxed--body { padding: 0.18em 0.4em 0.18em 0; }
+  .boxed-demo p {
+    font-size: 22px;
+    line-height: 1.5;
+    max-width: 32ch;
+    color: var(--ink);
+    margin: 0;
+  }
+
+  /* ─────────── DEMO 13: BODY RADIAL GRADIENT ─────────── */
+  .radial-demo {
+    position: relative;
+    height: 260px;
+    overflow: hidden;
+    background: var(--bg-0);
+  }
+  .radial-demo .bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% -10%, rgba(255,255,255,0.06), transparent 60%),
+      radial-gradient(ellipse 60% 40% at 50% 110%, rgba(255,255,255,0.04), transparent 60%);
+    pointer-events: none;
+  }
+  .radial-demo .msg {
+    position: absolute; inset: 0;
+    display: grid; place-items: center;
+    color: var(--ink-faint); font-size: 13px; letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  /* Reduced motion — respected everywhere */
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; }
+    .cta, .cta::after, .accordion .chev { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <p class="kicker">Handoff · v61</p>
+    <h1>All animations &amp; patterns from the landing page.</h1>
+    <p class="lead">Each block runs live so you can see what it does, and ships with its full HTML/CSS/JS in a collapsible block underneath. Drop any piece into your project — nothing depends on anything else on this page.</p>
+    <ul class="toc">
+      <li><a href="#p01">01 — Dither background · hero</a></li>
+      <li><a href="#p02">02 — Dither background · banner</a></li>
+      <li><a href="#p03">03 — Dither background · final</a></li>
+      <li><a href="#p04">04 — Wave dither strip</a></li>
+      <li><a href="#p05">05 — AI-node loader</a></li>
+      <li><a href="#p06">06 — Snowball loader</a></li>
+      <li><a href="#p07">07 — Bot tier icons (SVG)</a></li>
+      <li><a href="#p08">08 — CTA shine</a></li>
+      <li><a href="#p09">09 — Accordion pop-in + digit scramble</a></li>
+      <li><a href="#p10">10 — Reveal on scroll</a></li>
+      <li><a href="#p11">11 — Wordmark mix-blend-mode</a></li>
+      <li><a href="#p12">12 — Boxed per-line backdrop</a></li>
+      <li><a href="#p13">13 — Body radial gradient backdrop</a></li>
+    </ul>
+  </div>
+</header>
+
+<main>
+
+  <!-- ═════════ 01 · HERO DITHER ═════════ -->
+  <section class="pat" id="p01">
+    <div class="wrap">
+      <p class="num">01</p>
+      <h2>Dither background · hero preset</h2>
+      <p class="what">WebGL2 Bayer-8 dithered dot field, driven by fBm noise. Sparse, near-empty until a ripple fires. Tap anywhere on the block to fire a ripple. Auto-ripples every 5s.</p>
+      <div class="meta">
+        <span>Deps: <code>three@0.160.0</code></span>
+        <span>Preset: <code>hero</code></span>
+        <span>density <code>0.0</code></span>
+        <span>flowY <code>0.00</code></span>
+        <span>gradientY <code>0.00</code></span>
+        <span>autoRippleMs <code>5000</code></span>
+      </div>
+      <div class="demo dither-demo">
+        <span class="demo-label">Live · tap to ripple</span>
+        <div class="dither-bg" data-preset="hero"></div>
+        <div class="dither-caption">density 0.0 · autoRipple 5s</div>
+      </div>
+      <p class="note">One shared render loop drives every <code>.dither-bg</code> element on the page — all three CTA blocks (hero, banner, final) run in lock-step against a single <code>THREE.Clock</code>. Instances pause when they scroll off-screen (<code>IntersectionObserver</code>). One instance is skipped silently on devices without <code>webgl2</code>; container keeps its solid <code>bgColor</code>.</p>
+      <details class="code"><summary>HTML</summary><pre><code>&lt;div class="dither-bg" data-preset="hero"&gt;&lt;/div&gt;</code></pre></details>
+      <details class="code"><summary>CSS</summary><pre><code>.dither-bg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.dither-bg canvas { display: block; width: 100% !important; height: 100% !important; }
+/* Parent section needs position: relative + overflow: hidden + isolation: isolate.
+   DO NOT put z-index on inner .wrap — mix-blend-mode: difference on wordmarks
+   above needs the .wrap to stay out of its own stacking context. */</code></pre></details>
+      <details class="code"><summary>JS (full driver — shared across all 3 presets)</summary><pre><code>// See <script id="dither-src" type="text/plain"> block at bottom of this file for source</code></pre></details>
+      <details class="code"><summary>Fragment shader (GLSL3, Bayer8 + fBm + ripples + drift + gradient)</summary><pre><code>// See <script id="dither-frag-src" type="text/plain"> block at bottom of this file for source</code></pre></details>
+    </div>
+  </section>
+
+  <!-- ═════════ 02 · BANNER DITHER ═════════ -->
+  <section class="pat" id="p02">
+    <div class="wrap">
+      <p class="num">02</p>
+      <h2>Dither background · banner preset</h2>
+      <p class="what">Same shader, denser field, faster auto-ripples. Used behind the mid-page CTA banner where the copy sits on a busier surface.</p>
+      <div class="meta">
+        <span>Preset: <code>banner</code></span>
+        <span>density <code>0.45</code></span>
+        <span>flowY <code>0.00</code></span>
+        <span>gradientY <code>0.00</code></span>
+        <span>autoRippleMs <code>3500</code></span>
+      </div>
+      <div class="demo dither-demo">
+        <span class="demo-label">Live · tap to ripple</span>
+        <div class="dither-bg" data-preset="banner"></div>
+        <div class="dither-caption">density 0.45 · autoRipple 3.5s</div>
+      </div>
+      <p class="note">The banner preset is where you notice the recipe: an fBm noise field is thresholded through an ordered Bayer-8 matrix, then each &quot;on&quot; pixel is masked into a small anti-aliased circle. Text on top uses the <code>.boxed</code> per-line backdrop pattern (see 12) so the dots can&#39;t bleed into glyphs.</p>
+    </div>
+  </section>
+
+  <!-- ═════════ 03 · FINAL DITHER ═════════ -->
+  <section class="pat" id="p03">
+    <div class="wrap">
+      <p class="num">03</p>
+      <h2>Dither background · final preset</h2>
+      <p class="what">Bottom-heavy density gradient plus a slow upward drift, so the field feels like it&#39;s always breathing toward the top of the final block.</p>
+      <div class="meta">
+        <span>Preset: <code>final</code></span>
+        <span>density <code>0.20</code></span>
+        <span>flowY <code>0.04</code></span>
+        <span>gradientY <code>0.10</code></span>
+        <span>autoRippleMs <code>3500</code></span>
+      </div>
+      <div class="demo dither-demo">
+        <span class="demo-label">Live · tap to ripple</span>
+        <div class="dither-bg" data-preset="final"></div>
+        <div class="dither-caption">density 0.20 · flowY 0.04 · gradientY 0.10</div>
+      </div>
+      <p class="note">To add a fourth block, drop <code>&lt;div class=&quot;dither-bg&quot; data-preset=&quot;my-preset&quot;&gt;&lt;/div&gt;</code> inside a positioned parent, then add <code>DITHER_CONFIG.presets[&quot;my-preset&quot;] = { density, flowY, gradientY, autoRippleMs }</code>. Global knobs (shape, pixelSize, fbmSpeed, ripple speed/thickness, ink colour, bg colour) live at the top of <code>DITHER_CONFIG</code>.</p>
+    </div>
+  </section>
+
+  <!-- ═════════ 04 · WAVE DITHER STRIP ═════════ -->
+  <section class="pat" id="p04">
+    <div class="wrap">
+      <p class="num">04</p>
+      <h2>Wave dither strip</h2>
+      <p class="what">Same Bayer-8 + circle-mask recipe as the backgrounds, but the &quot;source&quot; brightness is a stack of three sines instead of noise. Drifts right → left. Sits at the visual floor of the manifesto block.</p>
+      <div class="meta">
+        <span>Deps: <code>three@0.160.0</code></span>
+        <span>pixelSize <code>4</code></span>
+        <span>ink <code>#ffffff</code></span>
+        <span>Wave: <code>3 stacked sines</code></span>
+      </div>
+      <div class="demo">
+        <span class="demo-label">Live</span>
+        <div id="wave_dither_canvas" data-pixel-size="4" data-ink="#ffffff"></div>
+      </div>
+      <details class="code"><summary>HTML</summary><pre><code>&lt;div id="wave_dither_canvas"
+     data-pixel-size="4"
+     data-ink="#ffffff"&gt;&lt;/div&gt;</code></pre></details>
+      <details class="code"><summary>CSS</summary><pre><code>#wave_dither_canvas {
+  position: relative;
+  width: 100%;
+  height: 33vh;
+  display: block;
+}
+#wave_dither_canvas canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}</code></pre></details>
+      <details class="code"><summary>Wave formula (GLSL, editable)</summary><pre><code>// uv.y ∈ [0,1] — bottom = 0, top = 1
+// Rest-line centred at 0.50. +uTime in phase → drift right→left.
+float waveY = 0.50
+  + sin(uv.x *  6.0 + uTime * 1.9) * 0.10
+  + sin(uv.x * 13.0 + uTime * 1.2) * 0.04
+  + sin(uv.x * 24.0 + uTime * 2.8) * 0.02;
+
+float thickness = 0.10;
+float feed      = smoothstep(thickness, 0.0, abs(uv.y - waveY));</code></pre></details>
+    </div>
+  </section>
+
+  <!-- ═════════ 05 · AI NODE LOADER ═════════ -->
+  <section class="pat" id="p05">
+    <div class="wrap">
+      <p class="num">05</p>
+      <h2>AI-node loader</h2>
+      <p class="what">Central raymarched octahedron (three-point-lit — key + fill + Phong spec + rim) with a ring of 6 satellite nodes. Guide lines glow constantly. Comet-tail data dots travel along each line, alternating inbound / outbound per satellite. All rendered as one dithered feed.</p>
+      <div class="meta">
+        <span>Deps: <code>three@0.160.0</code></span>
+        <span>Sats: <code>6</code></span>
+        <span>Comet dots per line: <code>3</code></span>
+        <span>Octahedron SDF: <a href="https://iquilezles.org/articles/distfunctions/" target="_blank" rel="noopener" style="color: var(--ink-dim);">Inigo Quilez</a></span>
+      </div>
+      <div class="demo">
+        <span class="demo-label">Live</span>
+        <div id="ai_node_canvas" data-pixel-size="4" data-ink="#ffffff"></div>
+      </div>
+      <p class="note">Everything in the frame is one <code>feed</code> value fed through Bayer-8 + circle-mask, so lit faces &rarr; dense dots, shadows &rarr; sparse dots, satellites and comet tails punch through with brightness. Object-space normals for flat shading come from <code>sign(p_obj)/sqrt(3.0)</code> — an octahedron shortcut that avoids a normal function.</p>
+    </div>
+  </section>
+
+  <!-- ═════════ 06 · SNOWBALL LOADER ═════════ -->
+  <section class="pat" id="p06">
+    <div class="wrap">
+      <p class="num">06</p>
+      <h2>Snowball loader (pure-CSS)</h2>
+      <p class="what">Zero-JS. High-contrast rework of jkantner&#39;s CodePen (<code>wvXbboe</code>): pure black + pure white, no soft shadows. A conic-gradient <code>track-cover</code> masked to the page background creates the &quot;ball emerges from behind the track&quot; illusion. Sits behind the copy in the &quot;Why now&quot; section.</p>
+      <div class="meta">
+        <span>Deps: <code>none</code></span>
+        <span>Ball cycle: <code>3s linear infinite</code></span>
+        <span>Texture: <code>0.25s scanlines</code></span>
+        <span>Size: scales with <code>font-size</code> (em)</span>
+      </div>
+      <div class="demo snowball-demo">
+        <span class="demo-label">Live</span>
+        <div class="snowball-loader" aria-hidden="true">
+          <div class="pl">
+            <div class="pl__outer-ring"></div>
+            <div class="pl__inner-ring"></div>
+            <div class="pl__track-cover"></div>
+            <div class="pl__ball">
+              <div class="pl__ball-texture"></div>
+              <div class="pl__ball-outer-shadow"></div>
+              <div class="pl__ball-inner-shadow"></div>
+              <div class="pl__ball-side-shadows"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <details class="code"><summary>HTML</summary><pre><code>&lt;div class="snowball-loader" aria-hidden="true"&gt;
+  &lt;div class="pl"&gt;
+    &lt;div class="pl__outer-ring"&gt;&lt;/div&gt;
+    &lt;div class="pl__inner-ring"&gt;&lt;/div&gt;
+    &lt;div class="pl__track-cover"&gt;&lt;/div&gt;
+    &lt;div class="pl__ball"&gt;
+      &lt;div class="pl__ball-texture"&gt;&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre></details>
+      <p class="note">Update <code>--page-bg</code> in the conic-gradient to match the surface you&#39;re dropping this on (currently hard-coded <code>#050507</code>). The whole loader scales via its <code>font-size</code> — everything else is <code>em</code>-based.</p>
+    </div>
+  </section>
+
+  <!-- ═════════ 07 · TIER ICONS ═════════ -->
+  <section class="pat" id="p07">
+    <div class="wrap">
+      <p class="num">07</p>
+      <h2>Bot tier icons — inline SVG with SMIL animations</h2>
+      <p class="what">Three build-tier icons animated entirely inside SVG. No JS, no CSS keyframes — just SMIL <code>&lt;animateTransform&gt;</code> and <code>&lt;animate stroke-dashoffset&gt;</code>. Icons: single bot with jump physics (Light); two bots swapping (Mid); four bots + dashed network flow (Heavy).</p>
+      <div class="demo tier-icons">
+        <div class="tier-icon-card">
+          <div class="icon" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <g>
+                <line x1="32" y1="14" x2="32" y2="18"/>
+                <circle cx="32" cy="13" r="1" fill="currentColor" stroke="none"/>
+                <rect x="22" y="20" width="20" height="20" rx="3" fill="#000"/>
+                <circle cx="28" cy="29" r="1.6" fill="currentColor" stroke="none"/>
+                <circle cx="36" cy="29" r="1.6" fill="currentColor" stroke="none"/>
+                <animateTransform attributeName="transform" type="translate"
+                  values="0 0; 0 -4.5; 0 0; 0 1.5; 0 0; 0 0"
+                  keyTimes="0; 0.18; 0.46; 0.54; 0.62; 1"
+                  calcMode="spline"
+                  keySplines="0.05 0.7 0.3 1; 0.4 0 0.7 1; 0.3 0 0.7 1; 0.1 0.7 0.5 1; 0 0 1 1"
+                  dur="1.4s" repeatCount="indefinite"/>
+              </g>
+            </svg>
+          </div>
+          <p class="lbl">Light — one bot jump</p>
+        </div>
+        <div class="tier-icon-card">
+          <div class="icon" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <g>
+                <line x1="18" y1="14" x2="18" y2="18"/>
+                <circle cx="18" cy="13" r="1" fill="currentColor" stroke="none"/>
+                <rect x="8" y="20" width="20" height="20" rx="3" fill="#000"/>
+                <circle cx="14" cy="29" r="1.4" fill="currentColor" stroke="none"/>
+                <circle cx="22" cy="29" r="1.4" fill="currentColor" stroke="none"/>
+                <animateTransform attributeName="transform" type="translate"
+                  values="0 0; 14 -8; 28 0; 14 -8; 0 0"
+                  keyTimes="0; 0.25; 0.5; 0.75; 1"
+                  dur="3s" repeatCount="indefinite"/>
+              </g>
+              <g>
+                <line x1="46" y1="14" x2="46" y2="18"/>
+                <circle cx="46" cy="13" r="1" fill="currentColor" stroke="none"/>
+                <rect x="36" y="20" width="20" height="20" rx="3" fill="#000"/>
+                <circle cx="42" cy="29" r="1.4" fill="currentColor" stroke="none"/>
+                <circle cx="50" cy="29" r="1.4" fill="currentColor" stroke="none"/>
+                <animateTransform attributeName="transform" type="translate"
+                  values="0 0; -14 8; -28 0; -14 8; 0 0"
+                  keyTimes="0; 0.25; 0.5; 0.75; 1"
+                  dur="3s" repeatCount="indefinite"/>
+              </g>
+            </svg>
+          </div>
+          <p class="lbl">Mid — two bots swap</p>
+        </div>
+        <div class="tier-icon-card">
+          <div class="icon" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="24" y1="14" x2="40" y2="14" stroke-dasharray="3 3">
+                <animate attributeName="stroke-dashoffset" from="0" to="-12" dur="0.9s" repeatCount="indefinite"/>
+              </line>
+              <line x1="50" y1="24" x2="50" y2="40" stroke-dasharray="3 3">
+                <animate attributeName="stroke-dashoffset" from="0" to="-12" dur="0.9s" repeatCount="indefinite"/>
+              </line>
+              <line x1="40" y1="50" x2="24" y2="50" stroke-dasharray="3 3">
+                <animate attributeName="stroke-dashoffset" from="0" to="-12" dur="0.9s" repeatCount="indefinite"/>
+              </line>
+              <line x1="14" y1="40" x2="14" y2="24" stroke-dasharray="3 3">
+                <animate attributeName="stroke-dashoffset" from="0" to="-12" dur="0.9s" repeatCount="indefinite"/>
+              </line>
+              <line x1="24" y1="24" x2="40" y2="40" stroke-dasharray="3 3">
+                <animate attributeName="stroke-dashoffset" from="0" to="-12" dur="0.9s" repeatCount="indefinite"/>
+              </line>
+              <line x1="40" y1="24" x2="24" y2="40" stroke-dasharray="3 3">
+                <animate attributeName="stroke-dashoffset" from="0" to="-12" dur="0.9s" repeatCount="indefinite"/>
+              </line>
+              <rect x="4"  y="4"  width="20" height="20" rx="3" fill="#000"/>
+              <circle cx="10" cy="12" r="1.3" fill="currentColor" stroke="none"/>
+              <circle cx="18" cy="12" r="1.3" fill="currentColor" stroke="none"/>
+              <rect x="40" y="4"  width="20" height="20" rx="3" fill="#000"/>
+              <circle cx="46" cy="12" r="1.3" fill="currentColor" stroke="none"/>
+              <circle cx="54" cy="12" r="1.3" fill="currentColor" stroke="none"/>
+              <rect x="4"  y="40" width="20" height="20" rx="3" fill="#000"/>
+              <circle cx="10" cy="48" r="1.3" fill="currentColor" stroke="none"/>
+              <circle cx="18" cy="48" r="1.3" fill="currentColor" stroke="none"/>
+              <rect x="40" y="40" width="20" height="20" rx="3" fill="#000"/>
+              <circle cx="46" cy="48" r="1.3" fill="currentColor" stroke="none"/>
+              <circle cx="54" cy="48" r="1.3" fill="currentColor" stroke="none"/>
+            </svg>
+          </div>
+          <p class="lbl">Heavy — 4 bots + network flow</p>
+        </div>
+      </div>
+      <p class="note">Colours inherit via <code>currentColor</code> — set the parent&#39;s <code>color</code> to re-skin. The Light-tier icon uses cubic-Bezier <code>keySplines</code> to give the jump real physics: fast lift-off, apex hang, accelerating fall, small landing squash, quick recovery, idle pause. The Heavy-tier network flow is six identical <code>stroke-dashoffset</code> animations locked to the same 0.9s cadence — cheap way to imply data movement without JS.</p>
+    </div>
+  </section>
+
+  <!-- ═════════ 08 · CTA SHINE ═════════ -->
+  <section class="pat" id="p08">
+    <div class="wrap">
+      <p class="num">08</p>
+      <h2>CTA button — periodic shine sweep</h2>
+      <p class="what">A single dark band sweeps across the button once every 2.5s. Uses <code>background-image</code> (not a <code>::after</code>) to stay on the safe side of iOS Safari layering. Arrow slides on hover; button inverts to ghost on hover.</p>
+      <div class="meta">
+        <span>Deps: <code>none</code></span>
+        <span>Cycle: <code>2.5s</code></span>
+        <span>Sweep: <code>~1.5s of the cycle</code></span>
+        <span>iOS-safe: <code>no pseudo-element</code></span>
+      </div>
+      <div class="demo cta-demo">
+        <a class="cta" href="#p08">Book a call</a>
+        <a class="cta ghost" href="#p08">Ghost variant</a>
+      </div>
+      <details class="code"><summary>CSS</summary><pre><code>.cta {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 16px 28px;
+  color: var(--bg-0);
+  border: 1px solid var(--ink); border-radius: 5px;
+  font: inherit; font-size: 15px; font-weight: 600;
+  letter-spacing: -0.005em; text-decoration: none; cursor: pointer;
+  transition: transform 120ms ease, background-color 120ms ease, color 120ms ease;
+
+  background-color: var(--ink);
+  background-image: linear-gradient(110deg,
+    transparent 0%, transparent 30%,
+    rgba(0, 0, 0, 0.55) 50%,
+    transparent 70%, transparent 100%);
+  background-size: 250% 100%;
+  background-repeat: no-repeat;
+  background-position: -130% 0;
+  animation: cta-shine 2.5s ease-in-out infinite;
+}
+@keyframes cta-shine {
+  0%   { background-position: -130% 0; }
+  60%  { background-position:  230% 0; }
+  100% { background-position:  230% 0; }
+}
+.cta::after {
+  content: '→'; display: inline-block;
+  transition: transform 200ms ease;
+}
+.cta:hover { background-color: transparent; color: var(--ink); }
+.cta:hover::after { transform: translateX(4px); }
+.cta.ghost { background: transparent; color: var(--ink); }
+.cta.ghost:hover { background: var(--ink); color: var(--bg-0); }</code></pre></details>
+    </div>
+  </section>
+
+  <!-- ═════════ 09 · ACCORDION POP + SCRAMBLE ═════════ -->
+  <section class="pat" id="p09">
+    <div class="wrap">
+      <p class="num">09</p>
+      <h2>Accordion — badge pop-in + digit scramble</h2>
+      <p class="what">Two effects on one accordion. (a) The number badges scale-and-fade in top-to-bottom on scroll, 110ms apart. (b) Every 5s they scramble their digits and lock back in an outside-in mirror cadence: <code>1+7 → 2+6 → 3+5 → 4</code>, each pair separated by 600ms.</p>
+      <div class="meta">
+        <span>Deps: <code>none</code></span>
+        <span>Badge pop: <code>0.35s scale(0.5) → 1</code></span>
+        <span>Scramble: <code>0.7s per badge</code></span>
+        <span>Cascade: <code>2.5s + 3s pause loop</code></span>
+      </div>
+      <div class="demo">
+        <span class="demo-label">Live</span>
+        <div style="padding: 24px;">
+          <button type="button" class="replay" id="replay-accordion">Replay pop-in</button>
+          <div class="accordion" id="demo-accordion">
+            <details><summary><span class="num"><span class="num-text">01</span></span><span class="title">Sales / BizDev Employee</span><span class="chev">+</span></summary><div class="body">Picks up leads, runs outreach, hands off to a human on reply.</div></details>
+            <details><summary><span class="num"><span class="num-text">02</span></span><span class="title">Content Production Employee</span><span class="chev">+</span></summary><div class="body">20 pieces of content per day, brand voice consistent.</div></details>
+            <details><summary><span class="num"><span class="num-text">03</span></span><span class="title">Finance Team Assistant</span><span class="chev">+</span></summary><div class="body">Crawls 20+ source systems, consolidates invoices, flags anomalies.</div></details>
+            <details><summary><span class="num"><span class="num-text">04</span></span><span class="title">Contract Renewal Agent</span><span class="chev">+</span></summary><div class="body">Watches every contract, pings the right person 60 days out.</div></details>
+            <details><summary><span class="num"><span class="num-text">05</span></span><span class="title">C-Suite Concierge</span><span class="chev">+</span></summary><div class="body">Personal AI for senior managers — lives in WhatsApp.</div></details>
+            <details><summary><span class="num"><span class="num-text">06</span></span><span class="title">Onboarding Buddy Agent</span><span class="chev">+</span></summary><div class="body">New hires productive in days — knows procedures, processes, people.</div></details>
+            <details><summary><span class="num"><span class="num-text">07</span></span><span class="title">On-Demand Project Agent</span><span class="chev">+</span></summary><div class="body">Spun up for a specific project. When it ends, the agent retires.</div></details>
+          </div>
+        </div>
+      </div>
+      <p class="note">Chevron rotates 45° when a <code>&lt;details&gt;</code> is open — native disclosure, zero JS. Full <code>prefers-reduced-motion</code> respect: the scramble module short-circuits and the pop-in has no motion (badges just appear).</p>
+    </div>
+  </section>
+
+  <!-- ═════════ 10 · REVEAL ON SCROLL ═════════ -->
+  <section class="pat" id="p10">
+    <div class="wrap">
+      <p class="num">10</p>
+      <h2>Reveal on scroll</h2>
+      <p class="what">Fade + 16px translateY in, 700ms ease. Triggered when the element crosses 12% of the viewport (with a -40px root-margin so it fires just before edge). Fires once, then unobserves.</p>
+      <div class="meta">
+        <span>Deps: <code>none (IntersectionObserver)</code></span>
+        <span>Duration: <code>700ms</code></span>
+        <span>Threshold: <code>0.12</code></span>
+        <span>Root margin: <code>0 0 -40px 0</code></span>
+      </div>
+      <div class="demo reveal-demo">
+        <span class="demo-label">Live · scroll me back into view</span>
+        <button type="button" class="replay" id="replay-reveal">Replay reveal</button>
+        <div class="row">
+          <div class="box reveal">First item — reveals as you scroll.</div>
+          <div class="box reveal">Second item — same effect, staggered by natural scroll delay.</div>
+        </div>
+        <div class="row">
+          <div class="box reveal">Third item</div>
+          <div class="box reveal">Fourth item</div>
+        </div>
+        <div class="row">
+          <div class="box reveal">Fifth item</div>
+          <div class="box reveal">Sixth item</div>
+        </div>
+      </div>
+      <details class="code"><summary>CSS + JS</summary><pre><code>/* CSS */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 700ms ease, transform 700ms ease;
+  will-change: opacity, transform;
+}
+.reveal.in { opacity: 1; transform: translateY(0); }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+}
+
+/* JS */
+(function () {
+  var els = document.querySelectorAll('.reveal');
+  if (!('IntersectionObserver' in window)) {
+    els.forEach(function (el) { el.classList.add('in'); });
+    return;
+  }
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+  els.forEach(function (el) { io.observe(el); });
+})();</code></pre></details>
+    </div>
+  </section>
+
+  <!-- ═════════ 11 · WORDMARK BLEND ═════════ -->
+  <section class="pat" id="p11">
+    <div class="wrap">
+      <p class="num">11</p>
+      <h2>Wordmark — <code>mix-blend-mode: difference</code></h2>
+      <p class="what">The wordmark inverts against whatever&#39;s behind it. White on dark → white glyphs. White on light → black glyphs. Works over the moving dither field in the hero and stays legible everywhere.</p>
+      <div class="meta">
+        <span>Deps: <code>none</code></span>
+        <span>Blend: <code>difference</code></span>
+        <span>Critical: parent must NOT have z-index / new stacking context</span>
+      </div>
+      <div class="demo wordmark-demo">
+        <div class="bg"></div>
+        <div class="wordmark-frame-demo">
+          <div class="wordmark">Mark Levi Consulting</div>
+        </div>
+      </div>
+      <p class="note">If the wordmark stops inverting, the ancestor picked up an <code>isolation: isolate</code> or a positioned <code>z-index</code> and formed its own stacking context. The blend mode can only reach layers in the same stacking context as the wordmark.</p>
+      <details class="code"><summary>CSS</summary><pre><code>.wordmark {
+  display: inline-block;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  mix-blend-mode: difference;
+  color: #ffffff;
+  line-height: 1;
+  user-select: none;
+}</code></pre></details>
+    </div>
+  </section>
+
+  <!-- ═════════ 12 · BOXED PER-LINE ═════════ -->
+  <section class="pat" id="p12">
+    <div class="wrap">
+      <p class="num">12</p>
+      <h2>Boxed per-line backdrop — <code>box-decoration-break: clone</code></h2>
+      <p class="what">Wrap any text in <code>&lt;span class=&quot;boxed&quot;&gt;</code> and each wrapped line gets its own solid black backdrop. Used everywhere headlines and copy sit on top of the dot field — glyphs stay readable, dots can&#39;t bleed through.</p>
+      <div class="meta">
+        <span>Deps: <code>none</code></span>
+        <span>Uses: <code>-webkit-box-decoration-break: clone</code></span>
+        <span>Padding trick: <code>0 on the left</code> so bg edge aligns with column start</span>
+      </div>
+      <div class="demo boxed-demo">
+        <p><span class="boxed boxed--body">This copy sits on top of a busy dot field. Every wrapped line carries its own black backdrop — that&#39;s the .boxed helper doing its job.</span></p>
+      </div>
+      <details class="code"><summary>CSS</summary><pre><code>.boxed {
+  background: #000000;
+  -webkit-box-decoration-break: clone;
+          box-decoration-break: clone;
+  padding: 0.05em 0.28em 0.05em 0;
+}
+.boxed--body {
+  padding: 0.18em 0.4em 0.18em 0;
+}
+/* Left padding = 0 so the box's left edge equals the span's
+   starting position — which equals the column's content-left.
+   Every headline / sub / button lines up on the same vertical axis. */</code></pre></details>
+    </div>
+  </section>
+
+  <!-- ═════════ 13 · BODY RADIAL ═════════ -->
+  <section class="pat" id="p13">
+    <div class="wrap">
+      <p class="num">13</p>
+      <h2>Body radial gradient — monochrome depth</h2>
+      <p class="what">A fixed <code>body::before</code> lays two very faint elliptical highlights top-and-bottom. Adds atmospheric depth to the otherwise flat monochrome canvas without any colour.</p>
+      <div class="meta">
+        <span>Deps: <code>none</code></span>
+        <span>Layer: <code>body::before, z-index: 0</code></span>
+        <span>Pointer events: <code>none</code></span>
+      </div>
+      <div class="demo radial-demo">
+        <div class="bg"></div>
+        <div class="msg">Two faint ellipses — top &amp; bottom</div>
+      </div>
+      <details class="code"><summary>CSS</summary><pre><code>body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% -10%,
+      rgba(255,255,255,0.06), transparent 60%),
+    radial-gradient(ellipse 60% 40% at 50% 110%,
+      rgba(255,255,255,0.04), transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+main { position: relative; z-index: 1; }</code></pre></details>
+    </div>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <p>Handoff extracted from landing.html · v61 · Mark Levi Consulting.<br>
+    Every pattern in this file matches the production landing page byte-for-byte.</p>
+  </div>
+</footer>
+
+<!-- ══════════════════ RUNTIME ══════════════════ -->
+
+<!-- Dither driver (shared across all 3 backgrounds). -->
+<script type="module">
+  import * as THREE from 'https://esm.sh/three@0.160.0';
+
+  const DITHER_CONFIG = {
+    shape:       'circle',
+    inkColor:    '#ffffff',
+    bgColor:     '#050507',
+    pixelSize:   4,
+    fbmSpeed:    0.05,
+    rippleSpeed: 0.30,
+    rippleThickness: 0.10,
+    presets: {
+      hero:   { density: 0.0,  autoRippleMs: 5000, flowY: 0.00, gradientY: 0.00 },
+      banner: { density: 0.45, autoRippleMs: 3500, flowY: 0.00, gradientY: 0.00 },
+      final:  { density: 0.20, autoRippleMs: 3500, flowY: 0.04, gradientY: 0.10 },
+    },
+  };
+
+  const SHAPES = { square: 0, circle: 1, triangle: 2, diamond: 3 };
+
+  const VERT = `
+void main() { gl_Position = vec4(position, 1.0); }`;
+
+  const FRAG = `
+precision highp float;
+
+uniform vec3  uColor;
+uniform vec2  uResolution;
+uniform float uTime;
+uniform float uPixelSize;
+uniform int   uShapeType;
+uniform float uDensity;
+uniform float uFbmSpeed;
+uniform float uRippleSpeed;
+uniform float uRippleThickness;
+uniform float uFlowY;
+uniform float uGradientY;
+
+const int SHAPE_SQUARE   = 0;
+const int SHAPE_CIRCLE   = 1;
+const int SHAPE_TRIANGLE = 2;
+const int SHAPE_DIAMOND  = 3;
+
+const int MAX_CLICKS = 10;
+uniform vec2  uClickPos[MAX_CLICKS];
+uniform float uClickTimes[MAX_CLICKS];
+
+out vec4 fragColor;
+
+float Bayer2(vec2 a) { a = floor(a); return fract(a.x / 2.0 + a.y * a.y * 0.75); }
+#define Bayer4(a) (Bayer2(0.5*(a))*0.25 + Bayer2(a))
+#define Bayer8(a) (Bayer4(0.5*(a))*0.25 + Bayer2(a))
+
+#define FBM_OCTAVES    5
+#define FBM_LACUNARITY 1.25
+#define FBM_GAIN       1.0
+#define FBM_SCALE      4.0
+
+float hash11(float n) { return fract(sin(n) * 43758.5453); }
+
+float vnoise(vec3 p) {
+  vec3 ip = floor(p);
+  vec3 fp = fract(p);
+  float n000 = hash11(dot(ip + vec3(0.0,0.0,0.0), vec3(1.0,57.0,113.0)));
+  float n100 = hash11(dot(ip + vec3(1.0,0.0,0.0), vec3(1.0,57.0,113.0)));
+  float n010 = hash11(dot(ip + vec3(0.0,1.0,0.0), vec3(1.0,57.0,113.0)));
+  float n110 = hash11(dot(ip + vec3(1.0,1.0,0.0), vec3(1.0,57.0,113.0)));
+  float n001 = hash11(dot(ip + vec3(0.0,0.0,1.0), vec3(1.0,57.0,113.0)));
+  float n101 = hash11(dot(ip + vec3(1.0,0.0,1.0), vec3(1.0,57.0,113.0)));
+  float n011 = hash11(dot(ip + vec3(0.0,1.0,1.0), vec3(1.0,57.0,113.0)));
+  float n111 = hash11(dot(ip + vec3(1.0,1.0,1.0), vec3(1.0,57.0,113.0)));
+  vec3 w = fp*fp*fp*(fp*(fp*6.0-15.0)+10.0);
+  float x00 = mix(n000, n100, w.x);
+  float x10 = mix(n010, n110, w.x);
+  float x01 = mix(n001, n101, w.x);
+  float x11 = mix(n011, n111, w.x);
+  float y0  = mix(x00, x10, w.y);
+  float y1  = mix(x01, x11, w.y);
+  return mix(y0, y1, w.z) * 2.0 - 1.0;
+}
+
+float fbm2(vec2 uv, float t) {
+  vec3 p = vec3(uv * FBM_SCALE, t);
+  float amp  = 1.0;
+  float freq = 1.0;
+  float sum  = 1.0;
+  for (int i = 0; i < FBM_OCTAVES; ++i) {
+    sum  += amp * vnoise(p * freq);
+    freq *= FBM_LACUNARITY;
+    amp  *= FBM_GAIN;
+  }
+  return sum * 0.5 + 0.5;
+}
+
+float maskCircle(vec2 p, float cov) {
+  float r = sqrt(cov) * 0.25;
+  float d = length(p - 0.5) - r;
+  float aa = 0.5 * fwidth(d);
+  return cov * (1.0 - smoothstep(-aa, aa, d * 2.0));
+}
+float maskTriangle(vec2 p, vec2 id, float cov) {
+  bool flip = mod(id.x + id.y, 2.0) > 0.5;
+  if (flip) p.x = 1.0 - p.x;
+  float r  = sqrt(cov);
+  float d  = p.y - r * (1.0 - p.x);
+  float aa = fwidth(d);
+  return cov * clamp(0.5 - d / aa, 0.0, 1.0);
+}
+float maskDiamond(vec2 p, float cov) {
+  float r = sqrt(cov) * 0.564;
+  return step(abs(p.x - 0.49) + abs(p.y - 0.49), r);
+}
+
+void main() {
+  float pixel = uPixelSize;
+  vec2 fragCoord = gl_FragCoord.xy - uResolution * 0.5;
+  float aspect = uResolution.x / uResolution.y;
+
+  vec2 pixelId = floor(fragCoord / pixel);
+  vec2 pixelUV = fract(fragCoord / pixel);
+
+  float cellPx = 8.0 * pixel;
+  vec2 cellId  = floor(fragCoord / cellPx);
+  vec2 cellCoord = cellId * cellPx;
+  vec2 uv = cellCoord / uResolution * vec2(aspect, 1.0);
+
+  vec2 flowUv = uv - vec2(0.0, uTime * uFlowY);
+  float feed = fbm2(flowUv, uTime * uFbmSpeed);
+
+  float ny = gl_FragCoord.y / max(uResolution.y, 1.0);
+  float dens = clamp(uDensity + uGradientY * (1.0 - ny) * 0.55, 0.0, 1.0);
+
+  feed = feed * 0.5 - mix(0.65, 0.10, dens);
+
+  const float dampT = 1.0;
+  const float dampR = 10.0;
+
+  for (int i = 0; i < MAX_CLICKS; ++i) {
+    vec2 pos = uClickPos[i];
+    if (pos.x < 0.0) continue;
+    vec2 cuv = (((pos - uResolution * 0.5 - cellPx * 0.5) / uResolution)) * vec2(aspect, 1.0);
+    float t = max(uTime - uClickTimes[i], 0.0);
+    float r = distance(uv, cuv);
+    float waveR = uRippleSpeed * t;
+    float ring  = exp(-pow((r - waveR) / uRippleThickness, 2.0));
+    float atten = exp(-dampT * t) * exp(-dampR * r);
+    feed = max(feed, ring * atten);
+  }
+
+  float bayer = Bayer8(fragCoord / uPixelSize) - 0.5;
+  float bw    = step(0.5, feed + bayer);
+
+  float coverage = bw;
+  float M;
+  if      (uShapeType == SHAPE_CIRCLE)   M = maskCircle (pixelUV, coverage);
+  else if (uShapeType == SHAPE_TRIANGLE) M = maskTriangle(pixelUV, pixelId, coverage);
+  else if (uShapeType == SHAPE_DIAMOND)  M = maskDiamond(pixelUV, coverage);
+  else                                   M = coverage;
+
+  fragColor = vec4(uColor, M);
+}`;
+
+  const MAX = 10;
+  const clock = new THREE.Clock();
+  const instances = [];
+
+  function initInstance(container, presetName) {
+    const cfg = DITHER_CONFIG;
+    const preset = cfg.presets[presetName] || cfg.presets.hero;
+
+    container.style.backgroundColor = cfg.bgColor;
+
+    const canvas = document.createElement('canvas');
+    const gl = canvas.getContext('webgl2', { antialias: true, alpha: true });
+    if (!gl) {
+      console.warn('[dither] WebGL2 not supported on this device.');
+      return null;
+    }
+    const renderer = new THREE.WebGLRenderer({ canvas, context: gl, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    container.appendChild(canvas);
+
+    const uniforms = {
+      uResolution:      { value: new THREE.Vector2() },
+      uTime:            { value: 0 },
+      uColor:           { value: new THREE.Color(cfg.inkColor) },
+      uClickPos:        { value: Array.from({ length: MAX }, () => new THREE.Vector2(-1, -1)) },
+      uClickTimes:      { value: new Float32Array(MAX) },
+      uShapeType:       { value: SHAPES[cfg.shape] ?? 1 },
+      uPixelSize:       { value: cfg.pixelSize * (renderer.getPixelRatio() || 1) },
+      uDensity:         { value: preset.density },
+      uFbmSpeed:        { value: cfg.fbmSpeed },
+      uRippleSpeed:     { value: cfg.rippleSpeed },
+      uRippleThickness: { value: cfg.rippleThickness },
+      uFlowY:           { value: preset.flowY     ?? 0 },
+      uGradientY:       { value: preset.gradientY ?? 0 },
+    };
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    const material = new THREE.ShaderMaterial({
+      vertexShader: VERT,
+      fragmentShader: FRAG,
+      uniforms,
+      glslVersion: THREE.GLSL3,
+      transparent: true,
+    });
+    scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material));
+
+    function resize() {
+      const rect = container.getBoundingClientRect();
+      const w = Math.max(1, Math.round(rect.width  || container.clientWidth  || window.innerWidth));
+      const h = Math.max(1, Math.round(rect.height || container.clientHeight || 1));
+      renderer.setSize(w, h, false);
+      const dpr = renderer.getPixelRatio();
+      uniforms.uResolution.value.set(w * dpr, h * dpr);
+    }
+    window.addEventListener('resize', resize);
+    if ('ResizeObserver' in window) new ResizeObserver(resize).observe(container);
+    resize();
+
+    let clickIdx = 0;
+    function fireRipple(canvasX, canvasY) {
+      uniforms.uClickPos.value[clickIdx].set(canvasX, canvasY);
+      uniforms.uClickTimes.value[clickIdx] = uniforms.uTime.value;
+      clickIdx = (clickIdx + 1) % MAX;
+    }
+
+    const host = container.parentElement;
+    host.addEventListener('pointerdown', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+      const y = (rect.height - (e.clientY - rect.top)) * (canvas.height / rect.height);
+      fireRipple(x, y);
+    });
+
+    function autoRipple() {
+      if (!canvas.width || !canvas.height) return;
+      fireRipple(Math.random() * canvas.width, Math.random() * canvas.height);
+    }
+    if (preset.autoRippleMs > 0) setInterval(autoRipple, preset.autoRippleMs);
+    setTimeout(autoRipple, 400);
+    setTimeout(autoRipple, 1200);
+
+    let visible = true;
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver((entries) => {
+        visible = entries[0].isIntersecting;
+      }, { threshold: 0 }).observe(container);
+    }
+
+    return {
+      preset: presetName,
+      uniforms,
+      isVisible: () => visible,
+      render: () => renderer.render(scene, camera),
+    };
+  }
+
+  document.querySelectorAll('.dither-bg').forEach((el) => {
+    try {
+      const inst = initInstance(el, el.dataset.preset || 'hero');
+      if (inst) instances.push(inst);
+    } catch (err) {
+      console.error('[dither]', el.dataset.preset, err);
+    }
+  });
+
+  (function tick() {
+    const t = clock.getElapsedTime();
+    instances.forEach((i) => {
+      i.uniforms.uTime.value = t;
+      if (i.isVisible()) i.render();
+    });
+    requestAnimationFrame(tick);
+  })();
+</script>
+
+<!-- Wave dither strip. -->
+<script type="module">
+  import * as THREE from 'https://esm.sh/three@0.160.0';
+
+  (function () {
+    var container = document.getElementById('wave_dither_canvas');
+    if (!container) return;
+
+    var pixelSize = parseFloat(container.dataset.pixelSize) || 4;
+    var inkColor  = container.dataset.ink || '#ffffff';
+
+    var canvas = document.createElement('canvas');
+    var gl = canvas.getContext('webgl2', { antialias: true, alpha: true });
+    if (!gl) return;
+    var renderer = new THREE.WebGLRenderer({ canvas: canvas, context: gl, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    container.appendChild(canvas);
+
+    var VERT = `
+void main() { gl_Position = vec4(position, 1.0); }`;
+
+    var FRAG = `
+precision highp float;
+
+uniform vec2  uResolution;
+uniform float uPixelSize;
+uniform vec3  uColor;
+uniform float uTime;
+
+out vec4 fragColor;
+
+float Bayer2(vec2 a) { a = floor(a); return fract(a.x / 2.0 + a.y * a.y * 0.75); }
+#define Bayer4(a) (Bayer2(0.5*(a))*0.25 + Bayer2(a))
+#define Bayer8(a) (Bayer4(0.5*(a))*0.25 + Bayer2(a))
+
+float maskCircle(vec2 p, float cov) {
+  float r = sqrt(cov) * 0.25;
+  float d = length(p - 0.5) - r;
+  float aa = 0.5 * fwidth(d);
+  return cov * (1.0 - smoothstep(-aa, aa, d * 2.0));
+}
+
+void main() {
+  vec2 fragCoord  = gl_FragCoord.xy;
+  vec2 cellId     = floor(fragCoord / uPixelSize);
+  vec2 cellCenter = (cellId + 0.5) * uPixelSize;
+  vec2 pixelUV    = fract(fragCoord / uPixelSize);
+
+  vec2 uv = cellCenter / uResolution;
+
+  float waveY = 0.50
+    + sin(uv.x *  6.0 + uTime * 1.9) * 0.10
+    + sin(uv.x * 13.0 + uTime * 1.2) * 0.04
+    + sin(uv.x * 24.0 + uTime * 2.8) * 0.02;
+
+  float thickness = 0.10;
+  float dist = abs(uv.y - waveY);
+  float feed = smoothstep(thickness, 0.0, dist);
+
+  float bayer = Bayer8(fragCoord / uPixelSize);
+  float on    = step(bayer, feed);
+  float M     = maskCircle(pixelUV, on);
+
+  fragColor = vec4(uColor, M);
+}`;
+
+    var uniforms = {
+      uResolution: { value: new THREE.Vector2() },
+      uPixelSize:  { value: pixelSize * (renderer.getPixelRatio() || 1) },
+      uColor:      { value: new THREE.Color(inkColor) },
+      uTime:       { value: 0 },
+    };
+
+    var scene = new THREE.Scene();
+    var camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    var material = new THREE.ShaderMaterial({
+      vertexShader: VERT,
+      fragmentShader: FRAG,
+      uniforms: uniforms,
+      glslVersion: THREE.GLSL3,
+      transparent: true,
+    });
+    scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material));
+
+    function resize() {
+      var rect = container.getBoundingClientRect();
+      var w = Math.max(1, Math.round(rect.width  || container.clientWidth  || window.innerWidth));
+      var h = Math.max(1, Math.round(rect.height || container.clientHeight || 1));
+      renderer.setSize(w, h, false);
+      var dpr = renderer.getPixelRatio();
+      uniforms.uResolution.value.set(w * dpr, h * dpr);
+    }
+    window.addEventListener('resize', resize);
+    if ('ResizeObserver' in window) new ResizeObserver(resize).observe(container);
+    resize();
+
+    var visible = true;
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries) {
+        visible = entries[0].isIntersecting;
+      }, { threshold: 0 }).observe(container);
+    }
+
+    var clock = new THREE.Clock();
+    (function tick() {
+      if (visible) {
+        uniforms.uTime.value = clock.getElapsedTime();
+        renderer.render(scene, camera);
+      }
+      requestAnimationFrame(tick);
+    })();
+  })();
+</script>
+
+<!-- AI-node loader. -->
+<script type="module">
+  import * as THREE from 'https://esm.sh/three@0.160.0';
+
+  (function () {
+    var container = document.getElementById('ai_node_canvas');
+    if (!container) return;
+
+    var pixelSize = parseFloat(container.dataset.pixelSize) || 4;
+    var inkColor  = container.dataset.ink || '#ffffff';
+
+    var canvas = document.createElement('canvas');
+    var gl = canvas.getContext('webgl2', { antialias: true, alpha: true });
+    if (!gl) return;
+    var renderer = new THREE.WebGLRenderer({ canvas: canvas, context: gl, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    container.appendChild(canvas);
+
+    var VERT = `
+void main() { gl_Position = vec4(position, 1.0); }`;
+
+    var FRAG = `
+precision highp float;
+
+uniform vec2  uResolution;
+uniform float uPixelSize;
+uniform vec3  uColor;
+uniform float uTime;
+
+out vec4 fragColor;
+
+float Bayer2(vec2 a) { a = floor(a); return fract(a.x / 2.0 + a.y * a.y * 0.75); }
+#define Bayer4(a) (Bayer2(0.5*(a))*0.25 + Bayer2(a))
+#define Bayer8(a) (Bayer4(0.5*(a))*0.25 + Bayer2(a))
+
+float maskCircle(vec2 p, float cov) {
+  float r = sqrt(cov) * 0.25;
+  float d = length(p - 0.5) - r;
+  float aa = 0.5 * fwidth(d);
+  return cov * (1.0 - smoothstep(-aa, aa, d * 2.0));
+}
+
+float sdOctahedron(vec3 p, float s) {
+  p = abs(p);
+  float m = p.x + p.y + p.z - s;
+  vec3 q;
+  if      (3.0 * p.x < m) q = p.xyz;
+  else if (3.0 * p.y < m) q = p.yzx;
+  else if (3.0 * p.z < m) q = p.zxy;
+  else return m * 0.57735027;
+  float k = clamp(0.5 * (q.z - q.y + s), 0.0, s);
+  return length(vec3(q.x, q.y - s + k, q.z - k));
+}
+
+#define N_SATS 6
+
+void main() {
+  vec2 fragCoord  = gl_FragCoord.xy;
+  vec2 cellId     = floor(fragCoord / uPixelSize);
+  vec2 cellCenter = (cellId + 0.5) * uPixelSize;
+  vec2 pixelUV    = fract(fragCoord / uPixelSize);
+
+  float minDim = min(uResolution.x, uResolution.y);
+  vec2 px = (cellCenter - uResolution * 0.5) / minDim;
+
+  float ay = uTime * 0.45;
+  float ax = uTime * 0.30;
+  mat3 ryMat = mat3(
+     cos(ay), 0.0, sin(ay),
+         0.0, 1.0,    0.0,
+    -sin(ay), 0.0, cos(ay));
+  mat3 rxMat = mat3(
+    1.0,      0.0,      0.0,
+    0.0,  cos(ax), -sin(ax),
+    0.0,  sin(ax),  cos(ax));
+  mat3 rot    = rxMat * ryMat;
+  mat3 invRot = transpose(rot);
+
+  float SHAPE_R = 0.225;
+  vec2 ndc = px / SHAPE_R;
+
+  float feed = 0.0;
+  if (length(ndc) < 1.20) {
+    vec3 ro = vec3(ndc, 2.0);
+    vec3 rd = vec3(0.0, 0.0, -1.0);
+    float t = 0.5;
+    bool hit = false;
+    vec3 objP = vec3(0.0);
+    for (int i = 0; i < 24; i++) {
+      vec3 worldP = ro + rd * t;
+      objP = invRot * worldP;
+      float h = sdOctahedron(objP, 1.0);
+      if (h < 0.002) { hit = true; break; }
+      t += h;
+      if (t > 3.5) break;
+    }
+    if (hit) {
+      vec3 nObj = sign(objP) / sqrt(3.0);
+      vec3 N = rot * nObj;
+
+      vec3 key  = normalize(vec3( 0.55, 0.75,  0.55));
+      vec3 fill = normalize(vec3(-0.55,-0.30,  0.40));
+      vec3 V    = vec3(0.0, 0.0, 1.0);
+
+      float diffKey  = max(dot(N, key),  0.0);
+      float diffFill = max(dot(N, fill), 0.0) * 0.30;
+      vec3  R        = reflect(-key, N);
+      float spec     = pow(max(dot(R, V), 0.0), 24.0) * 0.55;
+      float rim      = pow(1.0 - max(dot(N, V), 0.0), 2.5) * 0.18;
+
+      feed = 0.10 + diffKey * 0.65 + diffFill + spec + rim;
+      feed = clamp(feed, 0.0, 1.0);
+    }
+  }
+
+  float SAT_R = 0.40;
+  for (int i = 0; i < N_SATS; i++) {
+    float fi = float(i);
+    float ang = fi * 6.2831853 / float(N_SATS) - 1.5707963;
+    vec2  satPos = vec2(cos(ang), sin(ang)) * SAT_R;
+
+    float satD = length(px - satPos);
+    float satPulse = 0.6 + 0.4 * sin(uTime * 1.4 + fi * 0.85);
+    feed = max(feed, smoothstep(0.045, 0.028, satD) * satPulse);
+
+    vec2 toSat = -satPos;
+    float lineLen = length(toSat);
+    vec2 lineDir = toSat / lineLen;
+    vec2 fromSat = px - satPos;
+    float t = clamp(dot(fromSat, lineDir) / lineLen, 0.0, 1.0);
+    vec2 closest = satPos + lineDir * t * lineLen;
+    float lineD = length(px - closest);
+    feed = max(feed, smoothstep(0.007, 0.003, lineD) * 0.30);
+
+    float dir = mod(fi, 2.0) < 1.0 ? 1.0 : -1.0;
+    for (int j = 0; j < 3; j++) {
+      float jf = float(j);
+      float pos = fract(uTime * 0.55 + fi * 0.13 - jf * 0.07);
+      if (dir < 0.0) pos = 1.0 - pos;
+      vec2 dotPos = satPos + lineDir * pos * lineLen;
+      float dotD  = length(px - dotPos);
+      float strength = 1.0 - jf * 0.30;
+      feed = max(feed, smoothstep(0.030, 0.016, dotD) * strength);
+    }
+  }
+
+  float bayer = Bayer8(fragCoord / uPixelSize);
+  float on    = step(bayer, feed);
+  float M     = maskCircle(pixelUV, on);
+
+  fragColor = vec4(uColor, M);
+}`;
+
+    var uniforms = {
+      uResolution: { value: new THREE.Vector2() },
+      uPixelSize:  { value: pixelSize * (renderer.getPixelRatio() || 1) },
+      uColor:      { value: new THREE.Color(inkColor) },
+      uTime:       { value: 0 },
+    };
+
+    var scene = new THREE.Scene();
+    var camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    var material = new THREE.ShaderMaterial({
+      vertexShader: VERT,
+      fragmentShader: FRAG,
+      uniforms: uniforms,
+      glslVersion: THREE.GLSL3,
+      transparent: true,
+    });
+    scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material));
+
+    function resize() {
+      var rect = container.getBoundingClientRect();
+      var w = Math.max(1, Math.round(rect.width  || container.clientWidth  || window.innerWidth));
+      var h = Math.max(1, Math.round(rect.height || container.clientHeight || 1));
+      renderer.setSize(w, h, false);
+      var dpr = renderer.getPixelRatio();
+      uniforms.uResolution.value.set(w * dpr, h * dpr);
+    }
+    window.addEventListener('resize', resize);
+    if ('ResizeObserver' in window) new ResizeObserver(resize).observe(container);
+    resize();
+
+    var visible = true;
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries) {
+        visible = entries[0].isIntersecting;
+      }, { threshold: 0 }).observe(container);
+    }
+
+    var clock = new THREE.Clock();
+    (function tick() {
+      if (visible) {
+        uniforms.uTime.value = clock.getElapsedTime();
+        renderer.render(scene, camera);
+      }
+      requestAnimationFrame(tick);
+    })();
+  })();
+</script>
+
+<!-- Reveal on scroll — same script as production. -->
+<script>
+  (function () {
+    var els = document.querySelectorAll('.reveal');
+    if (!('IntersectionObserver' in window)) {
+      els.forEach(function (el) { el.classList.add('in'); });
+      return;
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in');
+        } else {
+          entry.target.classList.remove('in');
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    els.forEach(function (el) { io.observe(el); });
+
+    var replay = document.getElementById('replay-reveal');
+    if (replay) {
+      replay.addEventListener('click', function () {
+        els.forEach(function (el) { el.classList.remove('in'); });
+        setTimeout(function () {
+          els.forEach(function (el) {
+            var rect = el.getBoundingClientRect();
+            if (rect.top < window.innerHeight && rect.bottom > 0) {
+              el.classList.add('in');
+            }
+          });
+        }, 60);
+      });
+    }
+  })();
+</script>
+
+<!-- Digit scrambler + pop-in (accordion). -->
+<script>
+  (function () {
+    var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var accordionEl = document.getElementById('demo-accordion');
+    if (!accordionEl) return;
+
+    var nodes = accordionEl.querySelectorAll('.num-text');
+    var truth = Array.prototype.map.call(nodes, function (n) { return n.textContent; });
+
+    var GROUPS = [
+      { idx: [0, 6], offset: 0 },
+      { idx: [1, 5], offset: 600 },
+      { idx: [2, 4], offset: 1200 },
+      { idx: [3],    offset: 1800 },
+    ];
+    var SCRAMBLE_MS = 700;
+    var BADGE_APPEAR_MS = 1000;
+    var PAUSE_MS = 3000;
+
+    function scramble(node, originalText) {
+      var start = performance.now();
+      function tick(now) {
+        var t = (now - start) / SCRAMBLE_MS;
+        if (t >= 1) { node.textContent = originalText; return; }
+        var n = (Math.random() * 100) | 0;
+        node.textContent = (n < 10 ? '0' : '') + n;
+        requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    }
+
+    function runCascade() {
+      if (reduced) return;
+      GROUPS.forEach(function (g) {
+        setTimeout(function () {
+          g.idx.forEach(function (i) { if (nodes[i]) scramble(nodes[i], truth[i]); });
+        }, g.offset);
+      });
+    }
+
+    var loopTimer = null;
+    function loopCycle() {
+      runCascade();
+      loopTimer = setTimeout(loopCycle, 2500 + PAUSE_MS);
+    }
+
+    function startSequence() {
+      accordionEl.classList.add('in-view');
+      setTimeout(loopCycle, BADGE_APPEAR_MS);
+    }
+
+    if (!('IntersectionObserver' in window)) { startSequence(); return; }
+
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          startSequence();
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.05 });
+    io.observe(accordionEl);
+
+    var replay = document.getElementById('replay-accordion');
+    if (replay) {
+      replay.addEventListener('click', function () {
+        accordionEl.classList.remove('in-view');
+        if (loopTimer) { clearTimeout(loopTimer); loopTimer = null; }
+        // force reflow so animation restarts
+        void accordionEl.offsetWidth;
+        accordionEl.classList.add('in-view');
+      });
+    }
+  })();
+</script>
+
+</body>
+</html>
