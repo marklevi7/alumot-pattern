@@ -1,0 +1,2442 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stop paying humans for work machines do better. — Mark Levi Consulting</title>
+  <meta name="description" content="AI Employees that replace human work end-to-end. 80–95% cost reduction. Live in 30 days.">
+  <link rel="preconnect" href="https://rsms.me/">
+  <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+  <style>
+    :root {
+      --bg-0: #050507;
+      --bg-1: #0b0b10;
+      --bg-2: #11121a;
+      --ink: #f3f3f5;
+      --ink-dim: #ececf2;     /* +25% on v12's #c0c0cc — high readability in sun */
+      --ink-faint: #a0a0ad;   /* +25% on v12's #6c6c78 */
+      --line: rgba(255, 255, 255, 0.12);
+      --line-strong: rgba(255, 255, 255, 0.22);
+      --accent: #ffffff;
+    }
+
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    html, body { margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg-0);
+      color: var(--ink);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      font-feature-settings: 'ss01', 'cv11';
+      font-size: 17px;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+    }
+
+    @supports (font-variation-settings: normal) {
+      body { font-family: 'Inter var', -apple-system, BlinkMacSystemFont, sans-serif; }
+    }
+
+    /* Subtle radial gradient backdrop for monochrome depth */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% -10%, rgba(255,255,255,0.06), transparent 60%),
+        radial-gradient(ellipse 60% 40% at 50% 110%, rgba(255,255,255,0.04), transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    main { position: relative; z-index: 1; }
+
+    .wrap {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* The wave-dither canvas is the "floor" of the manifesto block. */
+    #wave_dither_canvas {
+      position: relative;
+      width: 100%;
+      height: 33vh;
+      display: block;
+    }
+    #wave_dither_canvas canvas {
+      display: block;
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    /* WHAT IT IS section gets the same "floor strip" treatment, with
+       a different abstract loader running inside it. */
+    .what-it-is {
+      padding-bottom: 0;
+      position: relative;
+      overflow: hidden;
+    }
+    #ai_node_canvas {
+      position: relative;
+      width: 100%;
+      height: 33vh;
+      display: block;
+      margin-top: 48px;            /* a bit of breathing room from the text */
+    }
+    #ai_node_canvas canvas {
+      display: block;
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    /* ─── INTRO (top of page, before hero) ────────────────────── */
+    /* Layered: solid dark background → opaque lit Dürer shape → dither
+       dot field OVERLAID on top. The pattern reads through as if the
+       shape were "screened" with the dots. */
+    .intro {
+      min-height: 100vh;
+      min-height: 100svh;
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-0);
+    }
+    .durer-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;          /* BEHIND the dither pattern */
+      display: block;
+      pointer-events: none;
+    }
+    /* Force the intro's dither container transparent so the shape below
+       shows through the gaps between dots. Other .dither-bg blocks
+       (hero / banner / final) keep their solid bgColor. */
+    .intro .dither-bg {
+      z-index: 1;
+      background-color: transparent !important;
+    }
+
+    /* ─── HERO ─────────────────────────────────────────────────── */
+    .hero {
+      min-height: 100vh;
+      min-height: 100svh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 96px 0 72px;
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    /* Shared dither-bg layer — used by hero, banner, and final CTA. */
+    .dither-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .dither-bg canvas {
+      display: block;
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    /* No z-index on .wrap — keep .wrap free of a stacking context so
+       mix-blend-mode: difference on headlines can blend with the
+       canvas underneath. DOM order alone keeps content above the bg. */
+    .hero .wrap,
+    .banner .wrap,
+    .final .wrap {
+      position: relative;
+    }
+
+    .hero h1 {
+      font-size: clamp(40px, 9vw, 112px);
+      line-height: 1.05;       /* extra room so the per-line bg doesn't collide */
+      letter-spacing: -0.035em;
+      font-weight: 600;
+      margin: 0 0 32px;
+      max-width: 18ch;
+      color: #ffffff;
+    }
+
+    .hero h1 em {
+      font-style: normal;
+      color: #d4d4d4;
+    }
+
+    .hero .sub {
+      font-size: clamp(16px, 2vw, 20px);
+      color: var(--ink-dim);
+      max-width: 56ch;
+      margin: 0 0 40px;
+      line-height: 1.7;
+    }
+
+    /* Per-line black backdrop so dot pattern can't bleed through text.
+       No box-shadow extension — the bg's left edge equals the span's
+       starting position which equals the column's content-left. That
+       way the text bg lines up exactly with the title and the button
+       on the left side of every block. */
+    .boxed {
+      background: #000000;
+      -webkit-box-decoration-break: clone;
+              box-decoration-break: clone;
+      padding: 0.05em 0.28em 0.05em 0;
+    }
+    .boxed--body {
+      padding: 0.18em 0.4em 0.18em 0;
+    }
+
+    /* ─── WORDMARK ─────────────────────────────────────────────── */
+    /* Frame mirrors .wrap so the wordmark's left edge sits on the
+       same vertical axis as the hero headline / sub / button on every
+       viewport (centred container on desktop, full-width on mobile). */
+    .wordmark-frame {
+      position: absolute;
+      top: 28px;
+      left: 0;
+      right: 0;
+      z-index: 2;
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 24px;
+      pointer-events: none;
+    }
+    .wordmark {
+      display: inline-block;
+      font-size: 17px;             /* matches body text */
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      mix-blend-mode: difference;
+      color: #ffffff;
+      line-height: 1;
+      user-select: none;
+    }
+    @media (max-width: 720px) {
+      .wordmark-frame { top: 22px; }
+      .wordmark { font-size: 16px; letter-spacing: 0.16em; }
+    }
+
+    /* ─── BUTTONS ──────────────────────────────────────────────── */
+    .cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 28px;
+      color: var(--bg-0);
+      border: 1px solid var(--ink);
+      border-radius: 5px;
+      font: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.005em;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform 120ms ease, background-color 120ms ease, color 120ms ease;
+
+      /* Periodic shine — a single dark band sweeps across the
+         button once every 5s. Using background-image (not a pseudo)
+         so it stays on the safe side of iOS Safari layering. */
+      background-color: var(--ink);
+      background-image: linear-gradient(
+        110deg,
+        transparent 0%,
+        transparent 30%,
+        rgba(0, 0, 0, 0.55) 50%,
+        transparent 70%,
+        transparent 100%
+      );
+      background-size: 250% 100%;
+      background-repeat: no-repeat;
+      background-position: -130% 0;
+      animation: cta-shine 2.5s ease-in-out infinite;
+    }
+
+    /* Slower sweep (~1.5s) and twice as often (cycle 2.5s).
+       No scale pulse — button stays the same size. */
+    @keyframes cta-shine {
+      0%   { background-position: -130% 0; }
+      60%  { background-position:  230% 0; }
+      100% { background-position:  230% 0; }
+    }
+
+    .cta::after {
+      content: '→';
+      display: inline-block;
+      transition: transform 200ms ease;
+    }
+
+    .cta:hover {
+      background-color: transparent;
+      color: var(--ink);
+    }
+
+    .cta:hover::after {
+      transform: translateX(4px);
+    }
+
+    .cta.ghost {
+      background: transparent;
+      color: var(--ink);
+    }
+
+    .cta.ghost:hover {
+      background: var(--ink);
+      color: var(--bg-0);
+    }
+
+    /* ─── SECTIONS ─────────────────────────────────────────────── */
+    section { padding: 96px 0; position: relative; }
+    /* Section dividers removed so dot-pattern blocks blend into the
+       neighbouring sections seamlessly. */
+
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin: 0 0 24px;
+      font-weight: 500;
+    }
+
+    h2 {
+      font-size: clamp(32px, 5.5vw, 56px);
+      line-height: 1.02;
+      letter-spacing: -0.03em;
+      font-weight: 600;
+      margin: 0 0 32px;
+      max-width: 22ch;
+    }
+
+    h3 {
+      font-size: clamp(22px, 3vw, 28px);
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      font-weight: 600;
+      margin: 0 0 16px;
+    }
+
+    p { margin: 0 0 16px; color: var(--ink); }
+    p.dim { color: var(--ink-dim); max-width: 60ch; }
+    p:last-child { margin-bottom: 0; }
+
+    .lead {
+      font-size: clamp(18px, 2.2vw, 22px);
+      line-height: 1.5;
+      color: var(--ink-dim);
+      max-width: 60ch;
+    }
+
+    /* ─── SCOREBOARD (Junior vs AI) ────────────────────────────── */
+    .score {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--line);
+      border: 1px solid var(--line);
+      margin-top: 48px;
+    }
+
+    .score .col {
+      background: var(--bg-1);
+      padding: 28px 20px;
+    }
+
+    .score .col.win {
+      background: var(--bg-2);
+    }
+
+    /* Both columns share the same title styling — same font size,
+       weight, color. Reusing the accordion title clamp so the size
+       comes from an existing scale rather than a new one. */
+    .score .col h4 {
+      font-size: clamp(18px, 2.2vw, 22px);
+      letter-spacing: -0.015em;
+      text-transform: none;
+      color: var(--ink);
+      margin: 0 0 24px;
+      font-weight: 500;
+      line-height: 1.25;
+    }
+
+    /* Both icons identical — same size, same color (--ink). */
+    .score .col-icon {
+      width: 60px;
+      height: 60px;
+      margin: 0 0 18px;
+      color: var(--ink);
+    }
+    .score .col-icon svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    @media (max-width: 720px) {
+      .score .col-icon { width: 48px; height: 48px; margin-bottom: 14px; }
+    }
+
+    .score-row {
+      padding: 14px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .score-row:last-child { border-bottom: none; }
+
+    .score-row .label {
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin: 0 0 6px;
+    }
+
+    .score-row .value {
+      font-size: clamp(15px, 2vw, 18px);
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      line-height: 1.25;
+    }
+
+    .col.win .score-row .value {
+      color: var(--ink);
+    }
+
+    .col:not(.win) .score-row .value {
+      color: var(--ink-dim);
+    }
+
+    .score-summary {
+      margin-top: 48px;
+      font-size: clamp(20px, 2.6vw, 28px);
+      line-height: 1.3;
+      letter-spacing: -0.02em;
+      max-width: 30ch;
+      font-weight: 500;
+    }
+    .score-summary span { color: var(--ink-dim); }
+
+    /* ─── MANIFESTO (between hero and scoreboard) ───────────────── */
+    .manifesto {
+      padding: 120px 0 0;          /* no bottom padding — wave hugs the section floor */
+      background: var(--bg-0);
+      position: relative;
+      overflow: hidden;
+    }
+    .manifesto-text {
+      font-size: clamp(28px, 4vw, 40px);   /* big title-style paragraph */
+      line-height: 1.35;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      max-width: 30ch;
+      font-weight: 500;
+      margin: 0;                  /* text bottom sits right above the wave */
+    }
+    @media (max-width: 720px) {
+      .manifesto { padding: 80px 0 0; }
+    }
+
+    /* ─── ACCORDION ────────────────────────────────────────────── */
+    .accordion { margin-top: 48px; border-top: 1px solid var(--line); }
+    .accordion details {
+      border-bottom: 1px solid var(--line);
+    }
+    .accordion summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 28px 0;
+      display: grid;
+      grid-template-columns: 56px 1fr 24px;
+      gap: 16px;
+      align-items: baseline;
+      transition: opacity 150ms ease;
+    }
+    .accordion summary::-webkit-details-marker { display: none; }
+    .accordion summary:hover { opacity: 0.75; }
+
+    .accordion .num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      background: var(--ink);
+      color: var(--bg-0);
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 4px;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0;
+      opacity: 0;                 /* hidden until the section enters view */
+      transform: scale(0.5);
+      transform-origin: 50% 50%;
+    }
+    .accordion.in-view .num {
+      animation: accordion-num-pop 0.35s ease-out both;
+    }
+    .accordion.in-view details:nth-of-type(1) .num { animation-delay: 0.00s; }
+    .accordion.in-view details:nth-of-type(2) .num { animation-delay: 0.11s; }
+    .accordion.in-view details:nth-of-type(3) .num { animation-delay: 0.22s; }
+    .accordion.in-view details:nth-of-type(4) .num { animation-delay: 0.33s; }
+    .accordion.in-view details:nth-of-type(5) .num { animation-delay: 0.44s; }
+    .accordion.in-view details:nth-of-type(6) .num { animation-delay: 0.55s; }
+    .accordion.in-view details:nth-of-type(7) .num { animation-delay: 0.66s; }
+    @keyframes accordion-num-pop {
+      from { opacity: 0; transform: scale(0.5); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    .accordion .num-text {
+      display: inline-block;
+      font-variant-numeric: tabular-nums;   /* keeps width stable mid-scramble */
+    }
+
+    .accordion .title {
+      font-size: clamp(18px, 2.2vw, 22px);
+      font-weight: 500;
+      letter-spacing: -0.015em;
+      line-height: 1.25;
+    }
+
+    .accordion .chev {
+      font-size: 20px;
+      color: var(--ink-faint);
+      transition: transform 200ms ease, color 200ms ease;
+      justify-self: end;
+      line-height: 1;
+    }
+
+    .accordion details[open] .chev {
+      transform: rotate(45deg);
+      color: var(--ink);
+    }
+
+    .accordion .body {
+      padding: 0 0 32px 72px;
+      max-width: 64ch;
+      color: var(--ink-dim);
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .accordion .body p { color: var(--ink-dim); margin-bottom: 12px; }
+    .accordion .body p strong { color: var(--ink); font-weight: 500; }
+
+    /* ─── BUILD TIERS (stacked list with icons) ─────────────────── */
+    .tiers { margin-top: 48px; border-top: 1px solid var(--line); }
+    .tier {
+      padding: 32px 0;
+      border-bottom: 1px solid var(--line);
+      display: grid;
+      grid-template-columns: 64px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+    .tier-icon {
+      width: 56px;
+      height: 56px;
+      color: var(--ink);
+    }
+    .tier-icon svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .tier-content { padding-top: 4px; }
+    .tier .name {
+      font-size: 13px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink);
+      font-weight: 500;
+      margin: 0 0 8px;
+    }
+    .tier .desc {
+      color: var(--ink-dim);
+      font-size: 17px;
+      line-height: 1.5;
+      margin: 0;
+    }
+    .tier .desc em {
+      color: var(--ink-faint);
+      font-style: italic;
+    }
+
+    /* ─── PHASES ───────────────────────────────────────────────── */
+    .phases { margin-top: 48px; }
+    .phase {
+      padding: 28px 0;
+      border-top: 1px solid var(--line);
+      display: grid;
+      grid-template-columns: 56px 1fr;
+      gap: 16px;
+      align-items: baseline;
+    }
+    .phase:last-child { border-bottom: 1px solid var(--line); }
+    .phase .num {
+      font-size: 13px;
+      color: var(--ink-faint);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.04em;
+    }
+    .phase .title {
+      font-size: clamp(18px, 2.2vw, 22px);
+      font-weight: 500;
+      letter-spacing: -0.015em;
+      margin: 0 0 8px;
+      line-height: 1.25;
+    }
+    .phase .body {
+      color: var(--ink-dim);
+      font-size: 16px;
+      line-height: 1.55;
+      max-width: 64ch;
+    }
+
+    /* ─── MID CTA BANNER ───────────────────────────────────────── */
+    .banner {
+      padding: 180px 0;          /* tall, deliberate breathing room */
+      text-align: left;
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+    }
+    .banner .wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .banner h2 {
+      margin: 0;
+      max-width: 20ch;
+      color: #ffffff;
+      line-height: 1.15;
+    }
+    .banner p {
+      color: var(--ink-dim);
+      max-width: 50ch;
+      margin: 0 0 8px;
+      line-height: 1.7;
+    }
+    .banner .eyebrow {
+      line-height: 2;
+    }
+
+    /* ─── FINAL CTA ────────────────────────────────────────────── */
+    .final {
+      padding: 200px 0 360px;       /* extra bottom for the embedded footer */
+      min-height: 100vh;
+      min-height: 100svh;       /* iOS small-viewport unit so no gap appears below */
+      text-align: left;
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      margin-bottom: 0;
+    }
+    /* Belt-and-suspenders: kill any default body trail below the
+       final section so the dot field really is the last visual. */
+    main { margin-bottom: 0; padding-bottom: 0; }
+    body { margin-bottom: 0; padding-bottom: 0; }
+    .final h2 {
+      font-size: clamp(36px, 7vw, 80px);
+      line-height: 1.1;
+      max-width: 18ch;
+      margin: 0 0 24px;
+      color: #ffffff;
+    }
+    .final p {
+      color: var(--ink-dim);
+      font-size: clamp(16px, 2vw, 20px);
+      max-width: 50ch;
+      margin: 0 0 40px;
+      line-height: 1.7;
+    }
+
+    /* ─── REVEAL ANIMATIONS ────────────────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 700ms ease, transform 700ms ease;
+      will-change: opacity, transform;
+    }
+    .reveal.in {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; }
+      .cta, .cta::after, .accordion .chev { transition: none; }
+      /* digit-scrambler JS already short-circuits on prefers-reduced-motion */
+    }
+
+    /* ─── MOBILE ────────────────────────────────────────────────── */
+    @media (max-width: 720px) {
+      body { font-size: 16px; }
+      section { padding: 72px 0; }
+      .hero { padding: 80px 0 56px; }
+      .hero h1 { letter-spacing: -0.03em; }
+
+      .score { grid-template-columns: 1fr 1fr; }
+      .score .col { padding: 20px 14px; }
+      .score-row { padding: 12px 0; }
+
+      .tier {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        padding: 24px 0;
+      }
+
+      .accordion summary {
+        grid-template-columns: 40px 1fr 20px;
+        padding: 22px 0;
+      }
+      .accordion .body { padding-left: 56px; }
+
+      .phase {
+        grid-template-columns: 40px 1fr;
+      }
+
+      .banner { padding: 130px 0; }
+      .final { padding: 140px 0 300px; min-height: 100svh; }
+      .final-footer { bottom: 40px; }
+      .final-footer .wrap { gap: 22px; }
+    }
+
+    /* ─── THEME TOGGLE ─────────────────────────────────────────── */
+    /* Fixed pill top-right. Uses --ink/--bg-0 so it auto-inverts on
+       whichever page it lives (dark → paper pill, light → dark pill). */
+    .theme-toggle {
+      position: fixed;
+      top: 22px;
+      right: 20px;
+      z-index: 20;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      background: var(--ink);
+      color: var(--bg-0);
+      border: 1px solid var(--ink);
+      border-radius: 999px;
+      font: inherit;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      text-decoration: none;
+      line-height: 1;
+      transition: transform 150ms ease, opacity 150ms ease;
+      -webkit-backdrop-filter: blur(6px);
+              backdrop-filter: blur(6px);
+    }
+    .theme-toggle:hover { opacity: 0.85; }
+    .theme-toggle .glyph { font-size: 13px; line-height: 1; }
+    @media (max-width: 720px) {
+      .theme-toggle { top: 18px; right: 16px; padding: 7px 12px; font-size: 10.5px; }
+    }
+
+    /* Small focus ring for accessibility */
+    a:focus-visible, summary:focus-visible, button:focus-visible {
+      outline: 2px solid var(--ink);
+      outline-offset: 4px;
+    }
+
+    /* ─── FOOTER ───────────────────────────────────────────────── */
+    /* No solid panel — the dot pattern flows through the footer area
+       unchanged. Each text node carries its own .boxed cutout so the
+       dots can't bleed through the glyphs. Compact, small, tight. */
+    .final-footer {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 2;
+      padding: 28px 0 24px;
+    }
+    .final-footer .wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .footer-mark {
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink);
+      margin: 0;
+    }
+    .footer-links {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .footer-links a {
+      color: var(--ink);
+      text-decoration: none;
+      font-size: 13px;
+    }
+    .footer-links a:hover { opacity: 0.78; }
+    .footer-meta {
+      margin: 0;
+      font-size: 11px;
+      color: var(--ink);
+      letter-spacing: 0.02em;
+    }
+    @media (min-width: 720px) {
+      .final-footer .wrap {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        column-gap: 32px;
+        row-gap: 8px;
+        align-items: start;
+      }
+      .footer-mark { grid-column: 1; grid-row: 1; }
+      .footer-meta { grid-column: 1; grid-row: 2; }
+      .footer-links {
+        grid-column: 2;
+        grid-row: 1 / span 2;
+        text-align: right;
+        gap: 6px;
+      }
+    }
+
+    /* ════════════════════════════════════════════════════════════
+       SNOWBALL LOADER (experimental — sits inside the WHY NOW
+       section, behind the text and slightly below it).
+       Pure-CSS rolling-ball loader, reskinned black + minimal
+       digital. Source: jkantner / CodePen wvXbboe.
+       All .pl* selectors are scoped under .snowball-loader so they
+       can't bleed into the rest of the page.
+    ════════════════════════════════════════════════════════════ */
+    .why-now {
+      position: relative;
+      overflow: hidden;
+      min-height: 95vh;          /* taller block to make room for the ball */
+    }
+    .why-now .wrap {
+      position: relative;
+      z-index: 2;                /* text above the ball */
+    }
+    .snowball-loader {
+      position: absolute;
+      left: 50%;
+      bottom: 7%;                /* sits clearly below the text */
+      transform: translateX(-50%);
+      font-size: clamp(11px, 3vw, 14px); /* drives the em-based loader size */
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .snowball-loader .pl,
+    .snowball-loader .pl__ball,
+    .snowball-loader .pl__ball-inner-shadow,
+    .snowball-loader .pl__ball-side-shadows,
+    .snowball-loader .pl__ball-texture,
+    .snowball-loader .pl__inner-ring,
+    .snowball-loader .pl__outer-ring,
+    .snowball-loader .pl__track-cover {
+      border-radius: 50%;
+    }
+    .snowball-loader .pl {
+      position: relative;
+      width: 16em;
+      height: 16em;
+    }
+    .snowball-loader .pl__ball,
+    .snowball-loader .pl__ball-inner-shadow,
+    .snowball-loader .pl__ball-outer-shadow,
+    .snowball-loader .pl__ball-side-shadows,
+    .snowball-loader .pl__ball-texture,
+    .snowball-loader .pl__ball-texture::before,
+    .snowball-loader .pl__inner-ring,
+    .snowball-loader .pl__outer-ring,
+    .snowball-loader .pl__track-cover {
+      position: absolute;
+    }
+    .snowball-loader .pl__ball,
+    .snowball-loader .pl__ball-inner-shadow,
+    .snowball-loader .pl__ball-outer-shadow,
+    .snowball-loader .pl__ball-texture::before,
+    .snowball-loader .pl__track-cover {
+      animation: ball 3s linear infinite;
+    }
+    .snowball-loader .pl__ball {
+      top: calc(50% - 1.25em);
+      left: calc(50% - 1.25em);
+      transform: rotate(0) translateY(-6.5em);
+      width: 2.5em;
+      height: 2.5em;
+      background: #ffffff;        /* pure-white flat ball */
+    }
+    /* High-contrast rework: hide every soft shadow so the only thing
+       on screen is pure black, pure white, and the rolling texture. */
+    .snowball-loader .pl__ball-inner-shadow,
+    .snowball-loader .pl__ball-outer-shadow,
+    .snowball-loader .pl__ball-side-shadows {
+      display: none;
+    }
+    .snowball-loader .pl__ball-texture {
+      overflow: hidden;
+      width: 100%;
+      height: 100%;
+      transform: translate3d(0, 0, 0);
+    }
+    /* Pure black scanlines on the white ball — gives the "rolling"
+       cue with maximum contrast. */
+    .snowball-loader .pl__ball-texture::before {
+      animation-name: ballTexture;
+      animation-duration: 0.25s;
+      background:
+        repeating-linear-gradient(
+          90deg,
+          #000 0,
+          #000 1.5px,
+          transparent 1.5px,
+          transparent 5px
+        );
+      content: "";
+      display: block;
+      top: 0;
+      right: 0;
+      width: 200%;
+      height: 100%;
+    }
+    /* Crisp 1.5px white outlines for both rings — no glows, no bevels. */
+    .snowball-loader .pl__inner-ring {
+      border: 1.5px solid #ffffff;
+      box-shadow: none;
+      top: 2.375em;
+      left: 2.375em;
+      width: calc(100% - 4.75em);
+      height: calc(100% - 4.75em);
+    }
+    .snowball-loader .pl__outer-ring {
+      border: 1.5px solid #ffffff;
+      box-shadow: none;
+      top: 0.75em;
+      left: 0.75em;
+      width: calc(100% - 1.5em);
+      height: calc(100% - 1.5em);
+    }
+    .snowball-loader .pl__track-cover {
+      animation-name: trackCover;
+      /* Solid page-bg conic mask — keeps the "ball appears from behind
+         the front of the track" illusion sharp. */
+      background-image: conic-gradient(#050507 210deg, hsla(0, 0%, 0%, 0) 270deg);
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    @keyframes ball {
+      from { transform: rotate(0)      translateY(-6.5em); }
+      50%  { transform: rotate(180deg) translateY(-6em); }
+      to   { transform: rotate(360deg) translateY(-6.5em); }
+    }
+    @keyframes ballInnerShadow {
+      from { transform: rotate(0); }
+      to   { transform: rotate(-360deg); }
+    }
+    @keyframes ballOuterShadow {
+      from { transform: rotate(20deg); }
+      to   { transform: rotate(-340deg); }
+    }
+    @keyframes ballTexture {
+      from { transform: translateX(0); }
+      to   { transform: translateX(50%); }
+    }
+    @keyframes trackCover {
+      from { transform: rotate(0); }
+      to   { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Fixed theme-switch pill top-right. Links to the light-mode twin. -->
+<a class="theme-toggle" href="landing-light.html" aria-label="Switch to light mode">
+  <span class="glyph" aria-hidden="true">☀</span>
+  <span>Light</span>
+</a>
+
+<main>
+
+  <!-- ─── INTRO ────────────────────────────────────────────────── -->
+  <!-- Full-viewport block. Dither pattern in the deep background,
+       Dürer's solid (truncated triangular trapezohedron) sitting on
+       top of it, opaque, flat-shaded, key light top-left-front. -->
+  <section class="intro">
+    <div class="dither-bg" data-preset="intro"></div>
+    <canvas id="durer_canvas" class="durer-canvas" aria-hidden="true"></canvas>
+  </section>
+
+  <!-- ─── HERO ─────────────────────────────────────────────────── -->
+  <section class="hero">
+    <div id="hero_bg" class="dither-bg" data-preset="hero"></div>
+    <div class="wordmark-frame" aria-hidden="true">
+      <div class="wordmark">Mark Levi Consulting</div>
+    </div>
+    <div class="wrap">
+      <h1 class="reveal">Stop paying humans for work machines do better.</h1>
+      <p class="sub reveal"><span class="boxed boxed--body">Custom-built AI Employees deployed inside your existing systems.</span></p>
+      <div class="reveal">
+        <a class="cta" href="https://calendly.com/marklevi/1hour" target="_blank" rel="noopener">Book a call</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── MANIFESTO ────────────────────────────────────────────── -->
+  <section class="manifesto">
+    <div class="wrap">
+      <p class="manifesto-text reveal">Every month you sign off on salaries for work that doesn't need a human anymore. Lead follow-ups. Content. Filing. Compliance. Reports. Calendar wrangling. Invoice reconciliation. Contract renewals. This work doesn't need talent. It needs volume. AI does volume for a fraction of the cost.</p>
+    </div>
+    <!-- Wave-dither strip living at the bottom of this block; behaves
+         as the visual "floor" for the manifesto copy above it. -->
+    <div id="wave_dither_canvas"
+         data-pixel-size="4"
+         data-ink="#ffffff"></div>
+  </section>
+
+  <!-- ─── SCOREBOARD ───────────────────────────────────────────── -->
+  <section>
+    <div class="wrap">
+      <h2 class="reveal">The math your CFO will recognize in five seconds.</h2>
+
+      <div class="score reveal">
+        <div class="col">
+          <div class="col-icon" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="32" cy="22" r="9"/>
+              <path d="M14 54 C14 42 23 36 32 36 C41 36 50 42 50 54"/>
+            </svg>
+          </div>
+          <h4>Junior employee</h4>
+          <div class="score-row">
+            <p class="label">Monthly cost</p>
+            <p class="value">$4,000 – $6,500</p>
+          </div>
+          <div class="score-row">
+            <p class="label">Hours per month</p>
+            <p class="value">160 (with breaks)</p>
+          </div>
+          <div class="score-row">
+            <p class="label">Sick days</p>
+            <p class="value">Yes</p>
+          </div>
+          <div class="score-row">
+            <p class="label">Turnover</p>
+            <p class="value">18 months avg</p>
+          </div>
+          <div class="score-row">
+            <p class="label">Output consistency</p>
+            <p class="value">Variable</p>
+          </div>
+        </div>
+        <div class="col win">
+          <div class="col-icon" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="32" y1="9" x2="32" y2="13"/>
+              <circle cx="32" cy="8.5" r="0.8" fill="currentColor" stroke="none"/>
+              <rect x="23" y="13" width="18" height="18" rx="3"/>
+              <circle cx="28" cy="22" r="1.4" fill="currentColor" stroke="none"/>
+              <circle cx="36" cy="22" r="1.4" fill="currentColor" stroke="none"/>
+              <path d="M14 54 C14 42 23 36 32 36 C41 36 50 42 50 54"/>
+            </svg>
+          </div>
+          <h4>AI Employee</h4>
+          <div class="score-row">
+            <p class="label">Monthly cost</p>
+            <p class="value">$150 – $800</p>
+          </div>
+          <div class="score-row">
+            <p class="label">Hours per month</p>
+            <p class="value">720 (always on)</p>
+          </div>
+          <div class="score-row">
+            <p class="label">Sick days</p>
+            <p class="value">No</p>
+          </div>
+          <div class="score-row">
+            <p class="label">Turnover</p>
+            <p class="value">Doesn't quit</p>
+          </div>
+          <div class="score-row">
+            <p class="label">Output consistency</p>
+            <p class="value">Identical every time</p>
+          </div>
+        </div>
+      </div>
+
+      <p class="score-summary reveal">The cost of a function drops by 80–95%. Output goes up. <span>That's a different category of business.</span></p>
+    </div>
+  </section>
+
+  <!-- ─── WHAT IT IS ───────────────────────────────────────────── -->
+  <section class="what-it-is">
+    <div class="wrap">
+      <h2 class="reveal">What an AI Employee actually is.</h2>
+      <p class="lead reveal">Not a chatbot. Not a copilot. Software that does a job a human currently does, end-to-end, on its own, in the systems you already use. WhatsApp. Email. CRM. AWS. Jira. Government portals. SAP. NetSuite. Wherever the work happens.</p>
+      <p class="lead reveal" style="margin-top: 24px;">It runs 24/7. It learns from every interaction. It asks for approval on what matters. It does the rest silently.</p>
+      <p class="lead reveal" style="margin-top: 24px;">You don't manage it like an employee. You program it by talking to it. <em>"Push everything to tomorrow."</em> Done. <em>"Every Monday at 9am, send me a recap of last week's pipeline."</em> Done. Forever.</p>
+    </div>
+    <!-- Same dither family as the manifesto wave; abstract loader
+         visualising an AI employee as a central node with data
+         flowing in and out along satellite links. -->
+    <div id="ai_node_canvas"
+         data-pixel-size="4"
+         data-ink="#ffffff"></div>
+  </section>
+
+  <!-- ─── 7 EMPLOYEES (accordion) ──────────────────────────────── -->
+  <section>
+    <div class="wrap">
+      <h2 class="reveal">Seven AI Employees. Ready to deploy.</h2>
+
+      <div class="accordion reveal">
+        <details>
+          <summary>
+            <span class="num"><span class="num-text">01</span></span>
+            <span class="title">Sales / BizDev Employee</span>
+            <span class="chev">+</span>
+          </summary>
+          <div class="body">
+            <p>Picks up leads from paid campaigns. Runs WhatsApp and email outreach. Follows up on its own a few times. Hands the lead off to a human the moment they reply.</p>
+            <p><strong>Live at a 13-person agency in Miami.</strong> Replaces a full-time SDR.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>
+            <span class="num"><span class="num-text">02</span></span>
+            <span class="title">Content Production Employee</span>
+            <span class="chev">+</span>
+          </summary>
+          <div class="body">
+            <p>20 pieces of content per day. Brand voice is consistent. Human approval before publishing.</p>
+            <p><strong>Live at a medical news outlet.</strong> Cut content cost from $2,500/month to $500/month. Replaces a full-time content writer.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>
+            <span class="num"><span class="num-text">03</span></span>
+            <span class="title">Finance Team Assistant</span>
+            <span class="chev">+</span>
+          </summary>
+          <div class="body">
+            <p>Crawls 20+ source systems, classifies and consolidates every invoice into your accounting platform. Builds daily, weekly, and monthly reports along the way.</p>
+            <p>Flags abnormal spending. Catches duplicate billing, missed discount terms, and vendor errors. <strong>Recovers 1–3% of annual spend in the first month, and saves the finance team 8 hours a week.</strong></p>
+          </div>
+        </details>
+
+        <details>
+          <summary>
+            <span class="num"><span class="num-text">04</span></span>
+            <span class="title">Contract Renewal Agent</span>
+            <span class="chev">+</span>
+          </summary>
+          <div class="body">
+            <p>Watches every contract: vendor, client, subscription. Knows renewal dates and when auto-renewal traps kick in. Pings the right person 60 days out with full context.</p>
+            <p><strong>Stops the silent leakage.</strong> Saves hundreds or thousands of dollars in avoidable losses.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary>
+            <span class="num"><span class="num-text">05</span></span>
+            <span class="title">C-Suite Concierge</span>
+            <span class="chev">+</span>
+          </summary>
+          <div class="body">
+            <p>Personal AI for senior managers. Lives in WhatsApp. Programmable by talking to it: <em>"push everything to tomorrow,"</em> or <em>"every morning at 10am, send me yesterday's pipeline."</em></p>
+            <p><strong>Replaces an executive assistant for a fraction of the cost.</strong></p>
+          </div>
+        </details>
+
+        <details>
+          <summary>
+            <span class="num"><span class="num-text">06</span></span>
+            <span class="title">Onboarding Buddy Agent</span>
+            <span class="chev">+</span>
+          </summary>
+          <div class="body">
+            <p>New hires stop asking the same 50 questions to 5 different people over 3 weeks. The agent knows the procedures, the processes, and the people.</p>
+            <p>New employees are productive within days. <strong>Saves 30+ hours of manager and HR time per hire.</strong></p>
+          </div>
+        </details>
+
+        <details>
+          <summary>
+            <span class="num"><span class="num-text">07</span></span>
+            <span class="title">On-Demand Project Agent</span>
+            <span class="chev">+</span>
+          </summary>
+          <div class="body">
+            <p>Spun up specifically for a 3-month campaign, a vendor sourcing sprint, or a new brand launch. Manages the process, drafts deliverables, and runs follow-ups.</p>
+            <p><strong>When the project ends, the agent retires.</strong></p>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── MID CTA BANNER ───────────────────────────────────────── -->
+  <section class="banner">
+    <div class="dither-bg" data-preset="banner"></div>
+    <div class="wrap">
+      <h2 class="reveal">$2,500 → $500 a month.</h2>
+      <p class="reveal"><span class="boxed boxed--body">Content cost at a medical news outlet, with one AI Employee. Live in production. Want the same math for your highest-cost workflow?</span></p>
+      <div class="reveal">
+        <a class="cta" href="https://calendly.com/marklevi/1hour" target="_blank" rel="noopener">Book a call</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── BUILD TIERS ──────────────────────────────────────────── -->
+  <section>
+    <div class="wrap">
+      <p class="eyebrow reveal">Build tiers</p>
+      <h2 class="reveal">Custom-built around a specific workflow in your company.</h2>
+
+      <div class="tiers reveal">
+        <div class="tier">
+          <div class="tier-icon" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <g>
+                <line x1="32" y1="14" x2="32" y2="18"/>
+                <circle cx="32" cy="13" r="1" fill="currentColor" stroke="none"/>
+                <rect x="22" y="20" width="20" height="20" rx="3" fill="#000"/>
+                <circle cx="28" cy="29" r="1.6" fill="currentColor" stroke="none"/>
+                <circle cx="36" cy="29" r="1.6" fill="currentColor" stroke="none"/>
+                <!-- Jump physics: fast lift-off (ease-out), apex hang,
+                     accelerating fall (ease-in), small landing squash,
+                     quick recovery, idle pause before next jump. -->
+                <animateTransform attributeName="transform" type="translate"
+                  values="0 0; 0 -4.5; 0 0; 0 1.5; 0 0; 0 0"
+                  keyTimes="0; 0.18; 0.46; 0.54; 0.62; 1"
+                  calcMode="spline"
+                  keySplines="0.05 0.7 0.3 1; 0.4 0 0.7 1; 0.3 0 0.7 1; 0.1 0.7 0.5 1; 0 0 1 1"
+                  dur="1.4s" repeatCount="indefinite"/>
+              </g>
+            </svg>
+          </div>
+          <div class="tier-content">
+            <p class="name">Light build</p>
+            <p class="desc">One task, one system. <em>e.g. inbound lead qualifier on WhatsApp.</em></p>
+          </div>
+        </div>
+
+        <div class="tier">
+          <div class="tier-icon" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <g>
+                <line x1="18" y1="14" x2="18" y2="18"/>
+                <circle cx="18" cy="13" r="1" fill="currentColor" stroke="none"/>
+                <rect x="8" y="20" width="20" height="20" rx="3" fill="#000"/>
+                <circle cx="14" cy="29" r="1.4" fill="currentColor" stroke="none"/>
+                <circle cx="22" cy="29" r="1.4" fill="currentColor" stroke="none"/>
+                <animateTransform attributeName="transform" type="translate"
+                  values="0 0; 14 -8; 28 0; 14 -8; 0 0"
+                  keyTimes="0; 0.25; 0.5; 0.75; 1"
+                  dur="3s" repeatCount="indefinite"/>
+              </g>
+              <g>
+                <line x1="46" y1="14" x2="46" y2="18"/>
+                <circle cx="46" cy="13" r="1" fill="currentColor" stroke="none"/>
+                <rect x="36" y="20" width="20" height="20" rx="3" fill="#000"/>
+                <circle cx="42" cy="29" r="1.4" fill="currentColor" stroke="none"/>
+                <circle cx="50" cy="29" r="1.4" fill="currentColor" stroke="none"/>
+                <animateTransform attributeName="transform" type="translate"
+                  values="0 0; -14 8; -28 0; -14 8; 0 0"
+                  keyTimes="0; 0.25; 0.5; 0.75; 1"
+                  dur="3s" repeatCount="indefinite"/>
+              </g>
+            </svg>
+          </div>
+          <div class="tier-content">
+            <p class="name">Mid build</p>
+            <p class="desc">Multi-step workflow, 2–3 integrations, memory. <em>e.g. Sales/BizDev Agent, Content Factory.</em></p>
+          </div>
+        </div>
+
+        <div class="tier">
+          <div class="tier-icon" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <!-- Lines drawn first (behind bots): square perimeter + X diagonals.
+                   All flow in lock-step via the same dash animation. -->
+              <line x1="24" y1="14" x2="40" y2="14" stroke-dasharray="3 3">
+                <animate attributeName="stroke-dashoffset" from="0" to="-12" dur="0.9s" repeatCount="indefinite"/>
+              </line>
+              <line x1="50" y1="24" x2="50" y2="40" stroke-dasharray="3 3">
+                <animate attributeName="stroke-dashoffset" from="0" to="-12" dur="0.9s" repeatCount="indefinite"/>
+              </line>
+              <line x1="40" y1="50" x2="24" y2="50" stroke-dasharray="3 3">
+                <animate attributeName="stroke-dashoffset" from="0" to="-12" dur="0.9s" repeatCount="indefinite"/>
+              </line>
+              <line x1="14" y1="40" x2="14" y2="24" stroke-dasharray="3 3">
+                <animate attributeName="stroke-dashoffset" from="0" to="-12" dur="0.9s" repeatCount="indefinite"/>
+              </line>
+              <line x1="24" y1="24" x2="40" y2="40" stroke-dasharray="3 3">
+                <animate attributeName="stroke-dashoffset" from="0" to="-12" dur="0.9s" repeatCount="indefinite"/>
+              </line>
+              <line x1="40" y1="24" x2="24" y2="40" stroke-dasharray="3 3">
+                <animate attributeName="stroke-dashoffset" from="0" to="-12" dur="0.9s" repeatCount="indefinite"/>
+              </line>
+
+              <!-- Four bots in the corners. Black fill so they sit cleanly above lines. -->
+              <rect x="4"  y="4"  width="20" height="20" rx="3" fill="#000"/>
+              <circle cx="10" cy="12" r="1.3" fill="currentColor" stroke="none"/>
+              <circle cx="18" cy="12" r="1.3" fill="currentColor" stroke="none"/>
+
+              <rect x="40" y="4"  width="20" height="20" rx="3" fill="#000"/>
+              <circle cx="46" cy="12" r="1.3" fill="currentColor" stroke="none"/>
+              <circle cx="54" cy="12" r="1.3" fill="currentColor" stroke="none"/>
+
+              <rect x="4"  y="40" width="20" height="20" rx="3" fill="#000"/>
+              <circle cx="10" cy="48" r="1.3" fill="currentColor" stroke="none"/>
+              <circle cx="18" cy="48" r="1.3" fill="currentColor" stroke="none"/>
+
+              <rect x="40" y="40" width="20" height="20" rx="3" fill="#000"/>
+              <circle cx="46" cy="48" r="1.3" fill="currentColor" stroke="none"/>
+              <circle cx="54" cy="48" r="1.3" fill="currentColor" stroke="none"/>
+            </svg>
+          </div>
+          <div class="tier-content">
+            <p class="name">Heavy build</p>
+            <p class="desc">Replaces an entire function. Multi-agent, autonomous, runs across your stack with minimal human supervision. <em>e.g. a full marketing department: research, content, scheduling, distribution, reporting — built and run as one system, no headcount.</em></p>
+          </div>
+        </div>
+      </div>
+
+      <p class="lead reveal" style="margin-top: 48px;">Your first AI employee lives in production within <strong style="color: var(--ink); font-weight: 600;">30 days</strong>. Most clients start with one Mid-build agent, see the impact, then deploy two or three more across the company.</p>
+    </div>
+  </section>
+
+  <!-- ─── PHASES ───────────────────────────────────────────────── -->
+  <section>
+    <div class="wrap">
+      <h2 class="reveal">How it works. Five phases.</h2>
+
+      <div class="phases reveal">
+        <div class="phase">
+          <span class="num">01</span>
+          <div>
+            <p class="title">Discovery & quote.</p>
+            <p class="body">A 30-minute call. You tell us where the most painful, most expensive, most repetitive work in your company happens today. We diagnose. We come back with a written scope: which AI Employee replaces it, what it does, build tier, fixed price, timeline. No surprises, no hourly meters.</p>
+          </div>
+        </div>
+        <div class="phase">
+          <span class="num">02</span>
+          <div>
+            <p class="title">Build.</p>
+            <p class="body">Two to four weeks, depending on tier. We map, plan, design, build, integrate, and train your AI Employee on your systems and your data. You see weekly progress. We stay close.</p>
+          </div>
+        </div>
+        <div class="phase">
+          <span class="num">03</span>
+          <div>
+            <p class="title">Stabilize.</p>
+            <p class="body">Your AI Employee goes live in production. Your team starts using it. They'll have questions, edge cases, requests. That's expected. For the first 30 days, we stay close, iterate fast, and shape the agent against real usage. By the end of stabilization, the agent is doing the job the way you and your team want.</p>
+          </div>
+        </div>
+        <div class="phase">
+          <span class="num">04</span>
+          <div>
+            <p class="title">Run.</p>
+            <p class="body">You use the agent like any other team member. We step back. The agent runs on its own.</p>
+          </div>
+        </div>
+        <div class="phase">
+          <span class="num">05</span>
+          <div>
+            <p class="title">Maintain.</p>
+            <p class="body">APIs change. Business rules evolve. We can either continue maintaining the agent for you, or teach your team how to do it. Two paths: knowledge transfer to your team, or a fixed monthly retainer where we keep it running. Your call.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── WHY NOW ──────────────────────────────────────────────── -->
+  <section class="why-now">
+    <div class="wrap">
+      <p class="eyebrow reveal">Why now</p>
+      <h2 class="reveal">Every month you wait, the math gets worse.</h2>
+      <p class="lead reveal">Your competitors are deploying AI Employees right now. Companies that move first this year will operate at a structurally lower cost than the ones that wait. By 2027, the gap is permanent.</p>
+      <p class="lead reveal" style="margin-top: 24px; color: var(--ink);">The question isn't whether to do this. It's which AI Employee you deploy first.</p>
+    </div>
+    <!-- Snowball loader sits behind the text and slightly below it. -->
+    <div class="snowball-loader" aria-hidden="true">
+      <div class="pl">
+        <div class="pl__outer-ring"></div>
+        <div class="pl__inner-ring"></div>
+        <div class="pl__track-cover"></div>
+        <div class="pl__ball">
+          <div class="pl__ball-texture"></div>
+          <div class="pl__ball-outer-shadow"></div>
+          <div class="pl__ball-inner-shadow"></div>
+          <div class="pl__ball-side-shadows"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── WHY US ───────────────────────────────────────────────── -->
+  <section>
+    <div class="wrap">
+      <p class="eyebrow reveal">Why us</p>
+      <h2 class="reveal">We don't sell projects. We sell working employees.</h2>
+      <p class="lead reveal">We're not an agency. We're a small group of senior operators with three execution teams behind us, led by tech executives who have shipped working AI Employees in real businesses over the past year. The case studies above are live deployments, not concept demos.</p>
+      <p class="lead reveal" style="margin-top: 24px;">Fixed price. Fixed timeline. We bring the right team for your problem and run the engagement end to end. One point of contact. No procurement spiral. No agency layers.</p>
+      <p class="lead reveal" style="margin-top: 24px; color: var(--ink);">You buy an AI Employee that works. We make sure it keeps working.</p>
+    </div>
+  </section>
+
+  <!-- ─── FINAL CTA + FOOTER ───────────────────────────────────── -->
+  <section class="final">
+    <div class="dither-bg" data-preset="final"></div>
+    <div class="wrap">
+      <h2 class="reveal">Ready to stop paying for work machines do better?</h2>
+      <p class="reveal"><span class="boxed boxed--body">30 minutes. No deck. No pitch. Just the math and your highest-cost workflow.</span></p>
+      <div class="reveal">
+        <a class="cta" href="https://calendly.com/marklevi/1hour" target="_blank" rel="noopener">Book a call</a>
+      </div>
+    </div>
+    <div class="final-footer">
+      <div class="wrap">
+        <p class="footer-mark"><span class="boxed">Mark Levi Consulting</span></p>
+        <ul class="footer-links">
+          <li><a href="privacy.html"><span class="boxed">Privacy Policy</span></a></li>
+          <li><a href="terms.html"><span class="boxed">Terms &amp; Conditions</span></a></li>
+          <li><a href="accessibility.html"><span class="boxed">Accessibility Statement</span></a></li>
+        </ul>
+        <p class="footer-meta"><span class="boxed">© 2026 Mark Levi Consulting</span></p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script type="module">
+  // ════════════════════════════════════════════════════════════════
+  //  DITHER PATTERN — adapted from Seva Dolgopolov's Codrops demo.
+  //  Drives the moving dot field in the hero, mid-banner, and final
+  //  CTA. To tweak, edit DITHER_CONFIG below.
+  // ════════════════════════════════════════════════════════════════
+  import * as THREE from 'https://esm.sh/three@0.160.0';
+
+  // ─── TWEAK HERE ─────────────────────────────────────────────────
+  const DITHER_CONFIG = {
+    // Shared across all three instances. Change one — change all three.
+    shape:       'circle',   // 'circle' | 'square' | 'triangle' | 'diamond'
+    inkColor:    '#ffffff',  // dot color
+    bgColor:     '#050507',  // backdrop behind the dots
+    pixelSize:   8,          // dot size in CSS pixels (multiplied by DPR internally so the visual size is consistent across devices)
+    fbmSpeed:    0.05,       // how fast the cloud-noise pattern drifts
+    rippleSpeed: 0.30,       // how fast tap/auto ripples spread
+    rippleThickness: 0.10,   // ring width of each ripple
+
+    // Per-section overrides.
+    //   density       : 0 = sparse, 0.5 = clearly visible, 1.0 = saturated
+    //   autoRippleMs  : interval for random ripples (0 to disable)
+    //   flowY         : upward drift speed of the pattern (0 = static)
+    //   gradientY     : extra density at the bottom (0 = uniform, 1 = strong gradient)
+    presets: {
+      intro:  { density: 0.10, autoRippleMs: 4500, flowY: 0.02, gradientY: 0.06 },
+      hero:   { density: 0.0,  autoRippleMs: 5000, flowY: 0.00, gradientY: 0.00 },
+      banner: { density: 0.45, autoRippleMs: 3500, flowY: 0.00, gradientY: 0.00 },
+      final:  { density: 0.20, autoRippleMs: 3500, flowY: 0.04, gradientY: 0.10 },
+    },
+  };
+  // ────────────────────────────────────────────────────────────────
+
+  const SHAPES = { square: 0, circle: 1, triangle: 2, diamond: 3 };
+
+  const VERT = `
+void main() { gl_Position = vec4(position, 1.0); }`;
+
+  const FRAG = `
+precision highp float;
+
+uniform vec3  uColor;
+uniform vec2  uResolution;
+uniform float uTime;
+uniform float uPixelSize;
+uniform int   uShapeType;
+uniform float uDensity;       // 0 = sparse, 1 = saturated
+uniform float uFbmSpeed;
+uniform float uRippleSpeed;
+uniform float uRippleThickness;
+uniform float uFlowY;         // upward drift speed of the noise field
+uniform float uGradientY;     // extra density toward the bottom (0..1)
+
+const int SHAPE_SQUARE   = 0;
+const int SHAPE_CIRCLE   = 1;
+const int SHAPE_TRIANGLE = 2;
+const int SHAPE_DIAMOND  = 3;
+
+const int MAX_CLICKS = 10;
+uniform vec2  uClickPos[MAX_CLICKS];
+uniform float uClickTimes[MAX_CLICKS];
+
+out vec4 fragColor;
+
+float Bayer2(vec2 a) { a = floor(a); return fract(a.x / 2.0 + a.y * a.y * 0.75); }
+#define Bayer4(a) (Bayer2(0.5*(a))*0.25 + Bayer2(a))
+#define Bayer8(a) (Bayer4(0.5*(a))*0.25 + Bayer2(a))
+
+#define FBM_OCTAVES    5
+#define FBM_LACUNARITY 1.25
+#define FBM_GAIN       1.0
+#define FBM_SCALE      4.0
+
+float hash11(float n) { return fract(sin(n) * 43758.5453); }
+
+float vnoise(vec3 p) {
+  vec3 ip = floor(p);
+  vec3 fp = fract(p);
+  float n000 = hash11(dot(ip + vec3(0.0,0.0,0.0), vec3(1.0,57.0,113.0)));
+  float n100 = hash11(dot(ip + vec3(1.0,0.0,0.0), vec3(1.0,57.0,113.0)));
+  float n010 = hash11(dot(ip + vec3(0.0,1.0,0.0), vec3(1.0,57.0,113.0)));
+  float n110 = hash11(dot(ip + vec3(1.0,1.0,0.0), vec3(1.0,57.0,113.0)));
+  float n001 = hash11(dot(ip + vec3(0.0,0.0,1.0), vec3(1.0,57.0,113.0)));
+  float n101 = hash11(dot(ip + vec3(1.0,0.0,1.0), vec3(1.0,57.0,113.0)));
+  float n011 = hash11(dot(ip + vec3(0.0,1.0,1.0), vec3(1.0,57.0,113.0)));
+  float n111 = hash11(dot(ip + vec3(1.0,1.0,1.0), vec3(1.0,57.0,113.0)));
+  vec3 w = fp*fp*fp*(fp*(fp*6.0-15.0)+10.0);
+  float x00 = mix(n000, n100, w.x);
+  float x10 = mix(n010, n110, w.x);
+  float x01 = mix(n001, n101, w.x);
+  float x11 = mix(n011, n111, w.x);
+  float y0  = mix(x00, x10, w.y);
+  float y1  = mix(x01, x11, w.y);
+  return mix(y0, y1, w.z) * 2.0 - 1.0;
+}
+
+float fbm2(vec2 uv, float t) {
+  vec3 p = vec3(uv * FBM_SCALE, t);
+  float amp  = 1.0;
+  float freq = 1.0;
+  float sum  = 1.0;
+  for (int i = 0; i < FBM_OCTAVES; ++i) {
+    sum  += amp * vnoise(p * freq);
+    freq *= FBM_LACUNARITY;
+    amp  *= FBM_GAIN;
+  }
+  return sum * 0.5 + 0.5;
+}
+
+float maskCircle(vec2 p, float cov) {
+  float r = sqrt(cov) * 0.25;
+  float d = length(p - 0.5) - r;
+  float aa = 0.5 * fwidth(d);
+  return cov * (1.0 - smoothstep(-aa, aa, d * 2.0));
+}
+float maskTriangle(vec2 p, vec2 id, float cov) {
+  bool flip = mod(id.x + id.y, 2.0) > 0.5;
+  if (flip) p.x = 1.0 - p.x;
+  float r  = sqrt(cov);
+  float d  = p.y - r * (1.0 - p.x);
+  float aa = fwidth(d);
+  return cov * clamp(0.5 - d / aa, 0.0, 1.0);
+}
+float maskDiamond(vec2 p, float cov) {
+  float r = sqrt(cov) * 0.564;
+  return step(abs(p.x - 0.49) + abs(p.y - 0.49), r);
+}
+
+void main() {
+  float pixel = uPixelSize;
+  vec2 fragCoord = gl_FragCoord.xy - uResolution * 0.5;
+  float aspect = uResolution.x / uResolution.y;
+
+  vec2 pixelId = floor(fragCoord / pixel);
+  vec2 pixelUV = fract(fragCoord / pixel);
+
+  float cellPx = 8.0 * pixel;
+  vec2 cellId  = floor(fragCoord / cellPx);
+  vec2 cellCoord = cellId * cellPx;
+  vec2 uv = cellCoord / uResolution * vec2(aspect, 1.0);
+
+  // Upward flow: shift the sampled noise downward over time so the
+  // visible pattern appears to drift up the screen.
+  vec2 flowUv = uv - vec2(0.0, uTime * uFlowY);
+  float feed = fbm2(flowUv, uTime * uFbmSpeed);
+
+  // Bottom-heavy density: ny=0 at bottom, ny=1 at top. Boost density
+  // near the bottom by uGradientY (0 = uniform, 1 = strong).
+  float ny = gl_FragCoord.y / max(uResolution.y, 1.0);
+  float dens = clamp(uDensity + uGradientY * (1.0 - ny) * 0.55, 0.0, 1.0);
+
+  // density (0..1) shifts the dither offset:
+  //   0 → -0.65 (sparse), 1 → -0.10 (saturated)
+  feed = feed * 0.5 - mix(0.65, 0.10, dens);
+
+  const float dampT = 1.0;
+  const float dampR = 10.0;
+
+  for (int i = 0; i < MAX_CLICKS; ++i) {
+    vec2 pos = uClickPos[i];
+    if (pos.x < 0.0) continue;
+    vec2 cuv = (((pos - uResolution * 0.5 - cellPx * 0.5) / uResolution)) * vec2(aspect, 1.0);
+    float t = max(uTime - uClickTimes[i], 0.0);
+    float r = distance(uv, cuv);
+    float waveR = uRippleSpeed * t;
+    float ring  = exp(-pow((r - waveR) / uRippleThickness, 2.0));
+    float atten = exp(-dampT * t) * exp(-dampR * r);
+    feed = max(feed, ring * atten);
+  }
+
+  float bayer = Bayer8(fragCoord / uPixelSize) - 0.5;
+  float bw    = step(0.5, feed + bayer);
+
+  float coverage = bw;
+  float M;
+  if      (uShapeType == SHAPE_CIRCLE)   M = maskCircle (pixelUV, coverage);
+  else if (uShapeType == SHAPE_TRIANGLE) M = maskTriangle(pixelUV, pixelId, coverage);
+  else if (uShapeType == SHAPE_DIAMOND)  M = maskDiamond(pixelUV, coverage);
+  else                                   M = coverage;
+
+  fragColor = vec4(uColor, M);
+}`;
+
+  const MAX = 10;
+  const clock = new THREE.Clock();
+  const instances = [];
+
+  function initInstance(container, presetName) {
+    const cfg = DITHER_CONFIG;
+    const preset = cfg.presets[presetName] || cfg.presets.hero;
+
+    container.style.backgroundColor = cfg.bgColor;
+
+    const canvas = document.createElement('canvas');
+    const gl = canvas.getContext('webgl2', { antialias: true, alpha: true });
+    if (!gl) {
+      console.warn('[dither] WebGL2 not supported on this device — leaving static bg.');
+      return null;
+    }
+    const renderer = new THREE.WebGLRenderer({ canvas, context: gl, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    container.appendChild(canvas);
+
+    const uniforms = {
+      uResolution:      { value: new THREE.Vector2() },
+      uTime:            { value: 0 },
+      uColor:           { value: new THREE.Color(cfg.inkColor) },
+      uClickPos:        { value: Array.from({ length: MAX }, () => new THREE.Vector2(-1, -1)) },
+      uClickTimes:      { value: new Float32Array(MAX) },
+      uShapeType:       { value: SHAPES[cfg.shape] ?? 1 },
+      // Multiply by DPR so cfg.pixelSize is interpreted in CSS pixels —
+      // dots stay the same visual size whether the screen is retina or not.
+      uPixelSize:       { value: cfg.pixelSize * (renderer.getPixelRatio() || 1) },
+      uDensity:         { value: preset.density },
+      uFbmSpeed:        { value: cfg.fbmSpeed },
+      uRippleSpeed:     { value: cfg.rippleSpeed },
+      uRippleThickness: { value: cfg.rippleThickness },
+      uFlowY:           { value: preset.flowY     ?? 0 },
+      uGradientY:       { value: preset.gradientY ?? 0 },
+    };
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    const material = new THREE.ShaderMaterial({
+      vertexShader: VERT,
+      fragmentShader: FRAG,
+      uniforms,
+      glslVersion: THREE.GLSL3,
+      transparent: true,
+    });
+    scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material));
+
+    function resize() {
+      const rect = container.getBoundingClientRect();
+      const w = Math.max(1, Math.round(rect.width  || container.clientWidth  || window.innerWidth));
+      const h = Math.max(1, Math.round(rect.height || container.clientHeight || 1));
+      renderer.setSize(w, h, false);
+      const dpr = renderer.getPixelRatio();
+      uniforms.uResolution.value.set(w * dpr, h * dpr);
+    }
+    window.addEventListener('resize', resize);
+    if ('ResizeObserver' in window) new ResizeObserver(resize).observe(container);
+    resize();
+
+    let clickIdx = 0;
+    function fireRipple(canvasX, canvasY) {
+      uniforms.uClickPos.value[clickIdx].set(canvasX, canvasY);
+      uniforms.uClickTimes.value[clickIdx] = uniforms.uTime.value;
+      clickIdx = (clickIdx + 1) % MAX;
+    }
+
+    const host = container.parentElement;
+    host.addEventListener('pointerdown', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+      const y = (rect.height - (e.clientY - rect.top)) * (canvas.height / rect.height);
+      fireRipple(x, y);
+    });
+
+    function autoRipple() {
+      if (!canvas.width || !canvas.height) return;
+      fireRipple(Math.random() * canvas.width, Math.random() * canvas.height);
+    }
+    if (preset.autoRippleMs > 0) setInterval(autoRipple, preset.autoRippleMs);
+    setTimeout(autoRipple, 400);
+    setTimeout(autoRipple, 1200);
+
+    let visible = true;
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver((entries) => {
+        visible = entries[0].isIntersecting;
+      }, { threshold: 0 }).observe(container);
+    }
+
+    return {
+      preset: presetName,
+      uniforms,
+      isVisible: () => visible,
+      render: () => renderer.render(scene, camera),
+    };
+  }
+
+  // Initialise every .dither-bg in the page.
+  document.querySelectorAll('.dither-bg').forEach((el) => {
+    try {
+      const inst = initInstance(el, el.dataset.preset || 'hero');
+      if (inst) instances.push(inst);
+    } catch (err) {
+      console.error('[dither]', el.dataset.preset, err);
+    }
+  });
+
+  // Single shared render loop drives all instances in lock-step
+  // (so they all animate to the same time clock).
+  (function tick() {
+    const t = clock.getElapsedTime();
+    instances.forEach((i) => {
+      i.uniforms.uTime.value = t;
+      if (i.isVisible()) i.render();
+    });
+    requestAnimationFrame(tick);
+  })();
+</script>
+
+<script type="module">
+  // Wave Bayer-dither: same Bayer8 threshold + maskCircle dot recipe
+  // the rest of the site uses, fed by a procedural sine-wave brightness
+  // function instead of an image or fbm noise. Wave drifts right→left
+  // via +uTime in the sine phase.
+  import * as THREE from 'https://esm.sh/three@0.160.0';
+
+  (function () {
+    var container = document.getElementById('wave_dither_canvas');
+    if (!container) return;
+
+    var pixelSize = parseFloat(container.dataset.pixelSize) || 4;
+    var inkColor  = container.dataset.ink || '#ffffff';
+
+    var canvas = document.createElement('canvas');
+    var gl = canvas.getContext('webgl2', { antialias: true, alpha: true });
+    if (!gl) {
+      console.warn('[wave-dither] WebGL2 not supported');
+      return;
+    }
+    var renderer = new THREE.WebGLRenderer({ canvas: canvas, context: gl, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    container.appendChild(canvas);
+
+    var VERT = `
+void main() { gl_Position = vec4(position, 1.0); }`;
+
+    var FRAG = `
+precision highp float;
+
+uniform vec2  uResolution;
+uniform float uPixelSize;
+uniform vec3  uColor;
+uniform float uTime;
+
+out vec4 fragColor;
+
+float Bayer2(vec2 a) { a = floor(a); return fract(a.x / 2.0 + a.y * a.y * 0.75); }
+#define Bayer4(a) (Bayer2(0.5*(a))*0.25 + Bayer2(a))
+#define Bayer8(a) (Bayer4(0.5*(a))*0.25 + Bayer2(a))
+
+float maskCircle(vec2 p, float cov) {
+  float r = sqrt(cov) * 0.25;
+  float d = length(p - 0.5) - r;
+  float aa = 0.5 * fwidth(d);
+  return cov * (1.0 - smoothstep(-aa, aa, d * 2.0));
+}
+
+void main() {
+  vec2 fragCoord  = gl_FragCoord.xy;
+  vec2 cellId     = floor(fragCoord / uPixelSize);
+  vec2 cellCenter = (cellId + 0.5) * uPixelSize;
+  vec2 pixelUV    = fract(fragCoord / uPixelSize);
+
+  // Normalised cell-centre coords (origin bottom-left, both 0..1).
+  vec2 uv = cellCenter / uResolution;
+
+  // Wave Y as a stack of sines. +uTime in the phase drifts the
+  // pattern from right to left. Rest-Y centred (0.50) so the wave
+  // sits in the vertical middle of its strip. Time coefficients
+  // bumped ~1.35× from v44 for a bit more energy.
+  float waveY = 0.50
+    + sin(uv.x *  6.0 + uTime * 1.9) * 0.10
+    + sin(uv.x * 13.0 + uTime * 1.2) * 0.04
+    + sin(uv.x * 24.0 + uTime * 2.8) * 0.02;
+
+  // Brightness peaks where the pixel is close to the wave line.
+  float thickness = 0.10;
+  float dist = abs(uv.y - waveY);
+  float feed = smoothstep(thickness, 0.0, dist);
+
+  // Bayer threshold + small-circle dot mask, matching the rest of
+  // the site's dither blocks.
+  float bayer = Bayer8(fragCoord / uPixelSize);
+  float on    = step(bayer, feed);
+  float M     = maskCircle(pixelUV, on);
+
+  fragColor = vec4(uColor, M);
+}`;
+
+    var uniforms = {
+      uResolution: { value: new THREE.Vector2() },
+      uPixelSize:  { value: pixelSize * (renderer.getPixelRatio() || 1) },
+      uColor:      { value: new THREE.Color(inkColor) },
+      uTime:       { value: 0 },
+    };
+
+    var scene = new THREE.Scene();
+    var camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    var material = new THREE.ShaderMaterial({
+      vertexShader: VERT,
+      fragmentShader: FRAG,
+      uniforms: uniforms,
+      glslVersion: THREE.GLSL3,
+      transparent: true,
+    });
+    scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material));
+
+    function resize() {
+      var rect = container.getBoundingClientRect();
+      var w = Math.max(1, Math.round(rect.width  || container.clientWidth  || window.innerWidth));
+      var h = Math.max(1, Math.round(rect.height || container.clientHeight || 1));
+      renderer.setSize(w, h, false);
+      var dpr = renderer.getPixelRatio();
+      uniforms.uResolution.value.set(w * dpr, h * dpr);
+    }
+    window.addEventListener('resize', resize);
+    if ('ResizeObserver' in window) new ResizeObserver(resize).observe(container);
+    resize();
+
+    // Pause render loop when the strip scrolls off-screen.
+    var visible = true;
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries) {
+        visible = entries[0].isIntersecting;
+      }, { threshold: 0 }).observe(container);
+    }
+
+    var clock = new THREE.Clock();
+    (function tick() {
+      if (visible) {
+        uniforms.uTime.value = clock.getElapsedTime();
+        renderer.render(scene, camera);
+      }
+      requestAnimationFrame(tick);
+    })();
+  })();
+</script>
+
+<script type="module">
+  // AI-employee node loader. Procedural scene: a central processing
+  // node, a ring of 6 satellites, faint connecting lines, and dots
+  // travelling along the lines (some inbound, some outbound) to
+  // suggest data flowing into / out of the central agent. Same Bayer-
+  // dither + maskCircle treatment as everywhere else.
+  import * as THREE from 'https://esm.sh/three@0.160.0';
+
+  (function () {
+    var container = document.getElementById('ai_node_canvas');
+    if (!container) return;
+
+    var pixelSize = parseFloat(container.dataset.pixelSize) || 4;
+    var inkColor  = container.dataset.ink || '#ffffff';
+
+    var canvas = document.createElement('canvas');
+    var gl = canvas.getContext('webgl2', { antialias: true, alpha: true });
+    if (!gl) {
+      console.warn('[ai-node] WebGL2 not supported');
+      return;
+    }
+    var renderer = new THREE.WebGLRenderer({ canvas: canvas, context: gl, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    container.appendChild(canvas);
+
+    var VERT = `
+void main() { gl_Position = vec4(position, 1.0); }`;
+
+    var FRAG = `
+precision highp float;
+
+uniform vec2  uResolution;
+uniform float uPixelSize;
+uniform vec3  uColor;
+uniform float uTime;
+
+out vec4 fragColor;
+
+float Bayer2(vec2 a) { a = floor(a); return fract(a.x / 2.0 + a.y * a.y * 0.75); }
+#define Bayer4(a) (Bayer2(0.5*(a))*0.25 + Bayer2(a))
+#define Bayer8(a) (Bayer4(0.5*(a))*0.25 + Bayer2(a))
+
+float maskCircle(vec2 p, float cov) {
+  float r = sqrt(cov) * 0.25;
+  float d = length(p - 0.5) - r;
+  float aa = 0.5 * fwidth(d);
+  return cov * (1.0 - smoothstep(-aa, aa, d * 2.0));
+}
+
+// Signed distance to a centred octahedron (Inigo Quilez).
+float sdOctahedron(vec3 p, float s) {
+  p = abs(p);
+  float m = p.x + p.y + p.z - s;
+  vec3 q;
+  if      (3.0 * p.x < m) q = p.xyz;
+  else if (3.0 * p.y < m) q = p.yzx;
+  else if (3.0 * p.z < m) q = p.zxy;
+  else return m * 0.57735027;
+  float k = clamp(0.5 * (q.z - q.y + s), 0.0, s);
+  return length(vec3(q.x, q.y - s + k, q.z - k));
+}
+
+#define N_SATS 6
+
+void main() {
+  vec2 fragCoord  = gl_FragCoord.xy;
+  vec2 cellId     = floor(fragCoord / uPixelSize);
+  vec2 cellCenter = (cellId + 0.5) * uPixelSize;
+  vec2 pixelUV    = fract(fragCoord / uPixelSize);
+
+  // Aspect-corrected centred coords. Origin at the canvas centre,
+  // 1 unit = the shorter canvas dimension. Keeps the satellite ring
+  // a true circle on any aspect ratio.
+  float minDim = min(uResolution.x, uResolution.y);
+  vec2 px = (cellCenter - uResolution * 0.5) / minDim;
+
+  // ---- centre: opaque, classically-lit octahedron --------------
+  // Raymarched against the octahedron SDF in object space, then
+  // shaded with ambient + diffuse + Phong specular per face. The
+  // resulting brightness becomes the dither feed for the centre,
+  // so highlights = dense dots, shadows = sparse dots.
+  float ay = uTime * 0.45;
+  float ax = uTime * 0.30;
+  mat3 ryMat = mat3(
+     cos(ay), 0.0, sin(ay),
+         0.0, 1.0,    0.0,
+    -sin(ay), 0.0, cos(ay));
+  mat3 rxMat = mat3(
+    1.0,      0.0,      0.0,
+    0.0,  cos(ax), -sin(ax),
+    0.0,  sin(ax),  cos(ax));
+  mat3 rot    = rxMat * ryMat;
+  mat3 invRot = transpose(rot);
+
+  float SHAPE_R = 0.225;           // visual radius in normalised coords (+25% from v49)
+  vec2 ndc = px / SHAPE_R;          // px=(0,0) at centre; ndc spans ~ [-1.5, 1.5] etc.
+
+  float feed = 0.0;
+  // Bounding-sphere reject before raymarching.
+  if (length(ndc) < 1.20) {
+    vec3 ro = vec3(ndc, 2.0);
+    vec3 rd = vec3(0.0, 0.0, -1.0);
+    float t = 0.5;
+    bool hit = false;
+    vec3 objP = vec3(0.0);
+    for (int i = 0; i < 24; i++) {
+      vec3 worldP = ro + rd * t;
+      objP = invRot * worldP;
+      float h = sdOctahedron(objP, 1.0);
+      if (h < 0.002) { hit = true; break; }
+      t += h;
+      if (t > 3.5) break;
+    }
+    if (hit) {
+      // Flat shading via face normal: octahedron faces are aligned to
+      // octants, so sign(p_obj) gives the face normal in object space.
+      vec3 nObj = sign(objP) / sqrt(3.0);
+      vec3 N = rot * nObj;
+
+      // Three-point-ish lighting: key from upper-front, soft fill from
+      // lower-left, subtle rim. Pure scalar, no colour.
+      vec3 key  = normalize(vec3( 0.55, 0.75,  0.55));
+      vec3 fill = normalize(vec3(-0.55,-0.30,  0.40));
+      vec3 V    = vec3(0.0, 0.0, 1.0);
+
+      float diffKey  = max(dot(N, key),  0.0);
+      float diffFill = max(dot(N, fill), 0.0) * 0.30;
+      vec3  R        = reflect(-key, N);
+      float spec     = pow(max(dot(R, V), 0.0), 24.0) * 0.55;
+      float rim      = pow(1.0 - max(dot(N, V), 0.0), 2.5) * 0.18;
+
+      feed = 0.10 + diffKey * 0.65 + diffFill + spec + rim;
+      feed = clamp(feed, 0.0, 1.0);
+    }
+  }
+
+  // Ring of 6 satellites pushed out a bit (centre is bigger now),
+  // with brighter guide lines and trailing data dots.
+  float SAT_R = 0.40;
+  for (int i = 0; i < N_SATS; i++) {
+    float fi = float(i);
+    float ang = fi * 6.2831853 / float(N_SATS) - 1.5707963;
+    vec2  satPos = vec2(cos(ang), sin(ang)) * SAT_R;
+
+    // Satellite node — pulses on its own rhythm.
+    float satD = length(px - satPos);
+    float satPulse = 0.6 + 0.4 * sin(uTime * 1.4 + fi * 0.85);
+    feed = max(feed, smoothstep(0.045, 0.028, satD) * satPulse);
+
+    // Brighter always-on link line.
+    vec2 toSat = -satPos;
+    float lineLen = length(toSat);
+    vec2 lineDir = toSat / lineLen;
+    vec2 fromSat = px - satPos;
+    float t = clamp(dot(fromSat, lineDir) / lineLen, 0.0, 1.0);
+    vec2 closest = satPos + lineDir * t * lineLen;
+    float lineD = length(px - closest);
+    feed = max(feed, smoothstep(0.007, 0.003, lineD) * 0.30);
+
+    // Trailing data dots — 3 dots in a comet, head bright, tail dim.
+    // Alternating direction per satellite (inbound / outbound).
+    float dir = mod(fi, 2.0) < 1.0 ? 1.0 : -1.0;
+    for (int j = 0; j < 3; j++) {
+      float jf = float(j);
+      float pos = fract(uTime * 0.55 + fi * 0.13 - jf * 0.07);
+      if (dir < 0.0) pos = 1.0 - pos;
+      vec2 dotPos = satPos + lineDir * pos * lineLen;
+      float dotD  = length(px - dotPos);
+      float strength = 1.0 - jf * 0.30;
+      feed = max(feed, smoothstep(0.030, 0.016, dotD) * strength);
+    }
+  }
+
+  // Bayer threshold + small-circle mask, matching every other dither
+  // block on the page.
+  float bayer = Bayer8(fragCoord / uPixelSize);
+  float on    = step(bayer, feed);
+  float M     = maskCircle(pixelUV, on);
+
+  fragColor = vec4(uColor, M);
+}`;
+
+    var uniforms = {
+      uResolution: { value: new THREE.Vector2() },
+      uPixelSize:  { value: pixelSize * (renderer.getPixelRatio() || 1) },
+      uColor:      { value: new THREE.Color(inkColor) },
+      uTime:       { value: 0 },
+    };
+
+    var scene = new THREE.Scene();
+    var camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    var material = new THREE.ShaderMaterial({
+      vertexShader: VERT,
+      fragmentShader: FRAG,
+      uniforms: uniforms,
+      glslVersion: THREE.GLSL3,
+      transparent: true,
+    });
+    scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material));
+
+    function resize() {
+      var rect = container.getBoundingClientRect();
+      var w = Math.max(1, Math.round(rect.width  || container.clientWidth  || window.innerWidth));
+      var h = Math.max(1, Math.round(rect.height || container.clientHeight || 1));
+      renderer.setSize(w, h, false);
+      var dpr = renderer.getPixelRatio();
+      uniforms.uResolution.value.set(w * dpr, h * dpr);
+    }
+    window.addEventListener('resize', resize);
+    if ('ResizeObserver' in window) new ResizeObserver(resize).observe(container);
+    resize();
+
+    var visible = true;
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries) {
+        visible = entries[0].isIntersecting;
+      }, { threshold: 0 }).observe(container);
+    }
+
+    var clock = new THREE.Clock();
+    (function tick() {
+      if (visible) {
+        uniforms.uTime.value = clock.getElapsedTime();
+        renderer.render(scene, camera);
+      }
+      requestAnimationFrame(tick);
+    })();
+  })();
+</script>
+
+<script type="module">
+  // ════════════════════════════════════════════════════════════════
+  //  DÜRER'S SOLID — dithered SDF render.
+  //  Same recipe as ai_node_canvas: raymarch the shape's SDF, shade
+  //  it (key light top-left-front + fill + spec + rim), then send
+  //  brightness through the Bayer-8 + circle-mask dither so the shape
+  //  is drawn as dots. Face planes precomputed in JS and passed in
+  //  as a uniform array; the SDF is the max over all plane distances.
+  // ════════════════════════════════════════════════════════════════
+  import * as THREE from 'https://esm.sh/three@0.160.0';
+
+  (function () {
+    const canvas = document.getElementById('durer_canvas');
+    if (!canvas) return;
+
+    // Dürer's solid vertices + 8-face list (2 triangles + 6 pentagons)
+    // from the same construction as v67/v68 (rhombohedron with acute
+    // rhombus angle 72°, then truncated at both apexes at fraction 1/φ).
+    const H = Math.sqrt((3 * Math.sqrt(5) + 5) / 10);
+    const P = 2.0 / (1.0 + Math.sqrt(5));
+    const zM = H / 2;
+    const zC = H * (1.5 - P);
+    const rM = 1.0;
+    const rC = P * 1.0;
+    const s60 = Math.sqrt(3) / 2;
+
+    const V = [
+      [ rM,        0,       -zM],
+      [-rM * 0.5,  rM*s60,  -zM],
+      [-rM * 0.5, -rM*s60,  -zM],
+      [ rM * 0.5,  rM*s60,   zM],
+      [ rM * 0.5, -rM*s60,   zM],
+      [-rM,        0,        zM],
+      [ rC * 0.5,  rC*s60,   zC],
+      [ rC * 0.5, -rC*s60,   zC],
+      [-rC,        0,        zC],
+      [ rC,        0,       -zC],
+      [-rC * 0.5,  rC*s60,  -zC],
+      [-rC * 0.5, -rC*s60,  -zC],
+    ];
+
+    const FACES = [
+      [6, 7, 8],
+      [9, 10, 11],
+      [6, 3, 0, 4, 7],
+      [8, 5, 1, 3, 6],
+      [7, 4, 2, 5, 8],
+      [9, 0, 3, 1, 10],
+      [10, 1, 5, 2, 11],
+      [11, 2, 4, 0, 9],
+    ];
+
+    // Precompute each face's outward-pointing plane (normal + d = n·v).
+    // The shader raymarcher takes max over these 8 as the SDF.
+    const facePlanes = FACES.map(face => {
+      const verts = face.map(i => V[i]);
+      const [p0, p1, p2] = [verts[0], verts[1], verts[2]];
+      const u = [p1[0]-p0[0], p1[1]-p0[1], p1[2]-p0[2]];
+      const v = [p2[0]-p0[0], p2[1]-p0[1], p2[2]-p0[2]];
+      let n = [
+        u[1]*v[2] - u[2]*v[1],
+        u[2]*v[0] - u[0]*v[2],
+        u[0]*v[1] - u[1]*v[0],
+      ];
+      if (n[0]*p0[0] + n[1]*p0[1] + n[2]*p0[2] < 0) n = [-n[0], -n[1], -n[2]];
+      const len = Math.hypot(n[0], n[1], n[2]) || 1;
+      n = [n[0]/len, n[1]/len, n[2]/len];
+      const d = n[0]*p0[0] + n[1]*p0[1] + n[2]*p0[2];
+      return new THREE.Vector4(n[0], n[1], n[2], d);
+    });
+
+    const gl = canvas.getContext('webgl2', { antialias: true, alpha: true });
+    if (!gl) return;
+    const renderer = new THREE.WebGLRenderer({ canvas, context: gl, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+
+    const VERT = `
+void main() { gl_Position = vec4(position, 1.0); }`;
+
+    const FRAG = `
+precision highp float;
+
+uniform vec2  uResolution;
+uniform float uPixelSize;
+uniform vec3  uColor;
+uniform float uTime;
+uniform vec4  uFaces[8];   // xyz = outward normal, w = plane offset
+
+out vec4 fragColor;
+
+float Bayer2(vec2 a) { a = floor(a); return fract(a.x / 2.0 + a.y * a.y * 0.75); }
+#define Bayer4(a) (Bayer2(0.5*(a))*0.25 + Bayer2(a))
+#define Bayer8(a) (Bayer4(0.5*(a))*0.25 + Bayer2(a))
+
+float maskCircle(vec2 p, float cov) {
+  float r = sqrt(cov) * 0.25;
+  float d = length(p - 0.5) - r;
+  float aa = 0.5 * fwidth(d);
+  return cov * (1.0 - smoothstep(-aa, aa, d * 2.0));
+}
+
+// Signed distance to a convex polyhedron = max over face plane distances.
+float sdDurer(vec3 p) {
+  float d = -1e5;
+  for (int i = 0; i < 8; i++) {
+    d = max(d, dot(p, uFaces[i].xyz) - uFaces[i].w);
+  }
+  return d;
+}
+
+// Numerical gradient of the SDF gives the face normal at a hit point.
+vec3 sdDurerNormal(vec3 p) {
+  vec2 e = vec2(0.002, 0.0);
+  return normalize(vec3(
+    sdDurer(p + e.xyy) - sdDurer(p - e.xyy),
+    sdDurer(p + e.yxy) - sdDurer(p - e.yxy),
+    sdDurer(p + e.yyx) - sdDurer(p - e.yyx)
+  ));
+}
+
+void main() {
+  vec2 fragCoord  = gl_FragCoord.xy;
+  vec2 cellId     = floor(fragCoord / uPixelSize);
+  vec2 cellCenter = (cellId + 0.5) * uPixelSize;
+  vec2 pixelUV    = fract(fragCoord / uPixelSize);
+
+  float minDim = min(uResolution.x, uResolution.y);
+  vec2 px = (cellCenter - uResolution * 0.5) / minDim;
+
+  // Same rotation cadence as ai_node_canvas.
+  float ay = uTime * 0.45;
+  float ax = uTime * 0.30;
+  mat3 ryMat = mat3(
+     cos(ay), 0.0, sin(ay),
+         0.0, 1.0,    0.0,
+    -sin(ay), 0.0, cos(ay));
+  mat3 rxMat = mat3(
+    1.0,      0.0,      0.0,
+    0.0,  cos(ax), -sin(ax),
+    0.0,  sin(ax),  cos(ax));
+  mat3 rot    = rxMat * ryMat;
+  mat3 invRot = transpose(rot);
+
+  float SHAPE_R = 0.32;
+  vec2 ndc = px / SHAPE_R;
+
+  float feed = 0.0;
+  // Bounding-sphere reject before raymarching.
+  if (length(ndc) < 1.6) {
+    vec3 ro = vec3(ndc, 3.0);
+    vec3 rd = vec3(0.0, 0.0, -1.0);
+    float t = 1.5;
+    bool hit = false;
+    vec3 objP = vec3(0.0);
+    for (int i = 0; i < 40; i++) {
+      vec3 worldP = ro + rd * t;
+      objP = invRot * worldP;
+      float h = sdDurer(objP);
+      if (h < 0.001) { hit = true; break; }
+      t += max(h, 0.01);
+      if (t > 5.0) break;
+    }
+    if (hit) {
+      vec3 objN = sdDurerNormal(objP);
+      vec3 N = rot * objN;
+
+      // Key light top-left-front, soft fill from bottom-right,
+      // Phong spec + rim — same shading rig as the AI-node loader.
+      vec3 key  = normalize(vec3(-0.55, 0.75,  0.55));
+      vec3 fill = normalize(vec3( 0.55,-0.30,  0.40));
+      vec3 V    = vec3(0.0, 0.0, 1.0);
+
+      float diffKey  = max(dot(N, key),  0.0);
+      float diffFill = max(dot(N, fill), 0.0) * 0.30;
+      vec3  R        = reflect(-key, N);
+      float spec     = pow(max(dot(R, V), 0.0), 24.0) * 0.55;
+      float rim      = pow(1.0 - max(dot(N, V), 0.0), 2.5) * 0.18;
+
+      feed = 0.10 + diffKey * 0.65 + diffFill + spec + rim;
+      feed = clamp(feed, 0.0, 1.0);
+    }
+  }
+
+  float bayer = Bayer8(fragCoord / uPixelSize);
+  float on    = step(bayer, feed);
+  float M     = maskCircle(pixelUV, on);
+
+  fragColor = vec4(uColor, M);
+}`;
+
+    const uniforms = {
+      uResolution: { value: new THREE.Vector2() },
+      uPixelSize:  { value: 8 * (renderer.getPixelRatio() || 1) },
+      uColor:      { value: new THREE.Color('#ffffff') },
+      uTime:       { value: 0 },
+      uFaces:      { value: facePlanes },
+    };
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    const material = new THREE.ShaderMaterial({
+      vertexShader: VERT,
+      fragmentShader: FRAG,
+      uniforms: uniforms,
+      glslVersion: THREE.GLSL3,
+      transparent: true,
+    });
+    scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material));
+
+    function resize() {
+      const rect = canvas.getBoundingClientRect();
+      const w = Math.max(1, Math.round(rect.width  || canvas.clientWidth  || window.innerWidth));
+      const h = Math.max(1, Math.round(rect.height || canvas.clientHeight || window.innerHeight));
+      renderer.setSize(w, h, false);
+      const dpr = renderer.getPixelRatio();
+      uniforms.uResolution.value.set(w * dpr, h * dpr);
+    }
+    window.addEventListener('resize', resize);
+    if ('ResizeObserver' in window) new ResizeObserver(resize).observe(canvas);
+    resize();
+
+    let visible = true;
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver((entries) => {
+        visible = entries[0].isIntersecting;
+      }, { threshold: 0 }).observe(canvas);
+    }
+
+    const clock = new THREE.Clock();
+    (function tick() {
+      if (visible) {
+        uniforms.uTime.value = clock.getElapsedTime();
+        renderer.render(scene, camera);
+      }
+      requestAnimationFrame(tick);
+    })();
+  })();
+</script>
+
+<script>
+  // Reveal-on-scroll using IntersectionObserver
+  (function () {
+    var els = document.querySelectorAll('.reveal');
+    if (!('IntersectionObserver' in window)) {
+      els.forEach(function (el) { el.classList.add('in'); });
+      return;
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    els.forEach(function (el) { io.observe(el); });
+  })();
+</script>
+
+<script>
+  // Digit scrambler for the accordion number badges. Each badge cycles
+  // its digit text through random 2-digit combinations for ~0.7s, then
+  // locks back to its true value. Uses the outside-in mirror cadence
+  // so the seven items pulse in pairs (1+7, 2+6, 3+5, 4 alone) on a
+  // perpetual 5s loop.
+  (function () {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    var nodes = document.querySelectorAll('.accordion .num-text');
+    if (!nodes.length) return;
+
+    // Outside-in mirror grouping → relative offset within each loop.
+    var GROUPS = [
+      { idx: [0, 6], offset: 0 },     // items 1 & 7
+      { idx: [1, 5], offset: 600 },   // items 2 & 6
+      { idx: [2, 4], offset: 1200 },  // items 3 & 5
+      { idx: [3],    offset: 1800 },  // item 4
+    ];
+    var SCRAMBLE_MS = 700;
+    var LOOP_MS = 5000;
+
+    // Capture each badge's "true" value so we can lock it back after the
+    // scramble pass finishes.
+    var truth = Array.prototype.map.call(nodes, function (n) { return n.textContent; });
+
+    function scramble(node, originalText) {
+      var start = performance.now();
+      function tick(now) {
+        var t = (now - start) / SCRAMBLE_MS;
+        if (t >= 1) { node.textContent = originalText; return; }
+        // Random 2-digit string with leading zeros preserved.
+        var n = (Math.random() * 100) | 0;
+        node.textContent = (n < 10 ? '0' : '') + n;
+        requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    }
+
+    var BADGE_APPEAR_MS = 1000;   // squares pop in top→bottom in ~1s
+    var PAUSE_MS = 3000;          // pause between scramble cycles
+
+    function runCascade() {
+      // Outside-in mirror cascade — pairs scramble in sequence.
+      GROUPS.forEach(function (g) {
+        setTimeout(function () {
+          g.idx.forEach(function (i) { scramble(nodes[i], truth[i]); });
+        }, g.offset);
+      });
+    }
+
+    function loopCycle() {
+      runCascade();
+      // Cascade tail = last group offset (1800) + scramble (700) = 2500ms.
+      setTimeout(loopCycle, 2500 + PAUSE_MS);
+    }
+
+    function startSequence(accordionEl) {
+      accordionEl.classList.add('in-view');             // CSS pop-in starts
+      setTimeout(loopCycle, BADGE_APPEAR_MS);            // scramble cycles after pop-in
+    }
+
+    // Hold off until the accordion scrolls into view — first square
+    // entering the viewport kicks off the whole sequence.
+    var accordionEl = document.querySelector('.accordion');
+    if (!accordionEl) return;
+    if (!('IntersectionObserver' in window)) { startSequence(accordionEl); return; }
+
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          startSequence(entry.target);
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.05 });
+    io.observe(accordionEl);
+  })();
+</script>
+
+</body>
+</html>
