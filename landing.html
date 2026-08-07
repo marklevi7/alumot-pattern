@@ -2112,23 +2112,42 @@ void main() {
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 
-    // ── Vertices (12) — top/bottom triangle caps + upper/lower middle rings.
-    //    ConvexGeometry below computes the closed manifold hull from these
-    //    points, so we don't need to trust the polygon face list (which had
-    //    a non-manifold edge in the source spec).
+    // ── Vertices (12) — Dürer's solid, built as the truncated triangular
+    //    trapezohedron. Recipe (Wolfram): start with a rhombohedron whose
+    //    rhombic faces have acute angle 72°, then truncate both 3-fold
+    //    apexes with a plane perpendicular to the axis.
+    //
+    //    Rhombohedron half-height h with cos(72°) = (-1/2 + h²)/(1 + h²)
+    //    gives h = √((3√5 + 5)/10) ≈ 1.0820. Truncation fraction p = 1/φ
+    //    ≈ 0.618 lands all 12 verts on a shared circumsphere.
+    //
+    //    6 middle verts (rhombohedron equator, z = ±h/2) + 3 top-cap verts
+    //    (z = h(3/2 − p)) + 3 bottom-cap verts (mirror below).
+    const H = Math.sqrt((3 * Math.sqrt(5) + 5) / 10);   // ≈ 1.0820
+    const P = 2.0 / (1.0 + Math.sqrt(5));               // 1/φ ≈ 0.6180
+    const zM = H / 2;                                   // middle-ring half-height
+    const zC = H * (1.5 - P);                           // triangle-cap half-height
+    const rM = 1.0;                                     // middle-ring radius (unit)
+    const rC = P * 1.0;                                 // top/bottom triangle radius
+    const s60 = Math.sqrt(3) / 2;                       // sin 60°
+
     const V = [
-      new THREE.Vector3( 0.000,  1.000,  1.414),  // 0
-      new THREE.Vector3( 0.866, -0.500,  1.414),  // 1
-      new THREE.Vector3(-0.866, -0.500,  1.414),  // 2
-      new THREE.Vector3( 0.000, -1.000, -1.414),  // 3
-      new THREE.Vector3(-0.866,  0.500, -1.414),  // 4
-      new THREE.Vector3( 0.866,  0.500, -1.414),  // 5
-      new THREE.Vector3( 1.414,  0.000,  0.500),  // 6
-      new THREE.Vector3(-0.707,  1.225,  0.500),  // 7
-      new THREE.Vector3(-0.707, -1.225,  0.500),  // 8
-      new THREE.Vector3(-1.414,  0.000, -0.500),  // 9
-      new THREE.Vector3( 0.707, -1.225, -0.500),  // 10
-      new THREE.Vector3( 0.707,  1.225, -0.500),  // 11
+      // Middle (lower) ring — z = −h/2, on 120° angles at 0°/120°/240°.
+      new THREE.Vector3( rM,        0,       -zM),  // 0  v100
+      new THREE.Vector3(-rM * 0.5,  rM*s60,  -zM),  // 1  v010
+      new THREE.Vector3(-rM * 0.5, -rM*s60,  -zM),  // 2  v001
+      // Middle (upper) ring — z = +h/2, rotated 60° from the lower ring.
+      new THREE.Vector3( rM * 0.5,  rM*s60,   zM),  // 3  v110
+      new THREE.Vector3( rM * 0.5, -rM*s60,   zM),  // 4  v101
+      new THREE.Vector3(-rM,        0,        zM),  // 5  v011
+      // Top triangle cap (truncation of top apex).
+      new THREE.Vector3( rC * 0.5,  rC*s60,   zC),  // 6  T1
+      new THREE.Vector3( rC * 0.5, -rC*s60,   zC),  // 7  T2
+      new THREE.Vector3(-rC,        0,        zC),  // 8  T3
+      // Bottom triangle cap (truncation of bottom apex).
+      new THREE.Vector3( rC,        0,       -zC),  // 9  B1
+      new THREE.Vector3(-rC * 0.5,  rC*s60,  -zC),  // 10 B2
+      new THREE.Vector3(-rC * 0.5, -rC*s60,  -zC),  // 11 B3
     ];
 
     const geometry = new ConvexGeometry(V);
@@ -2174,7 +2193,7 @@ void main() {
       camera.aspect = w / h;
       // Scale the shape mildly so it stays visually similar across aspects.
       const scale = Math.min(1.0, h / 700);
-      mesh.scale.setScalar(0.85 * (0.85 + scale * 0.25));
+      mesh.scale.setScalar(1.35 * (0.85 + scale * 0.25));
       camera.updateProjectionMatrix();
     }
     window.addEventListener('resize', resize);
