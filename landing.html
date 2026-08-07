@@ -94,10 +94,9 @@
     }
 
     /* ─── INTRO (top of page, before hero) ────────────────────── */
-    /* Full-viewport block. Dither pattern in the deep background,
-       Dürer's solid raymeshed via Three.js sitting on top of it,
-       rotating with the same rotY 0.45 / rotX 0.30 cadence as the
-       AI-node loader below. Key light from top-left-front. */
+    /* Layered: solid dark background → opaque lit Dürer shape → dither
+       dot field OVERLAID on top. The pattern reads through as if the
+       shape were "screened" with the dots. */
     .intro {
       min-height: 100vh;
       min-height: 100svh;
@@ -107,15 +106,23 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      background: var(--bg-0);
     }
     .durer-canvas {
       position: absolute;
       inset: 0;
       width: 100%;
       height: 100%;
-      z-index: 1;
+      z-index: 0;          /* BEHIND the dither pattern */
       display: block;
       pointer-events: none;
+    }
+    /* Force the intro's dither container transparent so the shape below
+       shows through the gaps between dots. Other .dither-bg blocks
+       (hero / banner / final) keep their solid bgColor. */
+    .intro .dither-bg {
+      z-index: 1;
+      background-color: transparent !important;
     }
 
     /* ─── HERO ─────────────────────────────────────────────────── */
@@ -1442,7 +1449,7 @@
     shape:       'circle',   // 'circle' | 'square' | 'triangle' | 'diamond'
     inkColor:    '#ffffff',  // dot color
     bgColor:     '#050507',  // backdrop behind the dots
-    pixelSize:   4,          // dot size in CSS pixels (multiplied by DPR internally so the visual size is consistent across devices)
+    pixelSize:   8,          // dot size in CSS pixels (multiplied by DPR internally so the visual size is consistent across devices)
     fbmSpeed:    0.05,       // how fast the cloud-noise pattern drifts
     rippleSpeed: 0.30,       // how fast tap/auto ripples spread
     rippleThickness: 0.10,   // ring width of each ripple

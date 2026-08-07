@@ -103,15 +103,21 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      background: var(--bg-0);
     }
     .durer-canvas {
       position: absolute;
       inset: 0;
       width: 100%;
       height: 100%;
-      z-index: 1;
+      z-index: 0;          /* BEHIND the dither pattern */
       display: block;
       pointer-events: none;
+    }
+    /* Intro's dither container transparent so shape shows through. */
+    .intro .dither-bg {
+      z-index: 1;
+      background-color: transparent !important;
     }
 
     /* ─── HERO ─────────────────────────────────────────────────── */
@@ -1435,7 +1441,7 @@
     shape:       'circle',   // 'circle' | 'square' | 'triangle' | 'diamond'
     inkColor:    '#1F1830',  // dot color (dark ink for light mode)
     bgColor:     '#FAF8F4',  // paper backdrop behind the dots
-    pixelSize:   4,          // dot size in CSS pixels (multiplied by DPR internally so the visual size is consistent across devices)
+    pixelSize:   8,          // dot size in CSS pixels (multiplied by DPR internally so the visual size is consistent across devices)
     fbmSpeed:    0.05,       // how fast the cloud-noise pattern drifts
     rippleSpeed: 0.30,       // how fast tap/auto ripples spread
     rippleThickness: 0.10,   // ring width of each ripple
