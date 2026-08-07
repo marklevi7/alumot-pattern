@@ -2091,7 +2091,6 @@ void main() {
   // key light top-left-front, rotating rotY 0.45 / rotX 0.30 like the
   // AI-node loader. Light-mode variant: deep-plum body, warm key light.
   import * as THREE from 'https://esm.sh/three@0.160.0';
-  import { ConvexGeometry } from 'https://esm.sh/three@0.160.0/examples/jsm/geometries/ConvexGeometry.js';
 
   (function () {
     const canvas = document.getElementById('durer_canvas');
@@ -2100,12 +2099,11 @@ void main() {
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 
-    // Dürer's solid, built as the truncated triangular trapezohedron:
-    // rhombohedron with 72° acute rhombus angle, then truncated at both
-    // 3-fold apexes with a plane perpendicular to the axis. p = 1/φ
-    // puts all 12 verts on a shared circumsphere.
-    const H = Math.sqrt((3 * Math.sqrt(5) + 5) / 10);   // ≈ 1.0820
-    const P = 2.0 / (1.0 + Math.sqrt(5));               // 1/φ ≈ 0.6180
+    // Dürer's solid = truncated triangular trapezohedron. Rhombohedron
+    // with 72° acute angle (h from cos(72°) = (h²−½)/(1+h²)) then
+    // truncated at both 3-fold apexes at fraction 1/φ.
+    const H = Math.sqrt((3 * Math.sqrt(5) + 5) / 10);
+    const P = 2.0 / (1.0 + Math.sqrt(5));
     const zM = H / 2;
     const zC = H * (1.5 - P);
     const rM = 1.0;
@@ -2113,29 +2111,67 @@ void main() {
     const s60 = Math.sqrt(3) / 2;
 
     const V = [
-      new THREE.Vector3( rM,        0,       -zM),
-      new THREE.Vector3(-rM * 0.5,  rM*s60,  -zM),
-      new THREE.Vector3(-rM * 0.5, -rM*s60,  -zM),
-      new THREE.Vector3( rM * 0.5,  rM*s60,   zM),
-      new THREE.Vector3( rM * 0.5, -rM*s60,   zM),
-      new THREE.Vector3(-rM,        0,        zM),
-      new THREE.Vector3( rC * 0.5,  rC*s60,   zC),
-      new THREE.Vector3( rC * 0.5, -rC*s60,   zC),
-      new THREE.Vector3(-rC,        0,        zC),
-      new THREE.Vector3( rC,        0,       -zC),
-      new THREE.Vector3(-rC * 0.5,  rC*s60,  -zC),
-      new THREE.Vector3(-rC * 0.5, -rC*s60,  -zC),
+      [ rM,        0,       -zM],
+      [-rM * 0.5,  rM*s60,  -zM],
+      [-rM * 0.5, -rM*s60,  -zM],
+      [ rM * 0.5,  rM*s60,   zM],
+      [ rM * 0.5, -rM*s60,   zM],
+      [-rM,        0,        zM],
+      [ rC * 0.5,  rC*s60,   zC],
+      [ rC * 0.5, -rC*s60,   zC],
+      [-rC,        0,        zC],
+      [ rC,        0,       -zC],
+      [-rC * 0.5,  rC*s60,  -zC],
+      [-rC * 0.5, -rC*s60,  -zC],
     ];
 
-    const geometry = new ConvexGeometry(V);
-    geometry.computeVertexNormals();
+    const FACES = [
+      [6, 7, 8],           // top triangle
+      [9, 10, 11],         // bottom triangle
+      [6, 3, 0, 4, 7],     // 3 top pentagons
+      [8, 5, 1, 3, 6],
+      [7, 4, 2, 5, 8],
+      [9, 0, 3, 1, 10],    // 3 bottom pentagons
+      [10, 1, 5, 2, 11],
+      [11, 2, 4, 0, 9],
+    ];
+
+    const positions = [];
+    const normals = [];
+    for (const face of FACES) {
+      let verts = face.map(i => V[i]);
+      const p0 = verts[0], p1 = verts[1], p2 = verts[2];
+      const u = [p1[0]-p0[0], p1[1]-p0[1], p1[2]-p0[2]];
+      const v = [p2[0]-p0[0], p2[1]-p0[1], p2[2]-p0[2]];
+      let n = [
+        u[1]*v[2] - u[2]*v[1],
+        u[2]*v[0] - u[0]*v[2],
+        u[0]*v[1] - u[1]*v[0],
+      ];
+      if (n[0]*p0[0] + n[1]*p0[1] + n[2]*p0[2] < 0) {
+        verts = verts.slice().reverse();
+        n = [-n[0], -n[1], -n[2]];
+      }
+      const nLen = Math.hypot(n[0], n[1], n[2]) || 1;
+      n = [n[0]/nLen, n[1]/nLen, n[2]/nLen];
+
+      for (let i = 1; i < verts.length - 1; i++) {
+        for (const p of [verts[0], verts[i], verts[i+1]]) {
+          positions.push(p[0], p[1], p[2]);
+          normals.push(n[0], n[1], n[2]);
+        }
+      }
+    }
+
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    geometry.setAttribute('normal',   new THREE.Float32BufferAttribute(normals, 3));
 
     // Deep plum body — reads clearly against the paper dither field.
     const material = new THREE.MeshStandardMaterial({
       color: 0x2A2340,
       roughness: 0.5,
       metalness: 0.04,
-      flatShading: true,
     });
 
     const mesh = new THREE.Mesh(geometry, material);

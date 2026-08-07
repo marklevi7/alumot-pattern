@@ -2103,7 +2103,6 @@ void main() {
   //  loader (rotY 0.45 rad/s, rotX 0.30 rad/s).
   // ════════════════════════════════════════════════════════════════
   import * as THREE from 'https://esm.sh/three@0.160.0';
-  import { ConvexGeometry } from 'https://esm.sh/three@0.160.0/examples/jsm/geometries/ConvexGeometry.js';
 
   (function () {
     const canvas = document.getElementById('durer_canvas');
@@ -2113,55 +2112,92 @@ void main() {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 
     // ── Vertices (12) — Dürer's solid, built as the truncated triangular
-    //    trapezohedron. Recipe (Wolfram): start with a rhombohedron whose
-    //    rhombic faces have acute angle 72°, then truncate both 3-fold
-    //    apexes with a plane perpendicular to the axis.
-    //
-    //    Rhombohedron half-height h with cos(72°) = (-1/2 + h²)/(1 + h²)
-    //    gives h = √((3√5 + 5)/10) ≈ 1.0820. Truncation fraction p = 1/φ
-    //    ≈ 0.618 lands all 12 verts on a shared circumsphere.
-    //
-    //    6 middle verts (rhombohedron equator, z = ±h/2) + 3 top-cap verts
-    //    (z = h(3/2 − p)) + 3 bottom-cap verts (mirror below).
-    const H = Math.sqrt((3 * Math.sqrt(5) + 5) / 10);   // ≈ 1.0820
+    //    trapezohedron. Recipe: rhombohedron with acute rhombus angle 72°
+    //    (h = √((3√5 + 5)/10) ≈ 1.0820), then truncate both 3-fold apexes
+    //    at fraction p = 1/φ (uniquely lands all 12 verts on a shared
+    //    circumsphere).
+    const H = Math.sqrt((3 * Math.sqrt(5) + 5) / 10);   // rhombohedron edge param
     const P = 2.0 / (1.0 + Math.sqrt(5));               // 1/φ ≈ 0.6180
-    const zM = H / 2;                                   // middle-ring half-height
-    const zC = H * (1.5 - P);                           // triangle-cap half-height
-    const rM = 1.0;                                     // middle-ring radius (unit)
-    const rC = P * 1.0;                                 // top/bottom triangle radius
-    const s60 = Math.sqrt(3) / 2;                       // sin 60°
+    const zM = H / 2;
+    const zC = H * (1.5 - P);
+    const rM = 1.0;
+    const rC = P * 1.0;
+    const s60 = Math.sqrt(3) / 2;
 
+    // 6 middle verts + 3 top-cap + 3 bottom-cap = 12.
     const V = [
-      // Middle (lower) ring — z = −h/2, on 120° angles at 0°/120°/240°.
-      new THREE.Vector3( rM,        0,       -zM),  // 0  v100
-      new THREE.Vector3(-rM * 0.5,  rM*s60,  -zM),  // 1  v010
-      new THREE.Vector3(-rM * 0.5, -rM*s60,  -zM),  // 2  v001
-      // Middle (upper) ring — z = +h/2, rotated 60° from the lower ring.
-      new THREE.Vector3( rM * 0.5,  rM*s60,   zM),  // 3  v110
-      new THREE.Vector3( rM * 0.5, -rM*s60,   zM),  // 4  v101
-      new THREE.Vector3(-rM,        0,        zM),  // 5  v011
-      // Top triangle cap (truncation of top apex).
-      new THREE.Vector3( rC * 0.5,  rC*s60,   zC),  // 6  T1
-      new THREE.Vector3( rC * 0.5, -rC*s60,   zC),  // 7  T2
-      new THREE.Vector3(-rC,        0,        zC),  // 8  T3
-      // Bottom triangle cap (truncation of bottom apex).
-      new THREE.Vector3( rC,        0,       -zC),  // 9  B1
-      new THREE.Vector3(-rC * 0.5,  rC*s60,  -zC),  // 10 B2
-      new THREE.Vector3(-rC * 0.5, -rC*s60,  -zC),  // 11 B3
+      [ rM,        0,       -zM],  // 0  v100 — lower ring, angle 0°
+      [-rM * 0.5,  rM*s60,  -zM],  // 1  v010 — lower ring, angle 120°
+      [-rM * 0.5, -rM*s60,  -zM],  // 2  v001 — lower ring, angle 240°
+      [ rM * 0.5,  rM*s60,   zM],  // 3  v110 — upper ring, angle 60°
+      [ rM * 0.5, -rM*s60,   zM],  // 4  v101 — upper ring, angle 300°
+      [-rM,        0,        zM],  // 5  v011 — upper ring, angle 180°
+      [ rC * 0.5,  rC*s60,   zC],  // 6  T1 — top cap, angle 60°
+      [ rC * 0.5, -rC*s60,   zC],  // 7  T2 — top cap, angle 300°
+      [-rC,        0,        zC],  // 8  T3 — top cap, angle 180°
+      [ rC,        0,       -zC],  // 9  B1 — bot cap, angle 0°
+      [-rC * 0.5,  rC*s60,  -zC],  // 10 B2 — bot cap, angle 120°
+      [-rC * 0.5, -rC*s60,  -zC],  // 11 B3 — bot cap, angle 240°
     ];
 
-    const geometry = new ConvexGeometry(V);
-    // Per-face normals so co-planar triangles that belong to the same
-    // pentagon/triangle face share a single normal → clean flat shading,
-    // no visible seams inside each face.
-    geometry.computeVertexNormals();
+    // ── Faces (8) — 2 triangles + 6 pentagons. Each pentagon comes
+    //    from one of the 6 original rhombohedron faces after its
+    //    apex vertex was cut off. Winding is fixed to outward below.
+    const FACES = [
+      [6, 7, 8],           // top triangle (T-verts)
+      [9, 10, 11],         // bottom triangle (B-verts)
+      // 3 top pentagons — each has 2 T-verts + 2 upper-ring + 1 lower-ring
+      [6, 3, 0, 4, 7],     // T1, v110, v100, v101, T2
+      [8, 5, 1, 3, 6],     // T3, v011, v010, v110, T1
+      [7, 4, 2, 5, 8],     // T2, v101, v001, v011, T3
+      // 3 bottom pentagons — each has 2 B-verts + 2 lower-ring + 1 upper-ring
+      [9, 0, 3, 1, 10],    // B1, v100, v110, v010, B2
+      [10, 1, 5, 2, 11],   // B2, v010, v011, v001, B3
+      [11, 2, 4, 0, 9],    // B3, v001, v101, v100, B1
+    ];
+
+    // Build a duplicated-vertex geometry: each face gets its own vertex
+    // copies with a face-normal → guaranteed flat shading, no cracks.
+    const positions = [];
+    const normals = [];
+    for (const face of FACES) {
+      let verts = face.map(i => V[i]);
+      const p0 = verts[0], p1 = verts[1], p2 = verts[2];
+      const u = [p1[0]-p0[0], p1[1]-p0[1], p1[2]-p0[2]];
+      const v = [p2[0]-p0[0], p2[1]-p0[1], p2[2]-p0[2]];
+      let n = [
+        u[1]*v[2] - u[2]*v[1],
+        u[2]*v[0] - u[0]*v[2],
+        u[0]*v[1] - u[1]*v[0],
+      ];
+      // Flip winding if the normal points inward (dot with any vert < 0
+      // since the shape is centred on the origin).
+      if (n[0]*p0[0] + n[1]*p0[1] + n[2]*p0[2] < 0) {
+        verts = verts.slice().reverse();
+        n = [-n[0], -n[1], -n[2]];
+      }
+      const nLen = Math.hypot(n[0], n[1], n[2]) || 1;
+      n = [n[0]/nLen, n[1]/nLen, n[2]/nLen];
+
+      // Fan-triangulate the polygon; each triangle shares the face normal.
+      for (let i = 1; i < verts.length - 1; i++) {
+        for (const p of [verts[0], verts[i], verts[i+1]]) {
+          positions.push(p[0], p[1], p[2]);
+          normals.push(n[0], n[1], n[2]);
+        }
+      }
+    }
+
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    geometry.setAttribute('normal',   new THREE.Float32BufferAttribute(normals, 3));
 
     // Slightly warm off-white — reads clearly against the dark dither field.
+    // Per-face normals set explicitly above → no need for material.flatShading.
     const material = new THREE.MeshStandardMaterial({
       color: 0xe8e6ee,
       roughness: 0.42,
       metalness: 0.06,
-      flatShading: true,
       envMapIntensity: 0.0,
     });
 
