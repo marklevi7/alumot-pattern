@@ -2091,6 +2091,7 @@ void main() {
   // key light top-left-front, rotating rotY 0.45 / rotX 0.30 like the
   // AI-node loader. Light-mode variant: deep-plum body, warm key light.
   import * as THREE from 'https://esm.sh/three@0.160.0';
+  import { ConvexGeometry } from 'https://esm.sh/three@0.160.0/examples/jsm/geometries/ConvexGeometry.js';
 
   (function () {
     const canvas = document.getElementById('durer_canvas');
@@ -2100,74 +2101,29 @@ void main() {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 
     const V = [
-      [ 0.000,  1.000,  1.414],
-      [ 0.866, -0.500,  1.414],
-      [-0.866, -0.500,  1.414],
-      [ 0.000, -1.000, -1.414],
-      [-0.866,  0.500, -1.414],
-      [ 0.866,  0.500, -1.414],
-      [ 1.414,  0.000,  0.500],
-      [-0.707,  1.225,  0.500],
-      [-0.707, -1.225,  0.500],
-      [-1.414,  0.000, -0.500],
-      [ 0.707, -1.225, -0.500],
-      [ 0.707,  1.225, -0.500],
+      new THREE.Vector3( 0.000,  1.000,  1.414),
+      new THREE.Vector3( 0.866, -0.500,  1.414),
+      new THREE.Vector3(-0.866, -0.500,  1.414),
+      new THREE.Vector3( 0.000, -1.000, -1.414),
+      new THREE.Vector3(-0.866,  0.500, -1.414),
+      new THREE.Vector3( 0.866,  0.500, -1.414),
+      new THREE.Vector3( 1.414,  0.000,  0.500),
+      new THREE.Vector3(-0.707,  1.225,  0.500),
+      new THREE.Vector3(-0.707, -1.225,  0.500),
+      new THREE.Vector3(-1.414,  0.000, -0.500),
+      new THREE.Vector3( 0.707, -1.225, -0.500),
+      new THREE.Vector3( 0.707,  1.225, -0.500),
     ];
 
-    const FACES = [
-      [0, 1, 2],
-      [3, 4, 5],
-      [0, 2, 8, 10, 11],
-      [1, 0, 11, 5, 6],
-      [2, 1, 6, 3, 8],
-      [3, 5, 11, 0, 10],
-      [4, 3, 10, 8, 9],
-      [5, 4, 9, 2, 6],
-    ];
-
-    function signedVol(a, b, c) {
-      return (a[0]*(b[1]*c[2] - b[2]*c[1])
-            - a[1]*(b[0]*c[2] - b[2]*c[0])
-            + a[2]*(b[0]*c[1] - b[1]*c[0])) / 6.0;
-    }
-
-    const positions = [];
-    const normals = [];
-    for (const face of FACES) {
-      let verts = face.map(i => V[i]);
-      const [a, b, c] = [verts[0], verts[1], verts[2]];
-      if (signedVol(a, b, c) < 0) verts = verts.slice().reverse();
-
-      const p0 = verts[0], p1 = verts[1], p2 = verts[2];
-      const u = [p1[0]-p0[0], p1[1]-p0[1], p1[2]-p0[2]];
-      const v = [p2[0]-p0[0], p2[1]-p0[1], p2[2]-p0[2]];
-      const n = [
-        u[1]*v[2] - u[2]*v[1],
-        u[2]*v[0] - u[0]*v[2],
-        u[0]*v[1] - u[1]*v[0],
-      ];
-      const nLen = Math.hypot(n[0], n[1], n[2]) || 1;
-      n[0] /= nLen; n[1] /= nLen; n[2] /= nLen;
-
-      for (let i = 1; i < verts.length - 1; i++) {
-        const tri = [verts[0], verts[i], verts[i+1]];
-        for (const p of tri) {
-          positions.push(p[0], p[1], p[2]);
-          normals.push(n[0], n[1], n[2]);
-        }
-      }
-    }
-
-    const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-    geometry.setAttribute('normal',   new THREE.Float32BufferAttribute(normals, 3));
+    const geometry = new ConvexGeometry(V);
+    geometry.computeVertexNormals();
 
     // Deep plum body — reads clearly against the paper dither field.
     const material = new THREE.MeshStandardMaterial({
       color: 0x2A2340,
       roughness: 0.5,
       metalness: 0.04,
-      flatShading: false,
+      flatShading: true,
     });
 
     const mesh = new THREE.Mesh(geometry, material);

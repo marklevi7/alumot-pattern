@@ -2103,6 +2103,7 @@ void main() {
   //  loader (rotY 0.45 rad/s, rotX 0.30 rad/s).
   // ════════════════════════════════════════════════════════════════
   import * as THREE from 'https://esm.sh/three@0.160.0';
+  import { ConvexGeometry } from 'https://esm.sh/three@0.160.0/examples/jsm/geometries/ConvexGeometry.js';
 
   (function () {
     const canvas = document.getElementById('durer_canvas');
@@ -2111,87 +2112,37 @@ void main() {
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 
-    // ── Vertices (12) — all lie on a sphere of radius √3. ────────
+    // ── Vertices (12) — top/bottom triangle caps + upper/lower middle rings.
+    //    ConvexGeometry below computes the closed manifold hull from these
+    //    points, so we don't need to trust the polygon face list (which had
+    //    a non-manifold edge in the source spec).
     const V = [
-      [ 0.000,  1.000,  1.414],  // 0
-      [ 0.866, -0.500,  1.414],  // 1
-      [-0.866, -0.500,  1.414],  // 2
-      [ 0.000, -1.000, -1.414],  // 3
-      [-0.866,  0.500, -1.414],  // 4
-      [ 0.866,  0.500, -1.414],  // 5
-      [ 1.414,  0.000,  0.500],  // 6
-      [-0.707,  1.225,  0.500],  // 7
-      [-0.707, -1.225,  0.500],  // 8
-      [-1.414,  0.000, -0.500],  // 9
-      [ 0.707, -1.225, -0.500],  // 10
-      [ 0.707,  1.225, -0.500],  // 11
+      new THREE.Vector3( 0.000,  1.000,  1.414),  // 0
+      new THREE.Vector3( 0.866, -0.500,  1.414),  // 1
+      new THREE.Vector3(-0.866, -0.500,  1.414),  // 2
+      new THREE.Vector3( 0.000, -1.000, -1.414),  // 3
+      new THREE.Vector3(-0.866,  0.500, -1.414),  // 4
+      new THREE.Vector3( 0.866,  0.500, -1.414),  // 5
+      new THREE.Vector3( 1.414,  0.000,  0.500),  // 6
+      new THREE.Vector3(-0.707,  1.225,  0.500),  // 7
+      new THREE.Vector3(-0.707, -1.225,  0.500),  // 8
+      new THREE.Vector3(-1.414,  0.000, -0.500),  // 9
+      new THREE.Vector3( 0.707, -1.225, -0.500),  // 10
+      new THREE.Vector3( 0.707,  1.225, -0.500),  // 11
     ];
 
-    // ── Faces (8) — 2 triangles + 6 pentagons. ───────────────────
-    const FACES = [
-      [0, 1, 2],
-      [3, 4, 5],
-      [0, 2, 8, 10, 11],
-      [1, 0, 11, 5, 6],
-      [2, 1, 6, 3, 8],
-      [3, 5, 11, 0, 10],
-      [4, 3, 10, 8, 9],
-      [5, 4, 9, 2, 6],
-    ];
-
-    // Signed volume of tetrahedron (v0, v1, v2, origin). Positive when
-    // (v0, v1, v2) wound counter-clockwise as seen from outside the origin.
-    function signedVol(a, b, c) {
-      return (a[0]*(b[1]*c[2] - b[2]*c[1])
-            - a[1]*(b[0]*c[2] - b[2]*c[0])
-            + a[2]*(b[0]*c[1] - b[1]*c[0])) / 6.0;
-    }
-
-    // Build a duplicated-vertex flat-shaded geometry: each face gets
-    // its own copy of vertices with a single face-normal. Winding is
-    // fixed to point outward by testing the first triangle of each
-    // face and reversing the face-order if needed.
-    const positions = [];
-    const normals = [];
-    for (const face of FACES) {
-      let verts = face.map(i => V[i]);
-      // Test outward winding on the fan's first triangle.
-      const [a, b, c] = [verts[0], verts[1], verts[2]];
-      if (signedVol(a, b, c) < 0) verts = verts.slice().reverse();
-
-      // Face normal (any triangle of the face is coplanar).
-      const p0 = verts[0], p1 = verts[1], p2 = verts[2];
-      const u = [p1[0]-p0[0], p1[1]-p0[1], p1[2]-p0[2]];
-      const v = [p2[0]-p0[0], p2[1]-p0[1], p2[2]-p0[2]];
-      const n = [
-        u[1]*v[2] - u[2]*v[1],
-        u[2]*v[0] - u[0]*v[2],
-        u[0]*v[1] - u[1]*v[0],
-      ];
-      const nLen = Math.hypot(n[0], n[1], n[2]) || 1;
-      n[0] /= nLen; n[1] /= nLen; n[2] /= nLen;
-
-      // Fan-triangulate around verts[0], emit each triangle's 3 verts
-      // with the shared face-normal → clean flat shading, no derivatives.
-      for (let i = 1; i < verts.length - 1; i++) {
-        const tri = [verts[0], verts[i], verts[i+1]];
-        for (const p of tri) {
-          positions.push(p[0], p[1], p[2]);
-          normals.push(n[0], n[1], n[2]);
-        }
-      }
-    }
-
-    const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-    geometry.setAttribute('normal',   new THREE.Float32BufferAttribute(normals, 3));
+    const geometry = new ConvexGeometry(V);
+    // Per-face normals so co-planar triangles that belong to the same
+    // pentagon/triangle face share a single normal → clean flat shading,
+    // no visible seams inside each face.
+    geometry.computeVertexNormals();
 
     // Slightly warm off-white — reads clearly against the dark dither field.
     const material = new THREE.MeshStandardMaterial({
       color: 0xe8e6ee,
       roughness: 0.42,
       metalness: 0.06,
-      flatShading: false,   // per-face normals above already give flat shading
+      flatShading: true,
       envMapIntensity: 0.0,
     });
 
