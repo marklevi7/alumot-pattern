@@ -2092,22 +2092,14 @@ void main() {
 </script>
 
 <script type="module">
-  // Dürer's solid — truncated triangular trapezohedron. Real Three.js
-  // mesh, flat-shaded via per-face duplicated-vertex normals, opaque,
-  // key light top-left-front, rotating rotY 0.45 / rotX 0.30 like the
-  // AI-node loader. Light-mode variant: deep-plum body, warm key light.
+  // Dürer's solid, dithered SDF render. See landing.html for full comments.
+  // Light-mode variant: dark plum dots on paper background.
   import * as THREE from 'https://esm.sh/three@0.160.0';
 
   (function () {
     const canvas = document.getElementById('durer_canvas');
     if (!canvas) return;
 
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-
-    // Dürer's solid = truncated triangular trapezohedron. Rhombohedron
-    // with 72° acute angle (h from cos(72°) = (h²−½)/(1+h²)) then
-    // truncated at both 3-fold apexes at fraction 1/φ.
     const H = Math.sqrt((3 * Math.sqrt(5) + 5) / 10);
     const P = 2.0 / (1.0 + Math.sqrt(5));
     const zM = H / 2;
@@ -2132,21 +2124,19 @@ void main() {
     ];
 
     const FACES = [
-      [6, 7, 8],           // top triangle
-      [9, 10, 11],         // bottom triangle
-      [6, 3, 0, 4, 7],     // 3 top pentagons
+      [6, 7, 8],
+      [9, 10, 11],
+      [6, 3, 0, 4, 7],
       [8, 5, 1, 3, 6],
       [7, 4, 2, 5, 8],
-      [9, 0, 3, 1, 10],    // 3 bottom pentagons
+      [9, 0, 3, 1, 10],
       [10, 1, 5, 2, 11],
       [11, 2, 4, 0, 9],
     ];
 
-    const positions = [];
-    const normals = [];
-    for (const face of FACES) {
-      let verts = face.map(i => V[i]);
-      const p0 = verts[0], p1 = verts[1], p2 = verts[2];
+    const facePlanes = FACES.map(face => {
+      const verts = face.map(i => V[i]);
+      const [p0, p1, p2] = [verts[0], verts[1], verts[2]];
       const u = [p1[0]-p0[0], p1[1]-p0[1], p1[2]-p0[2]];
       const v = [p2[0]-p0[0], p2[1]-p0[1], p2[2]-p0[2]];
       let n = [
@@ -2154,57 +2144,152 @@ void main() {
         u[2]*v[0] - u[0]*v[2],
         u[0]*v[1] - u[1]*v[0],
       ];
-      if (n[0]*p0[0] + n[1]*p0[1] + n[2]*p0[2] < 0) {
-        verts = verts.slice().reverse();
-        n = [-n[0], -n[1], -n[2]];
-      }
-      const nLen = Math.hypot(n[0], n[1], n[2]) || 1;
-      n = [n[0]/nLen, n[1]/nLen, n[2]/nLen];
-
-      for (let i = 1; i < verts.length - 1; i++) {
-        for (const p of [verts[0], verts[i], verts[i+1]]) {
-          positions.push(p[0], p[1], p[2]);
-          normals.push(n[0], n[1], n[2]);
-        }
-      }
-    }
-
-    const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-    geometry.setAttribute('normal',   new THREE.Float32BufferAttribute(normals, 3));
-
-    // Deep plum body — reads clearly against the paper dither field.
-    const material = new THREE.MeshStandardMaterial({
-      color: 0x2A2340,
-      roughness: 0.5,
-      metalness: 0.04,
+      if (n[0]*p0[0] + n[1]*p0[1] + n[2]*p0[2] < 0) n = [-n[0], -n[1], -n[2]];
+      const len = Math.hypot(n[0], n[1], n[2]) || 1;
+      n = [n[0]/len, n[1]/len, n[2]/len];
+      const d = n[0]*p0[0] + n[1]*p0[1] + n[2]*p0[2];
+      return new THREE.Vector4(n[0], n[1], n[2], d);
     });
 
-    const mesh = new THREE.Mesh(geometry, material);
+    const gl = canvas.getContext('webgl2', { antialias: true, alpha: true });
+    if (!gl) return;
+    const renderer = new THREE.WebGLRenderer({ canvas, context: gl, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+
+    const VERT = `
+void main() { gl_Position = vec4(position, 1.0); }`;
+
+    const FRAG = `
+precision highp float;
+
+uniform vec2  uResolution;
+uniform float uPixelSize;
+uniform vec3  uColor;
+uniform float uTime;
+uniform vec4  uFaces[8];
+
+out vec4 fragColor;
+
+float Bayer2(vec2 a) { a = floor(a); return fract(a.x / 2.0 + a.y * a.y * 0.75); }
+#define Bayer4(a) (Bayer2(0.5*(a))*0.25 + Bayer2(a))
+#define Bayer8(a) (Bayer4(0.5*(a))*0.25 + Bayer2(a))
+
+float maskCircle(vec2 p, float cov) {
+  float r = sqrt(cov) * 0.25;
+  float d = length(p - 0.5) - r;
+  float aa = 0.5 * fwidth(d);
+  return cov * (1.0 - smoothstep(-aa, aa, d * 2.0));
+}
+
+float sdDurer(vec3 p) {
+  float d = -1e5;
+  for (int i = 0; i < 8; i++) {
+    d = max(d, dot(p, uFaces[i].xyz) - uFaces[i].w);
+  }
+  return d;
+}
+
+vec3 sdDurerNormal(vec3 p) {
+  vec2 e = vec2(0.002, 0.0);
+  return normalize(vec3(
+    sdDurer(p + e.xyy) - sdDurer(p - e.xyy),
+    sdDurer(p + e.yxy) - sdDurer(p - e.yxy),
+    sdDurer(p + e.yyx) - sdDurer(p - e.yyx)
+  ));
+}
+
+void main() {
+  vec2 fragCoord  = gl_FragCoord.xy;
+  vec2 cellId     = floor(fragCoord / uPixelSize);
+  vec2 cellCenter = (cellId + 0.5) * uPixelSize;
+  vec2 pixelUV    = fract(fragCoord / uPixelSize);
+
+  float minDim = min(uResolution.x, uResolution.y);
+  vec2 px = (cellCenter - uResolution * 0.5) / minDim;
+
+  float ay = uTime * 0.45;
+  float ax = uTime * 0.30;
+  mat3 ryMat = mat3(
+     cos(ay), 0.0, sin(ay),
+         0.0, 1.0,    0.0,
+    -sin(ay), 0.0, cos(ay));
+  mat3 rxMat = mat3(
+    1.0,      0.0,      0.0,
+    0.0,  cos(ax), -sin(ax),
+    0.0,  sin(ax),  cos(ax));
+  mat3 rot    = rxMat * ryMat;
+  mat3 invRot = transpose(rot);
+
+  float SHAPE_R = 0.32;
+  vec2 ndc = px / SHAPE_R;
+
+  float feed = 0.0;
+  if (length(ndc) < 1.6) {
+    vec3 ro = vec3(ndc, 3.0);
+    vec3 rd = vec3(0.0, 0.0, -1.0);
+    float t = 1.5;
+    bool hit = false;
+    vec3 objP = vec3(0.0);
+    for (int i = 0; i < 40; i++) {
+      vec3 worldP = ro + rd * t;
+      objP = invRot * worldP;
+      float h = sdDurer(objP);
+      if (h < 0.001) { hit = true; break; }
+      t += max(h, 0.01);
+      if (t > 5.0) break;
+    }
+    if (hit) {
+      vec3 objN = sdDurerNormal(objP);
+      vec3 N = rot * objN;
+
+      vec3 key  = normalize(vec3(-0.55, 0.75,  0.55));
+      vec3 fill = normalize(vec3( 0.55,-0.30,  0.40));
+      vec3 V    = vec3(0.0, 0.0, 1.0);
+
+      float diffKey  = max(dot(N, key),  0.0);
+      float diffFill = max(dot(N, fill), 0.0) * 0.30;
+      vec3  R        = reflect(-key, N);
+      float spec     = pow(max(dot(R, V), 0.0), 24.0) * 0.55;
+      float rim      = pow(1.0 - max(dot(N, V), 0.0), 2.5) * 0.18;
+
+      feed = 0.10 + diffKey * 0.65 + diffFill + spec + rim;
+      feed = clamp(feed, 0.0, 1.0);
+    }
+  }
+
+  float bayer = Bayer8(fragCoord / uPixelSize);
+  float on    = step(bayer, feed);
+  float M     = maskCircle(pixelUV, on);
+
+  fragColor = vec4(uColor, M);
+}`;
+
+    const uniforms = {
+      uResolution: { value: new THREE.Vector2() },
+      uPixelSize:  { value: 8 * (renderer.getPixelRatio() || 1) },
+      uColor:      { value: new THREE.Color('#1F1830') },
+      uTime:       { value: 0 },
+      uFaces:      { value: facePlanes },
+    };
+
     const scene = new THREE.Scene();
-    scene.add(mesh);
-
-    scene.add(new THREE.AmbientLight(0xffffff, 0.55));
-    const key = new THREE.DirectionalLight(0xffffff, 1.9);
-    key.position.set(-4.0, 4.5, 5.5);
-    scene.add(key);
-    const fill = new THREE.DirectionalLight(0xffffff, 0.45);
-    fill.position.set(3.0, -1.5, 2.0);
-    scene.add(fill);
-
-    const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
-    camera.position.set(0, 0, 7.0);
-    camera.lookAt(0, 0, 0);
+    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    const material = new THREE.ShaderMaterial({
+      vertexShader: VERT,
+      fragmentShader: FRAG,
+      uniforms: uniforms,
+      glslVersion: THREE.GLSL3,
+      transparent: true,
+    });
+    scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material));
 
     function resize() {
       const rect = canvas.getBoundingClientRect();
       const w = Math.max(1, Math.round(rect.width  || canvas.clientWidth  || window.innerWidth));
       const h = Math.max(1, Math.round(rect.height || canvas.clientHeight || window.innerHeight));
       renderer.setSize(w, h, false);
-      camera.aspect = w / h;
-      const scale = Math.min(1.0, h / 700);
-      mesh.scale.setScalar(1.35 * (0.85 + scale * 0.25));
-      camera.updateProjectionMatrix();
+      const dpr = renderer.getPixelRatio();
+      uniforms.uResolution.value.set(w * dpr, h * dpr);
     }
     window.addEventListener('resize', resize);
     if ('ResizeObserver' in window) new ResizeObserver(resize).observe(canvas);
@@ -2220,9 +2305,7 @@ void main() {
     const clock = new THREE.Clock();
     (function tick() {
       if (visible) {
-        const t = clock.getElapsedTime();
-        mesh.rotation.y = t * 0.45;
-        mesh.rotation.x = t * 0.30;
+        uniforms.uTime.value = clock.getElapsedTime();
         renderer.render(scene, camera);
       }
       requestAnimationFrame(tick);
