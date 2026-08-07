@@ -9,15 +9,15 @@
   <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
   <style>
     :root {
-      --bg-0: #050507;
-      --bg-1: #0b0b10;
-      --bg-2: #11121a;
-      --ink: #f3f3f5;
-      --ink-dim: #ececf2;     /* +25% on v12's #c0c0cc — high readability in sun */
-      --ink-faint: #a0a0ad;   /* +25% on v12's #6c6c78 */
-      --line: rgba(255, 255, 255, 0.12);
-      --line-strong: rgba(255, 255, 255, 0.22);
-      --accent: #ffffff;
+      --bg-0: #FAF8F4;        /* paper */
+      --bg-1: #F0EEE8;
+      --bg-2: #E8E4DC;
+      --ink: #1F1830;         /* deep plum */
+      --ink-dim: #2A2340;
+      --ink-faint: #6A6478;
+      --line: rgba(31, 24, 48, 0.12);
+      --line-strong: rgba(31, 24, 48, 0.22);
+      --accent: #1F1830;
     }
 
     * { box-sizing: border-box; }
@@ -46,8 +46,8 @@
       position: fixed;
       inset: 0;
       background:
-        radial-gradient(ellipse 80% 60% at 50% -10%, rgba(255,255,255,0.06), transparent 60%),
-        radial-gradient(ellipse 60% 40% at 50% 110%, rgba(255,255,255,0.04), transparent 60%);
+        radial-gradient(ellipse 80% 60% at 50% -10%, rgba(31,24,48,0.05), transparent 60%),
+        radial-gradient(ellipse 60% 40% at 50% 110%, rgba(31,24,48,0.04), transparent 60%);
       pointer-events: none;
       z-index: 0;
     }
@@ -136,12 +136,12 @@
       font-weight: 600;
       margin: 0 0 32px;
       max-width: 18ch;
-      color: #ffffff;
+      color: var(--ink);
     }
 
     .hero h1 em {
       font-style: normal;
-      color: #d4d4d4;
+      color: var(--ink-faint);
     }
 
     .hero .sub {
@@ -158,7 +158,7 @@
        way the text bg lines up exactly with the title and the button
        on the left side of every block. */
     .boxed {
-      background: #000000;
+      background: var(--bg-0);
       -webkit-box-decoration-break: clone;
               box-decoration-break: clone;
       padding: 0.05em 0.28em 0.05em 0;
@@ -215,15 +215,15 @@
       cursor: pointer;
       transition: transform 120ms ease, background-color 120ms ease, color 120ms ease;
 
-      /* Periodic shine — a single dark band sweeps across the
-         button once every 5s. Using background-image (not a pseudo)
-         so it stays on the safe side of iOS Safari layering. */
+      /* Periodic shine — a single light band sweeps across the
+         (dark) button once every 2.5s. Using background-image (not a
+         pseudo) so it stays on the safe side of iOS Safari layering. */
       background-color: var(--ink);
       background-image: linear-gradient(
         110deg,
         transparent 0%,
         transparent 30%,
-        rgba(0, 0, 0, 0.55) 50%,
+        rgba(255, 255, 255, 0.55) 50%,
         transparent 70%,
         transparent 100%
       );
@@ -587,7 +587,7 @@
     .banner h2 {
       margin: 0;
       max-width: 20ch;
-      color: #ffffff;
+      color: var(--ink);
       line-height: 1.15;
     }
     .banner p {
@@ -623,7 +623,7 @@
       line-height: 1.1;
       max-width: 18ch;
       margin: 0 0 24px;
-      color: #ffffff;
+      color: var(--ink);
     }
     .final p {
       color: var(--ink-dim);
@@ -851,7 +851,7 @@
       transform: rotate(0) translateY(-6.5em);
       width: 2.5em;
       height: 2.5em;
-      background: #ffffff;        /* pure-white flat ball */
+      background: #1F1830;        /* dark flat ball for light mode */
     }
     /* High-contrast rework: hide every soft shadow so the only thing
        on screen is pure black, pure white, and the rolling texture. */
@@ -866,16 +866,16 @@
       height: 100%;
       transform: translate3d(0, 0, 0);
     }
-    /* Pure black scanlines on the white ball — gives the "rolling"
-       cue with maximum contrast. */
+    /* Pure paper scanlines on the dark ball — gives the "rolling"
+       cue with maximum contrast in light mode. */
     .snowball-loader .pl__ball-texture::before {
       animation-name: ballTexture;
       animation-duration: 0.25s;
       background:
         repeating-linear-gradient(
           90deg,
-          #000 0,
-          #000 1.5px,
+          #FAF8F4 0,
+          #FAF8F4 1.5px,
           transparent 1.5px,
           transparent 5px
         );
@@ -886,9 +886,9 @@
       width: 200%;
       height: 100%;
     }
-    /* Crisp 1.5px white outlines for both rings — no glows, no bevels. */
+    /* Crisp 1.5px dark outlines for both rings — no glows, no bevels. */
     .snowball-loader .pl__inner-ring {
-      border: 1.5px solid #ffffff;
+      border: 1.5px solid #1F1830;
       box-shadow: none;
       top: 2.375em;
       left: 2.375em;
@@ -896,7 +896,7 @@
       height: calc(100% - 4.75em);
     }
     .snowball-loader .pl__outer-ring {
-      border: 1.5px solid #ffffff;
+      border: 1.5px solid #1F1830;
       box-shadow: none;
       top: 0.75em;
       left: 0.75em;
@@ -907,7 +907,7 @@
       animation-name: trackCover;
       /* Solid page-bg conic mask — keeps the "ball appears from behind
          the front of the track" illusion sharp. */
-      background-image: conic-gradient(#050507 210deg, hsla(0, 0%, 0%, 0) 270deg);
+      background-image: conic-gradient(#FAF8F4 210deg, hsla(0, 0%, 0%, 0) 270deg);
       top: 0;
       left: 0;
       width: 100%;
@@ -939,10 +939,10 @@
 </head>
 <body>
 
-<!-- Fixed theme-switch pill top-right. Links to the light-mode twin. -->
-<a class="theme-toggle" href="landing-light.html" aria-label="Switch to light mode">
-  <span class="glyph" aria-hidden="true">☀</span>
-  <span>Light</span>
+<!-- Fixed theme-switch pill top-right. Links back to the dark twin. -->
+<a class="theme-toggle" href="landing.html" aria-label="Switch to dark mode">
+  <span class="glyph" aria-hidden="true">☾</span>
+  <span>Dark</span>
 </a>
 
 <main>
@@ -971,7 +971,7 @@
          as the visual "floor" for the manifesto copy above it. -->
     <div id="wave_dither_canvas"
          data-pixel-size="4"
-         data-ink="#ffffff"></div>
+         data-ink="#1F1830"></div>
   </section>
 
   <!-- ─── SCOREBOARD ───────────────────────────────────────────── -->
@@ -1061,7 +1061,7 @@
          flowing in and out along satellite links. -->
     <div id="ai_node_canvas"
          data-pixel-size="4"
-         data-ink="#ffffff"></div>
+         data-ink="#1F1830"></div>
   </section>
 
   <!-- ─── 7 EMPLOYEES (accordion) ──────────────────────────────── -->
@@ -1182,7 +1182,7 @@
               <g>
                 <line x1="32" y1="14" x2="32" y2="18"/>
                 <circle cx="32" cy="13" r="1" fill="currentColor" stroke="none"/>
-                <rect x="22" y="20" width="20" height="20" rx="3" fill="#000"/>
+                <rect x="22" y="20" width="20" height="20" rx="3" fill="#FAF8F4"/>
                 <circle cx="28" cy="29" r="1.6" fill="currentColor" stroke="none"/>
                 <circle cx="36" cy="29" r="1.6" fill="currentColor" stroke="none"/>
                 <!-- Jump physics: fast lift-off (ease-out), apex hang,
@@ -1209,7 +1209,7 @@
               <g>
                 <line x1="18" y1="14" x2="18" y2="18"/>
                 <circle cx="18" cy="13" r="1" fill="currentColor" stroke="none"/>
-                <rect x="8" y="20" width="20" height="20" rx="3" fill="#000"/>
+                <rect x="8" y="20" width="20" height="20" rx="3" fill="#FAF8F4"/>
                 <circle cx="14" cy="29" r="1.4" fill="currentColor" stroke="none"/>
                 <circle cx="22" cy="29" r="1.4" fill="currentColor" stroke="none"/>
                 <animateTransform attributeName="transform" type="translate"
@@ -1220,7 +1220,7 @@
               <g>
                 <line x1="46" y1="14" x2="46" y2="18"/>
                 <circle cx="46" cy="13" r="1" fill="currentColor" stroke="none"/>
-                <rect x="36" y="20" width="20" height="20" rx="3" fill="#000"/>
+                <rect x="36" y="20" width="20" height="20" rx="3" fill="#FAF8F4"/>
                 <circle cx="42" cy="29" r="1.4" fill="currentColor" stroke="none"/>
                 <circle cx="50" cy="29" r="1.4" fill="currentColor" stroke="none"/>
                 <animateTransform attributeName="transform" type="translate"
@@ -1261,19 +1261,19 @@
               </line>
 
               <!-- Four bots in the corners. Black fill so they sit cleanly above lines. -->
-              <rect x="4"  y="4"  width="20" height="20" rx="3" fill="#000"/>
+              <rect x="4"  y="4"  width="20" height="20" rx="3" fill="#FAF8F4"/>
               <circle cx="10" cy="12" r="1.3" fill="currentColor" stroke="none"/>
               <circle cx="18" cy="12" r="1.3" fill="currentColor" stroke="none"/>
 
-              <rect x="40" y="4"  width="20" height="20" rx="3" fill="#000"/>
+              <rect x="40" y="4"  width="20" height="20" rx="3" fill="#FAF8F4"/>
               <circle cx="46" cy="12" r="1.3" fill="currentColor" stroke="none"/>
               <circle cx="54" cy="12" r="1.3" fill="currentColor" stroke="none"/>
 
-              <rect x="4"  y="40" width="20" height="20" rx="3" fill="#000"/>
+              <rect x="4"  y="40" width="20" height="20" rx="3" fill="#FAF8F4"/>
               <circle cx="10" cy="48" r="1.3" fill="currentColor" stroke="none"/>
               <circle cx="18" cy="48" r="1.3" fill="currentColor" stroke="none"/>
 
-              <rect x="40" y="40" width="20" height="20" rx="3" fill="#000"/>
+              <rect x="40" y="40" width="20" height="20" rx="3" fill="#FAF8F4"/>
               <circle cx="46" cy="48" r="1.3" fill="currentColor" stroke="none"/>
               <circle cx="54" cy="48" r="1.3" fill="currentColor" stroke="none"/>
             </svg>
@@ -1406,8 +1406,8 @@
   const DITHER_CONFIG = {
     // Shared across all three instances. Change one — change all three.
     shape:       'circle',   // 'circle' | 'square' | 'triangle' | 'diamond'
-    inkColor:    '#ffffff',  // dot color
-    bgColor:     '#050507',  // backdrop behind the dots
+    inkColor:    '#1F1830',  // dot color (dark ink for light mode)
+    bgColor:     '#FAF8F4',  // paper backdrop behind the dots
     pixelSize:   4,          // dot size in CSS pixels (multiplied by DPR internally so the visual size is consistent across devices)
     fbmSpeed:    0.05,       // how fast the cloud-noise pattern drifts
     rippleSpeed: 0.30,       // how fast tap/auto ripples spread
