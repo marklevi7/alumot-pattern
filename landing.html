@@ -93,6 +93,31 @@
       height: 100% !important;
     }
 
+    /* ─── INTRO (top of page, before hero) ────────────────────── */
+    /* Full-viewport block. Dither pattern in the deep background,
+       Dürer's solid raymeshed via Three.js sitting on top of it,
+       rotating with the same rotY 0.45 / rotX 0.30 cadence as the
+       AI-node loader below. Key light from top-left-front. */
+    .intro {
+      min-height: 100vh;
+      min-height: 100svh;
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .durer-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      display: block;
+      pointer-events: none;
+    }
+
     /* ─── HERO ─────────────────────────────────────────────────── */
     .hero {
       min-height: 100vh;
@@ -947,6 +972,15 @@
 
 <main>
 
+  <!-- ─── INTRO ────────────────────────────────────────────────── -->
+  <!-- Full-viewport block. Dither pattern in the deep background,
+       Dürer's solid (truncated triangular trapezohedron) sitting on
+       top of it, opaque, flat-shaded, key light top-left-front. -->
+  <section class="intro">
+    <div class="dither-bg" data-preset="intro"></div>
+    <canvas id="durer_canvas" class="durer-canvas" aria-hidden="true"></canvas>
+  </section>
+
   <!-- ─── HERO ─────────────────────────────────────────────────── -->
   <section class="hero">
     <div id="hero_bg" class="dither-bg" data-preset="hero"></div>
@@ -1419,6 +1453,7 @@
     //   flowY         : upward drift speed of the pattern (0 = static)
     //   gradientY     : extra density at the bottom (0 = uniform, 1 = strong gradient)
     presets: {
+      intro:  { density: 0.10, autoRippleMs: 4500, flowY: 0.02, gradientY: 0.06 },
       hero:   { density: 0.0,  autoRippleMs: 5000, flowY: 0.00, gradientY: 0.00 },
       banner: { density: 0.45, autoRippleMs: 3500, flowY: 0.00, gradientY: 0.00 },
       final:  { density: 0.20, autoRippleMs: 3500, flowY: 0.04, gradientY: 0.10 },
@@ -2050,6 +2085,165 @@ void main() {
     (function tick() {
       if (visible) {
         uniforms.uTime.value = clock.getElapsedTime();
+        renderer.render(scene, camera);
+      }
+      requestAnimationFrame(tick);
+    })();
+  })();
+</script>
+
+<script type="module">
+  // ════════════════════════════════════════════════════════════════
+  //  DÜRER'S SOLID — truncated triangular trapezohedron.
+  //  12 vertices on a shared circumsphere. 8 faces: 2 equilateral
+  //  triangle caps + 6 elongated irregular pentagon sides.
+  //  Rendered as a real Three.js mesh (not raymarched), flat-shaded,
+  //  opaque, well-lit — key light from top-left-front, soft fill from
+  //  the opposite corner. Rotates on the same cadence as the AI-node
+  //  loader (rotY 0.45 rad/s, rotX 0.30 rad/s).
+  // ════════════════════════════════════════════════════════════════
+  import * as THREE from 'https://esm.sh/three@0.160.0';
+
+  (function () {
+    const canvas = document.getElementById('durer_canvas');
+    if (!canvas) return;
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+
+    // ── Vertices (12) — all lie on a sphere of radius √3. ────────
+    const V = [
+      [ 0.000,  1.000,  1.414],  // 0
+      [ 0.866, -0.500,  1.414],  // 1
+      [-0.866, -0.500,  1.414],  // 2
+      [ 0.000, -1.000, -1.414],  // 3
+      [-0.866,  0.500, -1.414],  // 4
+      [ 0.866,  0.500, -1.414],  // 5
+      [ 1.414,  0.000,  0.500],  // 6
+      [-0.707,  1.225,  0.500],  // 7
+      [-0.707, -1.225,  0.500],  // 8
+      [-1.414,  0.000, -0.500],  // 9
+      [ 0.707, -1.225, -0.500],  // 10
+      [ 0.707,  1.225, -0.500],  // 11
+    ];
+
+    // ── Faces (8) — 2 triangles + 6 pentagons. ───────────────────
+    const FACES = [
+      [0, 1, 2],
+      [3, 4, 5],
+      [0, 2, 8, 10, 11],
+      [1, 0, 11, 5, 6],
+      [2, 1, 6, 3, 8],
+      [3, 5, 11, 0, 10],
+      [4, 3, 10, 8, 9],
+      [5, 4, 9, 2, 6],
+    ];
+
+    // Signed volume of tetrahedron (v0, v1, v2, origin). Positive when
+    // (v0, v1, v2) wound counter-clockwise as seen from outside the origin.
+    function signedVol(a, b, c) {
+      return (a[0]*(b[1]*c[2] - b[2]*c[1])
+            - a[1]*(b[0]*c[2] - b[2]*c[0])
+            + a[2]*(b[0]*c[1] - b[1]*c[0])) / 6.0;
+    }
+
+    // Build a duplicated-vertex flat-shaded geometry: each face gets
+    // its own copy of vertices with a single face-normal. Winding is
+    // fixed to point outward by testing the first triangle of each
+    // face and reversing the face-order if needed.
+    const positions = [];
+    const normals = [];
+    for (const face of FACES) {
+      let verts = face.map(i => V[i]);
+      // Test outward winding on the fan's first triangle.
+      const [a, b, c] = [verts[0], verts[1], verts[2]];
+      if (signedVol(a, b, c) < 0) verts = verts.slice().reverse();
+
+      // Face normal (any triangle of the face is coplanar).
+      const p0 = verts[0], p1 = verts[1], p2 = verts[2];
+      const u = [p1[0]-p0[0], p1[1]-p0[1], p1[2]-p0[2]];
+      const v = [p2[0]-p0[0], p2[1]-p0[1], p2[2]-p0[2]];
+      const n = [
+        u[1]*v[2] - u[2]*v[1],
+        u[2]*v[0] - u[0]*v[2],
+        u[0]*v[1] - u[1]*v[0],
+      ];
+      const nLen = Math.hypot(n[0], n[1], n[2]) || 1;
+      n[0] /= nLen; n[1] /= nLen; n[2] /= nLen;
+
+      // Fan-triangulate around verts[0], emit each triangle's 3 verts
+      // with the shared face-normal → clean flat shading, no derivatives.
+      for (let i = 1; i < verts.length - 1; i++) {
+        const tri = [verts[0], verts[i], verts[i+1]];
+        for (const p of tri) {
+          positions.push(p[0], p[1], p[2]);
+          normals.push(n[0], n[1], n[2]);
+        }
+      }
+    }
+
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    geometry.setAttribute('normal',   new THREE.Float32BufferAttribute(normals, 3));
+
+    // Slightly warm off-white — reads clearly against the dark dither field.
+    const material = new THREE.MeshStandardMaterial({
+      color: 0xe8e6ee,
+      roughness: 0.42,
+      metalness: 0.06,
+      flatShading: false,   // per-face normals above already give flat shading
+      envMapIntensity: 0.0,
+    });
+
+    const mesh = new THREE.Mesh(geometry, material);
+    const scene = new THREE.Scene();
+    scene.add(mesh);
+
+    // Lighting: ambient floor + strong key from top-left-front + soft
+    // fill from bottom-right for a shaded but never-black look.
+    scene.add(new THREE.AmbientLight(0xffffff, 0.32));
+    const key = new THREE.DirectionalLight(0xffffff, 1.55);
+    key.position.set(-4.0, 4.5, 5.5);
+    scene.add(key);
+    const fill = new THREE.DirectionalLight(0xffffff, 0.32);
+    fill.position.set(3.0, -1.5, 2.0);
+    scene.add(fill);
+
+    // Camera pulled back so the solid sits centred and ~45% of the
+    // vertical viewport at desktop, ~35% on tall/narrow.
+    const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
+    camera.position.set(0, 0, 7.0);
+    camera.lookAt(0, 0, 0);
+
+    function resize() {
+      const rect = canvas.getBoundingClientRect();
+      const w = Math.max(1, Math.round(rect.width  || canvas.clientWidth  || window.innerWidth));
+      const h = Math.max(1, Math.round(rect.height || canvas.clientHeight || window.innerHeight));
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      // Scale the shape mildly so it stays visually similar across aspects.
+      const scale = Math.min(1.0, h / 700);
+      mesh.scale.setScalar(0.85 * (0.85 + scale * 0.25));
+      camera.updateProjectionMatrix();
+    }
+    window.addEventListener('resize', resize);
+    if ('ResizeObserver' in window) new ResizeObserver(resize).observe(canvas);
+    resize();
+
+    // Pause render loop when the intro block scrolls off-screen.
+    let visible = true;
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver((entries) => {
+        visible = entries[0].isIntersecting;
+      }, { threshold: 0 }).observe(canvas);
+    }
+
+    const clock = new THREE.Clock();
+    (function tick() {
+      if (visible) {
+        const t = clock.getElapsedTime();
+        mesh.rotation.y = t * 0.45;
+        mesh.rotation.x = t * 0.30;
         renderer.render(scene, camera);
       }
       requestAnimationFrame(tick);
